@@ -835,7 +835,8 @@
           submitBtn.innerHTML = '<i class="fas fa-check" style="margin-right:8px;"></i> Create Account';
         });
       });
-      
+
+// ----- LOGIN: Now uses fetch with format=json -----
 loginForm.addEventListener('submit', function(e) {
   e.preventDefault();
 
@@ -849,37 +850,43 @@ loginForm.addEventListener('submit', function(e) {
   }
 
   errorEl.classList.remove('show');
+  
+  const submitBtn = document.getElementById('loginSubmitBtn');
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
 
-  // Use fetch instead of redirect
-  const loginUrl = SCRIPT_URL + '?action=login&mobile=' + encodeURIComponent(mobile) + '&password=' + encodeURIComponent(password);
+  // Add format=json parameter to get JSON response
+  const loginUrl = SCRIPT_URL + '?action=login&mobile=' + encodeURIComponent(mobile) + '&password=' + encodeURIComponent(password) + '&format=json';
 
   fetch(loginUrl)
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      return response.json(); // Assuming your script returns JSON
+      return response.json();
     })
     .then(data => {
       if (data.success) {
-        // SUCCESS: Redirect to your specific site
-        window.location.href = 'https://your-specific-site.com/dashboard'; // Change this to your URL
+        // SUCCESS: Redirect to the URL from the sheet
+        const redirectUrl = data.redirectUrl || 'https://example.com/dashboard';
+        window.location.href = redirectUrl;
       } else {
-        // FAILURE: Show the popup error message
+        // FAILURE: Show error in popup
         errorEl.textContent = data.message || 'Invalid mobile number or password. Please try again.';
         errorEl.classList.add('show');
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-sign-in-alt" style="margin-right:8px;"></i> Login';
       }
     })
     .catch(error => {
       console.error('Login error:', error);
-      errorEl.textContent = 'Login failed. Please try again.';
+      errorEl.textContent = 'Login failed. Please check your connection and try again.';
       errorEl.classList.add('show');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-sign-in-alt" style="margin-right:8px;"></i> Login';
     });
 });
-      // ----- LOGIN: Redirect to AppScript for verification (AVOIDS CORS) -----
-
-
-    })();
   </script>
 </body>
 </html>
