@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -502,7 +501,7 @@
     </div>
   </div>
 
-  <!-- LOGIN POPUP (with 3 attempts & inline error) -->
+  <!-- LOGIN POPUP -->
   <div class="popup-overlay" id="loginPopup">
     <div class="popup">
       <button class="popup-close" id="closeLoginBtn"><i class="fas fa-times"></i></button>
@@ -683,7 +682,7 @@
         openConfirmPopup();
       });
 
-      // ----- SIGNUP: Step 3 -----
+      // ----- SIGNUP: Step 3 (FIXED) -----
       confirmForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const confirmPassword = document.getElementById('userConfirmPassword').value;
@@ -693,40 +692,47 @@
           return;
         }
         errorEl.classList.remove('show');
-        const payload = {
-          name: userData.name,
-          mobile: userData.mobile,
-          email: userData.email,
-          password: tempPassword,
-          timestamp: new Date().toISOString()
-        };
+        
         const submitBtn = confirmForm.querySelector('.submit-btn');
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
-        fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        })
-        .then(() => {
-          closeConfirmPopup();
-          openSuccessPopup();
-          userData = {};
-          tempPassword = '';
-          form.reset();
-        })
-        .catch(err => {
-          console.error('Submission error:', err);
-          alert('⚠️ Something went wrong. Please try again later.');
-        })
-        .finally(() => {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = '<i class="fas fa-check" style="margin-right:8px;"></i> Create Account';
-        });
+        
+        // Build URL with action=register
+        const registerUrl = SCRIPT_URL + 
+          '?action=register' +
+          '&name=' + encodeURIComponent(userData.name) +
+          '&mobile=' + encodeURIComponent(userData.mobile) +
+          '&email=' + encodeURIComponent(userData.email) +
+          '&password=' + encodeURIComponent(tempPassword) +
+          '&format=json';
+        
+        fetch(registerUrl)
+          .then(response => {
+            if (!response.ok) throw new Error('Network error');
+            return response.json();
+          })
+          .then(data => {
+            if (data.success) {
+              closeConfirmPopup();
+              openSuccessPopup();
+              userData = {};
+              tempPassword = '';
+              form.reset();
+            } else {
+              alert('Registration failed: ' + (data.message || 'Unknown error'));
+            }
+          })
+          .catch(err => {
+            console.error('Registration error:', err);
+            alert('⚠️ Could not connect to server. Please try again later.');
+          })
+          .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-check" style="margin-right:8px;"></i> Create Account';
+          });
       });
 
-      // ----- LOGIN: Direct fetch to AppScript (avoids redirect, handles attempts) -----
+      // ----- LOGIN (FIXED) -----
       loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -738,31 +744,32 @@
           return;
         }
 
-        // Check attempts
         if (loginAttempts <= 0) {
-          alert('Too many failed attempts. Please try again later or reset your password.');
+          alert('Too many failed attempts. Please try again later.');
           return;
         }
 
-        // Hide previous error
         loginError.classList.add('hidden');
 
-        // Build verification URL (no redirect)
-        const verifyUrl = SCRIPT_URL + '?action=login&mobile=' + encodeURIComponent(mobile) + '&password=' + encodeURIComponent(password) + '&redirect=false';
+        // Build login URL with action=login and format=json
+        const loginUrl = SCRIPT_URL + 
+          '?action=login' +
+          '&mobile=' + encodeURIComponent(mobile) +
+          '&password=' + encodeURIComponent(password) +
+          '&format=json';
 
-        // Disable button
         const submitBtn = document.getElementById('loginSubmitBtn');
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
 
-        fetch(verifyUrl)
+        fetch(loginUrl)
           .then(response => {
             if (!response.ok) throw new Error('Network error');
             return response.json();
           })
           .then(data => {
             if (data.success === true) {
-              // Login success: redirect to the URL from AppScript
+              // Login success
               const redirectUrl = data.redirectUrl || 'https://example.com/dashboard';
               window.location.href = redirectUrl;
             } else {
@@ -770,10 +777,12 @@
               loginAttempts--;
               attemptsSpan.textContent = loginAttempts;
               loginError.classList.remove('hidden');
-              // Update error message
+              
               let msg = 'Invalid credentials.';
               if (data.status === 'pending') msg = 'Account pending approval.';
               else if (data.status === 'blocked') msg = 'Account blocked. Contact support.';
+              else if (data.message) msg = data.message;
+              
               loginError.textContent = msg + ' Attempts left: ' + loginAttempts;
               
               if (loginAttempts <= 0) {
