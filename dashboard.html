@@ -4,18 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>Dashboard · secure</title>
-    <!-- Font & Icons (professional clean look) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #f4f7fc;
@@ -26,28 +20,20 @@
             padding: 1.5rem;
             margin: 0;
         }
-
-        /* main card – professional, responsive, mobile-first */
         .dashboard-card {
             max-width: 820px;
             width: 100%;
             background: #ffffff;
             border-radius: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 8px 20px -8px rgba(0, 20, 40, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15), 0 8px 20px -8px rgba(0,20,40,0.08);
             padding: 2rem 2.2rem;
             transition: all 0.2s ease;
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255,255,255,0.5);
             backdrop-filter: blur(2px);
         }
-
         @media (max-width: 480px) {
-            .dashboard-card {
-                padding: 1.5rem 1.2rem;
-                border-radius: 28px;
-            }
+            .dashboard-card { padding: 1.5rem 1.2rem; border-radius: 28px; }
         }
-
-        /* header */
         .dashboard-header {
             display: flex;
             justify-content: space-between;
@@ -57,13 +43,11 @@
             border-bottom: 1px solid #eef2f6;
             padding-bottom: 1.2rem;
         }
-
         .brand {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-
         .brand i {
             font-size: 1.8rem;
             color: #2563eb;
@@ -71,14 +55,12 @@
             padding: 10px;
             border-radius: 16px;
         }
-
         .brand h2 {
             font-weight: 700;
             font-size: 1.5rem;
             letter-spacing: -0.3px;
             color: #0b1a33;
         }
-
         .badge-secret {
             background: #eef2ff;
             color: #2563eb;
@@ -91,8 +73,6 @@
             gap: 6px;
             border: 1px solid #d9e3f5;
         }
-
-        /* user info row (name + mobile) */
         .user-identity {
             display: flex;
             flex-wrap: wrap;
@@ -104,14 +84,12 @@
             margin-bottom: 1.8rem;
             border: 1px solid #e9edf4;
         }
-
         .user-name h3 {
             font-weight: 700;
             font-size: 1.5rem;
             color: #0b1a33;
             letter-spacing: -0.2px;
         }
-
         .user-name .mobile {
             font-weight: 500;
             color: #3b4d66;
@@ -122,7 +100,6 @@
             border-radius: 40px;
             display: inline-block;
         }
-
         .user-email {
             color: #4a5c77;
             font-size: 0.9rem;
@@ -131,15 +108,12 @@
             border-radius: 40px;
             border: 1px solid #dce3ec;
         }
-
-        /* stats grid — 3 columns */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 1rem;
             margin: 1.8rem 0 2rem;
         }
-
         .stat-item {
             background: #fafcff;
             border-radius: 24px;
@@ -148,7 +122,6 @@
             border: 1px solid #eaf0f6;
             transition: 0.1s ease;
         }
-
         .stat-item .label {
             font-size: 0.7rem;
             text-transform: uppercase;
@@ -156,7 +129,6 @@
             color: #6a7e9c;
             font-weight: 600;
         }
-
         .stat-item .value {
             font-weight: 700;
             font-size: 1.7rem;
@@ -164,24 +136,17 @@
             margin-top: 0.2rem;
             letter-spacing: -0.3px;
         }
-
         .stat-item .value small {
             font-weight: 500;
             font-size: 0.9rem;
             color: #4d6a8f;
             margin-left: 2px;
         }
-
         .stat-item.highlight {
             background: #eef4ff;
             border-color: #cdddfa;
         }
-
-        .stat-item.highlight .value {
-            color: #1d4ed8;
-        }
-
-        /* last login */
+        .stat-item.highlight .value { color: #1d4ed8; }
         .last-login {
             background: #f2f6fd;
             border-radius: 40px;
@@ -194,12 +159,7 @@
             border: 1px solid #dce7f5;
             margin-bottom: 2rem;
         }
-
-        .last-login i {
-            color: #3b6bc4;
-        }
-
-        /* action row: withdraw + logout */
+        .last-login i { color: #3b6bc4; }
         .action-row {
             display: flex;
             flex-wrap: wrap;
@@ -210,13 +170,11 @@
             border-top: 1px solid #e9eff6;
             padding-top: 1.8rem;
         }
-
         .btn-group {
             display: flex;
             flex-wrap: wrap;
             gap: 0.8rem;
         }
-
         .btn {
             border: none;
             font-weight: 600;
@@ -234,55 +192,40 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             font-family: 'Inter', sans-serif;
         }
-
         .btn-primary {
             background: #1d4ed8;
             border: 1px solid #1d4ed8;
             color: white;
-            box-shadow: 0 8px 14px -8px rgba(29, 78, 216, 0.3);
+            box-shadow: 0 8px 14px -8px rgba(29,78,216,0.3);
         }
-
-        .btn-primary i {
-            color: white;
-        }
-
+        .btn-primary i { color: white; }
         .btn-primary:hover {
             background: #1a40b0;
             border-color: #1a40b0;
             transform: scale(1.01);
         }
-
         .btn-outline {
             background: transparent;
             border: 1px solid #d0ddea;
         }
-
         .btn-outline:hover {
             background: #f0f4fe;
             border-color: #b0c4e0;
         }
-
         .btn-danger-outline {
             border: 1px solid #f1d8dc;
             color: #a43747;
             background: #fff6f7;
         }
-
         .btn-danger-outline:hover {
             background: #fee9ec;
             border-color: #e6b6be;
         }
-
         .btn i {
             font-size: 1rem;
             color: #3f5b81;
         }
-
-        .btn-primary i {
-            color: white;
-        }
-
-        /* secret code chip */
+        .btn-primary i { color: white; }
         .secret-chip {
             background: #e6edf8;
             padding: 0.3rem 1.2rem;
@@ -293,45 +236,18 @@
             color: #1e3b66;
             border: 1px dashed #9db6d9;
         }
-
-        /* responsive */
         @media (max-width: 600px) {
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 0.7rem;
-            }
-            .stat-item .value {
-                font-size: 1.4rem;
-            }
-            .user-identity {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-            .user-email {
-                margin-left: 0;
-            }
-            .action-row {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .btn-group {
-                justify-content: center;
-            }
-            .btn {
-                justify-content: center;
-                padding: 0.7rem 1.2rem;
-                flex: 1;
-            }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+            .stat-item .value { font-size: 1.4rem; }
+            .user-identity { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+            .user-email { margin-left: 0; }
+            .action-row { flex-direction: column; align-items: stretch; }
+            .btn-group { justify-content: center; }
+            .btn { justify-content: center; padding: 0.7rem 1.2rem; flex: 1; }
         }
-
         @media (max-width: 420px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
+            .stats-grid { grid-template-columns: 1fr; }
         }
-
-        /* redirect hint (tiny) */
         .footnote {
             margin-top: 2rem;
             text-align: center;
@@ -340,19 +256,40 @@
             border-top: 1px solid #eef3f9;
             padding-top: 1.2rem;
         }
-
-        .footnote i {
-            margin-right: 6px;
+        .footnote i { margin-right: 6px; }
+        .hidden { display: none; }
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 1.2rem;
+            color: #1d4ed8;
+            font-weight: 500;
         }
-        .hidden {
-            display: none;
+        .spinner {
+            width: 28px;
+            height: 28px;
+            border: 4px solid #e0e7ff;
+            border-top: 4px solid #1d4ed8;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .error-message {
+            background: #fee9ec;
+            color: #a43747;
+            padding: 1rem 1.5rem;
+            border-radius: 30px;
+            border: 1px solid #f5d0d6;
+            text-align: center;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
 
 <div class="dashboard-card" id="dashboardMain">
-    <!-- header -->
     <div class="dashboard-header">
         <div class="brand">
             <i class="fas fa-layer-group"></i>
@@ -363,50 +300,54 @@
         </div>
     </div>
 
-    <!-- user identity -->
-    <div class="user-identity">
-        <div class="user-name">
-            <span id="userNameDisplay">Alex Rivera</span>
-            <span class="mobile" id="userMobileDisplay"><i class="fas fa-phone-alt" style="margin-right: 4px;"></i>+1 234 567 890</span>
-        </div>
-        <div class="user-email" id="userEmailDisplay"><i class="far fa-envelope"></i> alex.r@example.com</div>
+    <div id="loadingIndicator" class="loading-spinner hidden">
+        <div class="spinner"></div>
+        <span>Fetching secure data...</span>
     </div>
 
-    <!-- last login -->
-    <div class="last-login">
-        <i class="fas fa-clock"></i> 
-        <span>Last login: </span> 
-        <strong id="lastLoginDisplay">2026-06-24 14:32</strong>
+    <div id="errorContainer" class="error-message hidden"></div>
+
+    <div id="dashboardContent">
+        <div class="user-identity">
+            <div class="user-name">
+                <span id="userNameDisplay">—</span>
+                <span class="mobile" id="userMobileDisplay"><i class="fas fa-phone-alt" style="margin-right: 4px;"></i>—</span>
+            </div>
+            <div class="user-email" id="userEmailDisplay"><i class="far fa-envelope"></i> —</div>
+        </div>
+
+        <div class="last-login">
+            <i class="fas fa-clock"></i> 
+            <span>Last login: </span> 
+            <strong id="lastLoginDisplay">—</strong>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-item highlight">
+                <div class="label"><i class="fas fa-wallet"></i> Total earning</div>
+                <div class="value" id="totalEarningDisplay">$0</div>
+            </div>
+            <div class="stat-item">
+                <div class="label"><i class="fas fa-hand-holding-usd"></i> Withdrawed</div>
+                <div class="value" id="withdrawedDisplay">$0</div>
+            </div>
+            <div class="stat-item">
+                <div class="label"><i class="fas fa-piggy-bank"></i> Balance</div>
+                <div class="value" id="balanceDisplay">$0</div>
+            </div>
+        </div>
+
+        <div class="action-row">
+            <div class="btn-group">
+                <button class="btn btn-primary" id="withdrawBtn"><i class="fas fa-arrow-up-right-from-square"></i> Withdraw</button>
+                <button class="btn btn-outline" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+            <div class="secret-chip" id="secretChip">
+                <i class="fas fa-key"></i> SECRET: <span id="secretCodeChip">—</span>
+            </div>
+        </div>
     </div>
 
-    <!-- stats: total earning, withdrawed, balance -->
-    <div class="stats-grid">
-        <div class="stat-item highlight">
-            <div class="label"><i class="fas fa-wallet"></i> Total earning</div>
-            <div class="value" id="totalEarningDisplay">$4,250</div>
-        </div>
-        <div class="stat-item">
-            <div class="label"><i class="fas fa-hand-holding-usd"></i> Withdrawed</div>
-            <div class="value" id="withdrawedDisplay">$2,100</div>
-        </div>
-        <div class="stat-item">
-            <div class="label"><i class="fas fa-piggy-bank"></i> Balance</div>
-            <div class="value" id="balanceDisplay">$2,150</div>
-        </div>
-    </div>
-
-    <!-- actions: withdraw + logout -->
-    <div class="action-row">
-        <div class="btn-group">
-            <button class="btn btn-primary" id="withdrawBtn"><i class="fas fa-arrow-up-right-from-square"></i> Withdraw</button>
-            <button class="btn btn-outline" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
-        </div>
-        <div class="secret-chip" id="secretChip">
-            <i class="fas fa-key"></i> SECRET: <span id="secretCodeChip">C0D3</span>
-        </div>
-    </div>
-
-    <!-- footnote -->
     <div class="footnote">
         <i class="fas fa-shield-alt"></i> secured · dashboard v2.0
     </div>
@@ -414,52 +355,11 @@
 
 <script>
     (function() {
-        // -------- DATASHEET (rows) --------
-        // Each row: secretCode, name, mobile, email (optional), lastLogin, totalEarning, withdrawed, balance
-        const sheetData = [
-            {
-                secret: "ALPHA-007",
-                name: "Alex Rivera",
-                mobile: "+1 234 567 890",
-                email: "alex.r@example.com",
-                lastLogin: "2026-06-25 09:12",
-                totalEarning: 4250,
-                withdrawed: 2100,
-                balance: 2150
-            },
-            {
-                secret: "BRAVO-882",
-                name: "Jamie L. Chen",
-                mobile: "+44 7700 900123",
-                email: "jamie.c@work.co",
-                lastLogin: "2026-06-24 22:05",
-                totalEarning: 7850,
-                withdrawed: 5300,
-                balance: 2550
-            },
-            {
-                secret: "CHARLIE-99X",
-                name: "Samira K. Okafor",
-                mobile: "+234 801 234 5678",
-                email: "samira.o@digital.ng",
-                lastLogin: "2026-06-25 07:30",
-                totalEarning: 12100,
-                withdrawed: 8700,
-                balance: 3400
-            },
-            {
-                secret: "DELTA-512",
-                name: "Morgan T. Hayes",
-                mobile: "+1 987 654 3210",
-                email: "morgan.h@outlook.com",
-                lastLogin: "2026-06-23 16:45",
-                totalEarning: 3250,
-                withdrawed: 1200,
-                balance: 2050
-            }
-        ];
+        // --- Configuration ---
+        // ⚠️ REPLACE WITH YOUR ACTUAL APPS SCRIPT WEB APP URL
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx2G4X6jLm9nP3Q7R8sT1uV2wX3yZ4A5B6C7D8E9F0G/exec'; 
 
-        // -------- DOM refs --------
+        // DOM refs
         const secretDisplay = document.getElementById('secretCodeDisplay');
         const secretChip = document.getElementById('secretCodeChip');
         const userName = document.getElementById('userNameDisplay');
@@ -469,147 +369,130 @@
         const totalEarning = document.getElementById('totalEarningDisplay');
         const withdrawed = document.getElementById('withdrawedDisplay');
         const balance = document.getElementById('balanceDisplay');
-
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const errorContainer = document.getElementById('errorContainer');
+        const dashboardContent = document.getElementById('dashboardContent');
         const withdrawBtn = document.getElementById('withdrawBtn');
         const logoutBtn = document.getElementById('logoutBtn');
 
-        // -------- Helper: redirect to pages.dev --------
+        // Helper: redirect to pages.dev
         function redirectToPagesDev() {
             window.location.href = 'https://workfrommobile.pages.dev/';
         }
 
-        // -------- extract secret from URL --------
+        // Get secret from URL (case-insensitive, supports ?secretcode= or ?secretCode=)
         function getSecretFromUrl() {
             const params = new URLSearchParams(window.location.search);
-            // we expect ?secretcode=XXXX  (case insensitive, but we use exact)
-            const code = params.get('secretcode') || params.get('secretCode') || '';
-            return code.trim();
+            return (params.get('secretcode') || params.get('secretCode') || '').trim();
         }
 
-        // -------- find row by secret (case sensitive, but we can normalize) --------
-        function findRowBySecret(secret) {
-            if (!secret) return null;
-            // normalize: trim, uppercase? we keep as-is but sheet uses uppercase, we can compare lowerCase for flexibility
-            const normalizedInput = secret.trim();
-            for (let row of sheetData) {
-                if (row.secret.toLowerCase() === normalizedInput.toLowerCase()) {
-                    return row;
-                }
-            }
-            return null;
+        // Show error & hide content
+        function showError(message) {
+            errorContainer.textContent = message;
+            errorContainer.classList.remove('hidden');
+            dashboardContent.style.display = 'none';
+            loadingIndicator.classList.add('hidden');
         }
 
-        // -------- render dashboard with row data --------
+        // Render user data
         function renderDashboard(row) {
             if (!row) {
-                // if no row, fallback: show empty / placeholder (but redirect logic should prevent)
-                // but we keep safe:
-                userName.textContent = '—';
-                userMobile.textContent = '—';
-                userEmail.textContent = '—';
-                lastLogin.textContent = '—';
-                totalEarning.textContent = '$0';
-                withdrawed.textContent = '$0';
-                balance.textContent = '$0';
-                secretDisplay.textContent = '???';
-                secretChip.textContent = '???';
+                showError('❌ Invalid secret or user not found.');
+                return;
+            }
+            // populate
+            secretDisplay.textContent = row.secret || '—';
+            secretChip.textContent = row.secret || '—';
+            userName.textContent = row.name || '—';
+            userMobile.textContent = row.mobile || '—';
+            userEmail.textContent = row.email || '—';
+            lastLogin.textContent = row.lastLogin || '—';
+            totalEarning.textContent = row.totalEarning ? `$${Number(row.totalEarning).toLocaleString()}` : '$0';
+            withdrawed.textContent = row.withdrawed ? `$${Number(row.withdrawed).toLocaleString()}` : '$0';
+            balance.textContent = row.balance ? `$${Number(row.balance).toLocaleString()}` : '$0';
+
+            // show content, hide error & loading
+            dashboardContent.style.display = 'block';
+            errorContainer.classList.add('hidden');
+            loadingIndicator.classList.add('hidden');
+        }
+
+        // Main fetch from Apps Script
+        function fetchUserData(secret) {
+            if (!secret) {
+                // no secret → redirect
+                redirectToPagesDev();
                 return;
             }
 
-            secretDisplay.textContent = row.secret;
-            secretChip.textContent = row.secret;
-            userName.textContent = row.name;
-            userMobile.textContent = row.mobile;
-            userEmail.textContent = row.email || '—';
-            lastLogin.textContent = row.lastLogin || 'N/A';
-            totalEarning.textContent = `$${row.totalEarning.toLocaleString()}`;
-            withdrawed.textContent = `$${row.withdrawed.toLocaleString()}`;
-            balance.textContent = `$${row.balance.toLocaleString()}`;
+            // Show loading, hide content
+            loadingIndicator.classList.remove('hidden');
+            dashboardContent.style.display = 'none';
+            errorContainer.classList.add('hidden');
+
+            // Build URL with secret
+            const url = `${APPS_SCRIPT_URL}?secretcode=${encodeURIComponent(secret)}`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // data expected: { status: 'success', user: { ... } } or { status: 'error', message: '...' }
+                    if (data.status === 'success' && data.user) {
+                        renderDashboard(data.user);
+                    } else {
+                        // invalid or not found
+                        showError(data.message || '❌ Invalid secret or user not found.');
+                    }
+                })
+                .catch(err => {
+                    console.error('Fetch error:', err);
+                    showError('⚠️ Could not reach server. Please try again later.');
+                });
         }
 
-        // -------- MAIN logic --------
+        // ----- INIT -----
         function init() {
-            const currentUrl = window.location.href.toLowerCase();
-            // 1. check if URL is exactly www.dashboard.com (or contains dashboard.com as main)
-            // we check hostname + pathname; we want to redirect if user visits www.dashboard.com 
-            // (or any variant that is not with secret code) 
-            // but we also want to keep secret code route.
+            const secret = getSecretFromUrl();
             const host = window.location.hostname;
             const isDashboardDomain = host === 'www.dashboard.com' || host === 'dashboard.com';
 
-            // get secret from URL
-            const secret = getSecretFromUrl();
-
-            // If we are on www.dashboard.com and there is NO secret, redirect.
-            // also if secret is empty -> redirect.
+            // If on dashboard.com and no secret → redirect
             if (isDashboardDomain && !secret) {
                 redirectToPagesDev();
-                return; // stop execution
+                return;
             }
 
-            // If we have a secret (even if not on dashboard.com) we try to find row.
-            // But if the domain is dashboard.com AND secret is present, we show the row.
-            // If domain is not dashboard.com, but secret is present → we also show row (simulate)
-            // (professional behaviour: any domain with secret param shows data)
+            // If secret exists → fetch from Apps Script
             if (secret) {
-                const row = findRowBySecret(secret);
-                if (row) {
-                    renderDashboard(row);
-                    // show the badge with secret
-                    document.getElementById('secretBadge').style.display = 'inline-flex';
-                    document.getElementById('secretChip').style.display = 'inline-flex';
-                } else {
-                    // secret not found -> fallback: but we still display something? 
-                    // we can show "not found" but also we keep placeholder
-                    renderDashboard(null);
-                    // we also show a message in badge
-                    secretDisplay.textContent = 'INVALID';
-                    secretChip.textContent = 'INVALID';
-                    // but we do NOT redirect because user supplied a secret.
-                    // we set a friendly error
-                    userName.textContent = '⛔ Unknown secret';
-                    userMobile.textContent = '—';
-                    userEmail.textContent = '—';
-                    lastLogin.textContent = '—';
-                    totalEarning.textContent = '$0';
-                    withdrawed.textContent = '$0';
-                    balance.textContent = '$0';
-                }
+                fetchUserData(secret);
             } else {
-                // No secret at all, and domain is not dashboard.com? 
-                // We still might want to show something? but we treat as "no secret" -> redirect
-                // but if host is not dashboard.com, we still show demo? 
-                // We decide: if no secret and not dashboard.com -> show default demo (first row)
-                // so that the page works for testing.
-                if (!isDashboardDomain) {
-                    // show demo row (first)
-                    const demoRow = sheetData[0];
-                    renderDashboard(demoRow);
-                    secretDisplay.textContent = demoRow.secret;
-                    secretChip.textContent = demoRow.secret;
-                } else {
-                    // this case should have been caught earlier, but fallback redirect
-                    redirectToPagesDev();
-                }
+                // Not on dashboard.com and no secret → show demo? 
+                // But requirement: if no secret or no data → redirect.
+                // So we redirect.
+                redirectToPagesDev();
             }
-
-            // -------- attach event handlers (withdraw / logout) --------
-            withdrawBtn.addEventListener('click', function() {
-                alert('💳 Withdraw action triggered. (Demo)');
-                // In real world, you'd call API, etc.
-            });
-
-            logoutBtn.addEventListener('click', function() {
-                // logout: redirect to pages.dev (or dashboard.com)
-                if (confirm('Logout and redirect to workfrommobile.pages.dev?')) {
-                    redirectToPagesDev();
-                }
-            });
         }
 
-        // run
+        // Event listeners
+        withdrawBtn.addEventListener('click', function() {
+            alert('💳 Withdraw action triggered. (Demo)');
+        });
+
+        logoutBtn.addEventListener('click', function() {
+            if (confirm('Logout and redirect to workfrommobile.pages.dev?')) {
+                redirectToPagesDev();
+            }
+        });
+
+        // start
         init();
     })();
 </script>
+
 </body>
 </html>
