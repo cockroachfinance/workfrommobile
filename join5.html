@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Work From Home – Earn Extra Income</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    }
+
+    body {
+      background: #f5f7fb;
+      color: #1e293b;
+    }
+
+    header {
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      color: white;
+      text-align: center;
+      padding: 70px 20px;
+      position: relative;
+    }
+
+    .login-btn-top {
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 10px 22px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .login-btn-top:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+    }
+
+    .login-btn-top i {
+      font-size: 1rem;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      letter-spacing: -0.5px;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: auto;
+      opacity: 0.9;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      margin-top: 25px;
+      padding: 14px 34px;
+      background: #22c55e;
+      color: white;
+      text-decoration: none;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      box-shadow: 0 8px 18px rgba(34, 197, 94, 0.3);
+      transition: 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+
+    .cta-btn:hover {
+      background: #16a34a;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(34, 197, 94, 0.4);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 24px;
+      max-width: 1000px;
+      margin: 50px auto;
+      padding: 0 20px;
+    }
+
+    .stat {
+      background: white;
+      padding: 28px 16px;
+      text-align: center;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+      transition: 0.2s;
+    }
+
+    .stat h2 {
+      color: #2563eb;
+      font-size: 2.2rem;
+      margin-bottom: 6px;
+    }
+
+    .section {
+      max-width: 1100px;
+      margin: 70px auto;
+      padding: 0 20px;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .section-title h2 {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .cards, .steps, .testimonials {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 28px;
+    }
+
+    .card, .step, .testimonial, .faq-item {
+      background: white;
+      padding: 26px 22px;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+      transition: 0.15s;
+    }
+
+    .card h3, .step h3 {
+      color: #2563eb;
+      margin-bottom: 8px;
+    }
+
+    .step span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #2563eb;
+      color: white;
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+
+    .faq-item {
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      cursor: default;
+      border-radius: 16px;
+    }
+
+    .faq-question {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #0f172a;
+    }
+
+    .faq-question button {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      color: #2563eb;
+      cursor: pointer;
+      padding: 0 6px;
+      transition: 0.2s;
+    }
+
+    .faq-question button:hover {
+      color: #1e40af;
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.2s ease;
+      padding-top: 0;
+      color: #334155;
+      line-height: 1.5;
+    }
+
+    .faq-answer.open {
+      max-height: 200px;
+      padding-top: 14px;
+    }
+
+    .faq-answer p {
+      margin: 0;
+    }
+
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .popup-overlay.active {
+      display: flex;
+    }
+
+    .popup {
+      background: white;
+      max-width: 440px;
+      width: 90%;
+      padding: 32px 28px 28px;
+      border-radius: 32px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+      position: relative;
+      animation: fadeUp 0.25s ease;
+    }
+
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .popup-close {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      background: #f1f5f9;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 40px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #1e293b;
+      transition: 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .popup-close:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .popup h2 {
+      margin-bottom: 6px;
+      font-size: 1.8rem;
+      color: #0f172a;
+    }
+
+    .popup p.sub {
+      color: #64748b;
+      margin-bottom: 24px;
+    }
+
+    .popup label {
+      font-weight: 500;
+      display: block;
+      margin-top: 14px;
+      margin-bottom: 4px;
+      color: #1e293b;
+    }
+
+    .popup input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 60px;
+      font-size: 1rem;
+      transition: 0.15s;
+      background: #f8fafc;
+    }
+
+    .popup input:focus {
+      outline: 2px solid #2563eb;
+      outline-offset: 2px;
+      background: white;
+    }
+
+    .popup .submit-btn {
+      width: 100%;
+      margin-top: 28px;
+      padding: 16px;
+      background: #2563eb;
+      border: none;
+      border-radius: 60px;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .popup .submit-btn:hover {
+      background: #1d4ed8;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.3);
+    }
+
+    .popup .submit-btn.secondary {
+      background: #22c55e;
+    }
+
+    .popup .submit-btn.secondary:hover {
+      background: #16a34a;
+    }
+
+    .popup .optional {
+      font-weight: 400;
+      color: #94a3b8;
+      font-size: 0.85rem;
+      margin-left: 6px;
+    }
+
+    .password-popup .popup {
+      max-width: 400px;
+    }
+
+    .password-popup .popup input {
+      margin-bottom: 8px;
+    }
+
+    .password-error {
+      color: #ef4444;
+      font-size: 0.9rem;
+      margin-top: 6px;
+      display: none;
+    }
+
+    .password-error.show {
+      display: block;
+    }
+
+    .login-error {
+      color: #ef4444;
+      font-size: 0.9rem;
+      margin-top: 6px;
+      display: none;
+      text-align: center;
+    }
+
+    .login-error.show {
+      display: block;
+    }
+
+    .success-popup .popup {
+      max-width: 420px;
+      text-align: center;
+    }
+
+    .success-icon {
+      font-size: 4rem;
+      color: #22c55e;
+      margin-bottom: 10px;
+    }
+
+    .success-popup .popup p {
+      color: #475569;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .success-popup .popup .btn-group {
+      display: flex;
+      gap: 12px;
+      flex-direction: column;
+    }
+
+    .success-popup .popup .btn-group .submit-btn {
+      margin-top: 0;
+    }
+
+    footer {
+      background: #0f172a;
+      color: #e2e8f0;
+      text-align: center;
+      padding: 40px 20px;
+      margin-top: 60px;
+    }
+
+    footer p {
+      opacity: 0.7;
+      font-size: 0.95rem;
+    }
+
+    .testimonial strong {
+      display: block;
+      margin-top: 12px;
+      color: #2563eb;
+    }
+
+    .cta-btn i {
+      margin-right: 8px;
+    }
+
+    @media (max-width: 640px) {
+      header h1 { font-size: 2.2rem; }
+      .popup { padding: 24px 18px; }
+      .login-btn-top {
+        top: 10px;
+        right: 10px;
+        padding: 6px 14px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="login-btn-top" id="openLoginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
+    
+    <h1>Work From Home</h1>
+    <p>Earn extra income online by completing simple digital tasks from anywhere.</p>
+    <button class="cta-btn" id="openPopupBtn"><i class="fas fa-rocket"></i> Start Today</button>
+  </header>
+
+  <section class="stats">
+    <div class="stat"><h2>10,000+</h2><p>Members</p></div>
+    <div class="stat"><h2>₹50L+</h2><p>Paid Out</p></div>
+    <div class="stat"><h2>24/7</h2><p>Support</p></div>
+    <div class="stat"><h2>100%</h2><p>Remote</p></div>
+  </section>
+
+  <section class="section">
+    <div class="section-title"><h2>Available Tasks</h2></div>
+    <div class="cards">
+      <div class="card"><h3>Watch Videos</h3><p>Earn rewards by viewing short videos and engaging with content.</p></div>
+      <div class="card"><h3>Social Media Tasks</h3><p>Like, follow and interact with social media content.</p></div>
+      <div class="card"><h3>App Testing</h3><p>Test apps and provide simple feedback for rewards.</p></div>
+      <div class="card"><h3>Online Surveys</h3><p>Complete surveys and market research tasks.</p></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title"><h2>How It Works</h2></div>
+    <div class="steps">
+      <div class="step"><span>1</span><h3>Register</h3><p>Create your free account.</p></div>
+      <div class="step"><span>2</span><h3>Complete Tasks</h3><p>Select tasks and start earning.</p></div>
+      <div class="step"><span>3</span><h3>Withdraw Earnings</h3><p>Receive payments securely.</p></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title"><h2>Testimonials</h2></div>
+    <div class="testimonials">
+      <div class="testimonial"><p>"I earn extra money during weekends. Very easy to use."</p><strong>– Rahul</strong></div>
+      <div class="testimonial"><p>"Great side income opportunity for students."</p><strong>– Priya</strong></div>
+      <div class="testimonial"><p>"Simple tasks and fast support."</p><strong>– Arjun</strong></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title"><h2>Frequently Asked Questions</h2></div>
+
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>Is registration free?</span>
+        <button class="faq-toggle"><i class="fas fa-chevron-down"></i></button>
+      </div>
+      <div class="faq-answer"><p>Yes, joining is completely free.</p></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>How do I get paid?</span>
+        <button class="faq-toggle"><i class="fas fa-chevron-down"></i></button>
+      </div>
+      <div class="faq-answer"><p>Payments can be made through supported payment methods.</p></div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>Can students join?</span>
+        <button class="faq-toggle"><i class="fas fa-chevron-down"></i></button>
+      </div>
+      <div class="faq-answer"><p>Yes, students and working professionals can participate.</p></div>
+    </div>
+  </section>
+
+  <section class="section" style="text-align:center;">
+    <h2>Ready to Start?</h2>
+    <p style="margin:15px 0; color: #475569;">Join today and begin earning from simple online tasks.</p>
+    <button class="cta-btn" id="openPopupBtn2"><i class="fas fa-user-plus"></i> Join Now</button>
+  </section>
+
+  <!-- SIGNUP POPUP -->
+  <div class="popup-overlay" id="popupOverlay">
+    <div class="popup">
+      <button class="popup-close" id="closePopupBtn"><i class="fas fa-times"></i></button>
+      <h2>Start earning ✨</h2>
+      <p class="sub">Fill in your details to get started.</p>
+
+      <form id="signupForm">
+        <label for="userName">Full Name <span style="color:#ef4444;">*</span></label>
+        <input type="text" id="userName" placeholder="e.g. Aman Sharma" required>
+
+        <label for="userMobile">Mobile Number <span style="color:#ef4444;">*</span></label>
+        <input type="tel" id="userMobile" placeholder="9876543210" required>
+
+        <label for="userEmail">Email Address <span class="optional">(optional)</span></label>
+        <input type="email" id="userEmail" placeholder="you@example.com">
+
+        <button type="submit" class="submit-btn"><i class="fas fa-paper-plane" style="margin-right:8px;"></i> Submit</button>
+      </form>
+      <p style="margin-top:16px; font-size:0.85rem; color:#94a3b8; text-align:center;">We'll send you task updates.</p>
+    </div>
+  </div>
+
+  <!-- PASSWORD POPUP -->
+  <div class="popup-overlay password-popup" id="passwordPopup">
+    <div class="popup">
+      <button class="popup-close" id="closePasswordPopup"><i class="fas fa-times"></i></button>
+      <h2>Set Password 🔒</h2>
+      <p class="sub">Create a secure password for your account.</p>
+
+      <form id="passwordForm">
+        <label for="userPassword">Password <span style="color:#ef4444;">*</span></label>
+        <input type="password" id="userPassword" placeholder="Enter password" required minlength="6">
+        
+        <button type="submit" class="submit-btn"><i class="fas fa-arrow-right" style="margin-right:8px;"></i> Next</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- CONFIRM PASSWORD POPUP -->
+  <div class="popup-overlay password-popup" id="confirmPopup">
+    <div class="popup">
+      <button class="popup-close" id="closeConfirmPopup"><i class="fas fa-times"></i></button>
+      <h2>Confirm Password ✅</h2>
+      <p class="sub">Re-enter your password to confirm.</p>
+
+      <form id="confirmForm">
+        <label for="userConfirmPassword">Confirm Password <span style="color:#ef4444;">*</span></label>
+        <input type="password" id="userConfirmPassword" placeholder="Re-enter password" required>
+        <div class="password-error" id="passwordError">Passwords do not match!</div>
+        
+        <button type="submit" class="submit-btn"><i class="fas fa-check" style="margin-right:8px;"></i> Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- SUCCESS POPUP (Account Created) -->
+  <div class="popup-overlay success-popup" id="successPopup">
+    <div class="popup">
+      <button class="popup-close" id="closeSuccessPopup"><i class="fas fa-times"></i></button>
+      <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+      <h2>Account Created! 🎉</h2>
+      <p>Welcome to the Work From Home family!<br>Please login to get your member ID and start earning.</p>
+      <div class="btn-group">
+        <button class="submit-btn" id="goToLoginBtn"><i class="fas fa-sign-in-alt" style="margin-right:8px;"></i> Login Now</button>
+        <button class="submit-btn secondary" id="continueHomeBtn"><i class="fas fa-home" style="margin-right:8px;"></i> Continue to Home</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN POPUP -->
+  <div class="popup-overlay" id="loginPopup">
+    <div class="popup">
+      <button class="popup-close" id="closeLoginBtn"><i class="fas fa-times"></i></button>
+      <h2>Welcome Back 👋</h2>
+      <p class="sub">Login to your account to continue earning.</p>
+
+      <form id="loginForm">
+        <label for="loginMobile">Mobile Number <span style="color:#ef4444;">*</span></label>
+        <input type="tel" id="loginMobile" placeholder="9876543210" required>
+
+        <label for="loginPassword">Password <span style="color:#ef4444;">*</span></label>
+        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+        
+        <div class="login-error" id="loginError">Invalid mobile number or password. Please try again.</div>
+        
+        <button type="submit" class="submit-btn" id="loginSubmitBtn"><i class="fas fa-sign-in-alt" style="margin-right:8px;"></i> Login</button>
+      </form>
+      <p style="margin-top:16px; font-size:0.85rem; color:#94a3b8; text-align:center;">
+        Don't have an account? <a href="#" id="switchToSignup" style="color:#2563eb; text-decoration:none; font-weight:600;">Sign up here</a>
+      </p>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2026 Work From Home. All Rights Reserved.</p>
+  </footer>
+
+  <script>
+    (function() {
+      "use strict";
+
+      // DOM refs
+      const overlay = document.getElementById('popupOverlay');
+      const passwordPopup = document.getElementById('passwordPopup');
+      const confirmPopup = document.getElementById('confirmPopup');
+      const loginPopup = document.getElementById('loginPopup');
+      const successPopup = document.getElementById('successPopup');
+      
+      const openBtns = [document.getElementById('openPopupBtn'), document.getElementById('openPopupBtn2')];
+      const closeBtn = document.getElementById('closePopupBtn');
+      const closePasswordBtn = document.getElementById('closePasswordPopup');
+      const closeConfirmBtn = document.getElementById('closeConfirmPopup');
+      const closeLoginBtn = document.getElementById('closeLoginBtn');
+      const closeSuccessBtn = document.getElementById('closeSuccessPopup');
+      const openLoginBtn = document.getElementById('openLoginBtn');
+      const switchToSignup = document.getElementById('switchToSignup');
+      const goToLoginBtn = document.getElementById('goToLoginBtn');
+      const continueHomeBtn = document.getElementById('continueHomeBtn');
+      
+      const form = document.getElementById('signupForm');
+      const passwordForm = document.getElementById('passwordForm');
+      const confirmForm = document.getElementById('confirmForm');
+      const loginForm = document.getElementById('loginForm');
+      
+      let userData = {};
+      let tempPassword = '';
+
+      // APPSCRIPT URL - REPLACE WITH YOUR DEPLOYED URL
+      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwb8R4fppxj745l8pVN3-omJAoCldugCt9YuxJ3nHZHh2tzKeo5cTJPpbn6C2bNUfRi/exec';
+
+      // ----- Open / Close functions -----
+      function openPopup() {
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        form.reset();
+      }
+
+      function closePopup() {
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+        form.reset();
+      }
+
+      function openPasswordPopup() {
+        passwordPopup.classList.add('active');
+        document.getElementById('userPassword').value = '';
+      }
+
+      function closePasswordPopup() {
+        passwordPopup.classList.remove('active');
+        document.getElementById('userPassword').value = '';
+      }
+
+      function openConfirmPopup() {
+        confirmPopup.classList.add('active');
+        document.getElementById('userConfirmPassword').value = '';
+        document.getElementById('passwordError').classList.remove('show');
+      }
+
+      function closeConfirmPopup() {
+        confirmPopup.classList.remove('active');
+        document.getElementById('userConfirmPassword').value = '';
+        document.getElementById('passwordError').classList.remove('show');
+      }
+
+      function openLoginPopup() {
+        loginPopup.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        document.getElementById('loginForm').reset();
+        document.getElementById('loginError').classList.remove('show');
+      }
+
+      function closeLoginPopup() {
+        loginPopup.classList.remove('active');
+        document.body.style.overflow = '';
+        document.getElementById('loginForm').reset();
+        document.getElementById('loginError').classList.remove('show');
+      }
+
+      function openSuccessPopup() {
+        successPopup.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeSuccessPopup() {
+        successPopup.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      function closeAllPopups() {
+        closePopup();
+        closePasswordPopup();
+        closeConfirmPopup();
+        closeLoginPopup();
+        closeSuccessPopup();
+        document.body.style.overflow = '';
+      }
+
+      // Event listeners
+      openBtns.forEach(btn => btn.addEventListener('click', openPopup));
+      closeBtn.addEventListener('click', closePopup);
+      openLoginBtn.addEventListener('click', openLoginPopup);
+      closeLoginBtn.addEventListener('click', closeLoginPopup);
+      closeSuccessBtn.addEventListener('click', closeSuccessPopup);
+      
+      // Success popup buttons
+      goToLoginBtn.addEventListener('click', function() {
+        closeSuccessPopup();
+        openLoginPopup();
+      });
+      
+      continueHomeBtn.addEventListener('click', function() {
+        closeSuccessPopup();
+      });
+
+      switchToSignup.addEventListener('click', function(e) {
+        e.preventDefault();
+        closeLoginPopup();
+        openPopup();
+      });
+
+      closePasswordBtn.addEventListener('click', closePasswordPopup);
+      closeConfirmBtn.addEventListener('click', closeConfirmPopup);
+
+      // NO backdrop click listeners - popups only close with X button
+
+      // FAQ Toggle
+      const faqToggles = document.querySelectorAll('.faq-toggle');
+      faqToggles.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const faqItem = this.closest('.faq-item');
+          const answer = faqItem.querySelector('.faq-answer');
+          const icon = this.querySelector('i');
+          answer.classList.toggle('open');
+          icon.className = answer.classList.contains('open') ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+        });
+      });
+
+      // ----- SIGNUP: Step 1 -----
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('userName').value.trim();
+        const mobile = document.getElementById('userMobile').value.trim();
+        const email = document.getElementById('userEmail').value.trim();
+
+        if (!name || !mobile) {
+          alert('Please fill in Name and Mobile number.');
+          return;
+        }
+        if (!/^\d{10,15}$/.test(mobile)) {
+          alert('Please enter a valid mobile number (10-15 digits).');
+          return;
+        }
+
+        userData = { name, mobile, email: email || 'not provided' };
+        closePopup();
+        openPasswordPopup();
+      });
+
+      // ----- SIGNUP: Step 2 -----
+      passwordForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const password = document.getElementById('userPassword').value;
+        
+        if (password.length < 6) {
+          alert('Password must be at least 6 characters long.');
+          return;
+        }
+        
+        tempPassword = password;
+        closePasswordPopup();
+        openConfirmPopup();
+      });
+
+      // ----- SIGNUP: Step 3 -----
+      confirmForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const confirmPassword = document.getElementById('userConfirmPassword').value;
+        const errorEl = document.getElementById('passwordError');
+        
+        if (confirmPassword !== tempPassword) {
+          errorEl.classList.add('show');
+          return;
+        }
+        
+        errorEl.classList.remove('show');
+        
+        const payload = {
+          name: userData.name,
+          mobile: userData.mobile,
+          email: userData.email,
+          password: tempPassword,
+          timestamp: new Date().toISOString()
+        };
+
+        const submitBtn = confirmForm.querySelector('.submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+
+        fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+        .then(() => {
+          closeConfirmPopup();
+          openSuccessPopup();
+          userData = {};
+          tempPassword = '';
+          form.reset();
+        })
+        .catch(err => {
+          console.error('Submission error:', err);
+          alert('⚠️ Something went wrong. Please try again later.');
+        })
+        .finally(() => {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-check" style="margin-right:8px;"></i> Create Account';
+        });
+      });
+
+      // ----- LOGIN: Redirect to AppScript for verification (AVOIDS CORS) -----
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const mobile = document.getElementById('loginMobile').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+        const errorEl = document.getElementById('loginError');
+
+        if (!mobile || !password) {
+          alert('Please enter both mobile number and password.');
+          return;
+        }
+
+        errorEl.classList.remove('show');
+
+        // DIRECT REDIRECT to AppScript - this avoids CORS entirely
+        // AppScript will verify and redirect to the URL in column G
+        const verifyUrl = SCRIPT_URL + '?action=login&mobile=' + encodeURIComponent(mobile) + '&password=' + encodeURIComponent(password) + '&redirect=true';
+        
+        // Redirect the page to AppScript
+        window.location.href = verifyUrl;
+      });
+
+    })();
+  </script>
+</body>
+</html>
