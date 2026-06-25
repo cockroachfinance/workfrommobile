@@ -353,6 +353,21 @@
     .cta-btn i {
       margin-right: 8px;
     }
+    /* Registration error message */
+    .reg-error {
+      color: #ef4444;
+      font-size: 0.9rem;
+      margin-top: 10px;
+      text-align: center;
+      display: none;
+      padding: 8px;
+      background: #fef2f2;
+      border-radius: 8px;
+      border: 1px solid #fecaca;
+    }
+    .reg-error.show {
+      display: block;
+    }
     @media (max-width: 640px) {
       header h1 { font-size: 2.2rem; }
       .popup { padding: 24px 18px; }
@@ -452,6 +467,7 @@
         <input type="tel" id="userMobile" placeholder="9876543210" required>
         <label for="userEmail">Email Address <span class="optional">(optional)</span></label>
         <input type="email" id="userEmail" placeholder="you@example.com">
+        <div id="regError" class="reg-error">⚠️ This mobile number is already registered. Please use a different number or login.</div>
         <button type="submit" class="submit-btn"><i class="fas fa-paper-plane" style="margin-right:8px;"></i> Submit</button>
       </form>
       <p style="margin-top:16px; font-size:0.85rem; color:#94a3b8; text-align:center;">We'll send you task updates.</p>
@@ -553,6 +569,7 @@
       const loginForm = document.getElementById('loginForm');
       const loginError = document.getElementById('loginError');
       const attemptsSpan = document.getElementById('attemptsLeft');
+      const regError = document.getElementById('regError');
       
       let userData = {};
       let tempPassword = '';
@@ -566,11 +583,13 @@
         overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
         form.reset();
+        regError.classList.remove('show'); // Hide error when opening
       }
       function closePopup() {
         overlay.classList.remove('active');
         document.body.style.overflow = '';
         form.reset();
+        regError.classList.remove('show');
       }
       function openPasswordPopup() {
         passwordPopup.classList.add('active');
@@ -650,23 +669,67 @@
         });
       });
 
-      // ----- SIGNUP: Step 1 -----
+      // ----- SIGNUP: Step 1 (FIXED - Shows error in popup) -----
       form.addEventListener('submit', function(e) {
         e.preventDefault();
+        
+        // Hide previous error
+        regError.classList.remove('show');
+        
         const name = document.getElementById('userName').value.trim();
         const mobile = document.getElementById('userMobile').value.trim();
         const email = document.getElementById('userEmail').value.trim();
+        
         if (!name || !mobile) {
-          alert('Please fill in Name and Mobile number.');
+          regError.textContent = '⚠️ Please fill in Name and Mobile number.';
+          regError.classList.add('show');
           return;
         }
         if (!/^\d{10,15}$/.test(mobile)) {
-          alert('Please enter a valid mobile number (10-15 digits).');
+          regError.textContent = '⚠️ Please enter a valid mobile number (10-15 digits).';
+          regError.classList.add('show');
           return;
         }
+        
         userData = { name, mobile, email: email || 'not provided' };
-        closePopup();
-        openPasswordPopup();
+        
+        // Check if mobile already exists via API
+        const checkUrl = SCRIPT_URL + 
+          '?action=checkMobile' +
+          '&mobile=' + encodeURIComponent(mobile) +
+          '&format=json';
+        
+        const submitBtn = form.querySelector('.submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+        
+        fetch(checkUrl)
+          .then(response => {
+            if (!response.ok) throw new Error('Network error');
+            return response.json();
+          })
+          .then(data => {
+            if (data.exists) {
+              // Mobile exists - show error in popup
+              regError.textContent = '⚠️ This mobile number is already registered. Please use a different number or login.';
+              regError.classList.add('show');
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = '<i class="fas fa-paper-plane" style="margin-right:8px;"></i> Submit';
+            } else {
+              // Mobile doesn't exist - proceed to password
+              closePopup();
+              openPasswordPopup();
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = '<i class="fas fa-paper-plane" style="margin-right:8px;"></i> Submit';
+            }
+          })
+          .catch(err => {
+            console.error('Check error:', err);
+            regError.textContent = '⚠️ Could not verify mobile number. Please try again.';
+            regError.classList.add('show');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane" style="margin-right:8px;"></i> Submit';
+          });
       });
 
       // ----- SIGNUP: Step 2 -----
@@ -682,7 +745,7 @@
         openConfirmPopup();
       });
 
-      // ----- SIGNUP: Step 3 (FIXED) -----
+      // ----- SIGNUP: Step 3 -----
       confirmForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const confirmPassword = document.getElementById('userConfirmPassword').value;
@@ -732,7 +795,7 @@
           });
       });
 
-      // ----- LOGIN (FIXED) -----
+      // ----- LOGIN -----
       loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
