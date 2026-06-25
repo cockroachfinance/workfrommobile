@@ -396,6 +396,35 @@
       margin-top: 0;
     }
 
+    /* Custom Alert Popup */
+    .alert-popup .popup {
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .alert-icon {
+      font-size: 3.5rem;
+      margin-bottom: 10px;
+    }
+
+    .alert-icon.warning {
+      color: #f59e0b;
+    }
+
+    .alert-icon.error {
+      color: #ef4444;
+    }
+
+    .alert-icon.success {
+      color: #22c55e;
+    }
+
+    .alert-popup .popup p {
+      color: #475569;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
     footer {
       background: #0f172a;
       color: #e2e8f0;
@@ -579,6 +608,17 @@
     </div>
   </div>
 
+  <!-- CUSTOM ALERT POPUP -->
+  <div class="popup-overlay alert-popup" id="alertPopup">
+    <div class="popup">
+      <button class="popup-close" id="closeAlertBtn"><i class="fas fa-times"></i></button>
+      <div class="alert-icon" id="alertIcon"><i class="fas fa-exclamation-triangle"></i></div>
+      <h2 id="alertTitle">Alert</h2>
+      <p id="alertMessage">This is an alert message.</p>
+      <button class="submit-btn" id="alertOkBtn">OK</button>
+    </div>
+  </div>
+
   <!-- LOGIN POPUP -->
   <div class="popup-overlay" id="loginPopup">
     <div class="popup">
@@ -617,6 +657,7 @@
       const confirmPopup = document.getElementById('confirmPopup');
       const loginPopup = document.getElementById('loginPopup');
       const successPopup = document.getElementById('successPopup');
+      const alertPopup = document.getElementById('alertPopup');
       
       const openBtns = [document.getElementById('openPopupBtn'), document.getElementById('openPopupBtn2')];
       const closeBtn = document.getElementById('closePopupBtn');
@@ -624,6 +665,8 @@
       const closeConfirmBtn = document.getElementById('closeConfirmPopup');
       const closeLoginBtn = document.getElementById('closeLoginBtn');
       const closeSuccessBtn = document.getElementById('closeSuccessPopup');
+      const closeAlertBtn = document.getElementById('closeAlertBtn');
+      const alertOkBtn = document.getElementById('alertOkBtn');
       const openLoginBtn = document.getElementById('openLoginBtn');
       const switchToSignup = document.getElementById('switchToSignup');
       const goToLoginBtn = document.getElementById('goToLoginBtn');
@@ -638,7 +681,43 @@
       let tempPassword = '';
 
       // APPSCRIPT URL - REPLACE WITH YOUR DEPLOYED URL
-      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzHPWs2E4boZmUMRTAabNzIjatd9ekUaaXEZ1JIPqYxz-GQcHNbO_e93fTSMSmvZTCsCQ/exec';
+      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwb8R4fppxj745l8pVN3-omJAoCldugCt9YuxJ3nHZHh2tzKeo5cTJPpbn6C2bNUfRi/exec';
+
+      // ----- Custom Alert Function -----
+      function showAlert(type, title, message) {
+        const icon = document.getElementById('alertIcon');
+        const titleEl = document.getElementById('alertTitle');
+        const messageEl = document.getElementById('alertMessage');
+        
+        // Reset classes
+        icon.className = 'alert-icon';
+        
+        if (type === 'warning') {
+          icon.classList.add('warning');
+          icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+        } else if (type === 'error') {
+          icon.classList.add('error');
+          icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+        } else if (type === 'success') {
+          icon.classList.add('success');
+          icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+        } else {
+          icon.innerHTML = '<i class="fas fa-info-circle"></i>';
+        }
+        
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        alertPopup.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeAlert() {
+        alertPopup.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      closeAlertBtn.addEventListener('click', closeAlert);
+      alertOkBtn.addEventListener('click', closeAlert);
 
       // ----- Open / Close functions -----
       function openPopup() {
@@ -705,6 +784,7 @@
         closeConfirmPopup();
         closeLoginPopup();
         closeSuccessPopup();
+        closeAlert();
         document.body.style.overflow = '';
       }
 
@@ -758,11 +838,11 @@
         const email = document.getElementById('userEmail').value.trim();
 
         if (!name || !mobile) {
-          alert('Please fill in Name and Mobile number.');
+          showAlert('error', 'Error', 'Please fill in Name and Mobile number.');
           return;
         }
         if (!/^\d{10,15}$/.test(mobile)) {
-          alert('Please enter a valid mobile number (10-15 digits).');
+          showAlert('error', 'Error', 'Please enter a valid mobile number (10-15 digits).');
           return;
         }
 
@@ -778,7 +858,7 @@
         const password = document.getElementById('userPassword').value;
         
         if (password.length < 6) {
-          alert('Password must be at least 6 characters long.');
+          showAlert('warning', 'Warning', 'Password must be at least 6 characters long.');
           return;
         }
         
@@ -828,7 +908,7 @@
         })
         .catch(err => {
           console.error('Submission error:', err);
-          alert('⚠️ Something went wrong. Please try again later.');
+          showAlert('error', 'Error', 'Something went wrong. Please try again later.');
         })
         .finally(() => {
           submitBtn.disabled = false;
@@ -836,27 +916,58 @@
         });
       });
 
-      // ----- LOGIN: Redirect to AppScript for verification (AVOIDS CORS) -----
+      // ----- LOGIN: Check credentials via fetch -----
       loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
         const mobile = document.getElementById('loginMobile').value.trim();
         const password = document.getElementById('loginPassword').value.trim();
         const errorEl = document.getElementById('loginError');
+        const submitBtn = document.getElementById('loginSubmitBtn');
 
         if (!mobile || !password) {
-          alert('Please enter both mobile number and password.');
+          showAlert('warning', 'Warning', 'Please enter both mobile number and password.');
           return;
         }
 
         errorEl.classList.remove('show');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
 
-        // DIRECT REDIRECT to AppScript - this avoids CORS entirely
-        // AppScript will verify and redirect to the URL in column G
-        const verifyUrl = SCRIPT_URL + '?action=login&mobile=' + encodeURIComponent(mobile) + '&password=' + encodeURIComponent(password) + '&redirect=true';
-        
-        // Redirect the page to AppScript
-        window.location.href = verifyUrl;
+        const verifyUrl = SCRIPT_URL + '?action=login&mobile=' + encodeURIComponent(mobile) + '&password=' + encodeURIComponent(password);
+
+        fetch(verifyUrl, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.redirectUrl) {
+            // Successful login - redirect
+            window.location.href = data.redirectUrl;
+          } else {
+            // Failed login - show custom alert based on status
+            if (data.status === 'pending') {
+              showAlert('warning', 'Account Pending', 'Your account is pending approval. Please wait for admin to activate.');
+            } else if (data.status === 'blocked') {
+              showAlert('error', 'Account Blocked', 'Your account has been blocked. Please contact support.');
+            } else {
+              showAlert('error', 'Login Failed', data.message || 'Invalid mobile number or password.');
+            }
+            errorEl.classList.add('show');
+            errorEl.textContent = data.message || 'Invalid mobile number or password.';
+          }
+        })
+        .catch(err => {
+          console.error('Login error:', err);
+          showAlert('error', 'Network Error', 'Could not connect to server. Please try again.');
+          errorEl.classList.add('show');
+          errorEl.textContent = 'Network error. Please try again.';
+        })
+        .finally(() => {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-sign-in-alt" style="margin-right:8px;"></i> Login';
+        });
       });
 
     })();
