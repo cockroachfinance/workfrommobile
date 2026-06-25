@@ -323,6 +323,14 @@
       box-shadow: 0 8px 18px rgba(37, 99, 235, 0.3);
     }
 
+    .popup .submit-btn.secondary {
+      background: #22c55e;
+    }
+
+    .popup .submit-btn.secondary:hover {
+      background: #16a34a;
+    }
+
     .popup .optional {
       font-weight: 400;
       color: #94a3b8;
@@ -359,6 +367,34 @@
 
     .login-error.show {
       display: block;
+    }
+
+    /* Success Popup */
+    .success-popup .popup {
+      max-width: 420px;
+      text-align: center;
+    }
+
+    .success-icon {
+      font-size: 4rem;
+      color: #22c55e;
+      margin-bottom: 10px;
+    }
+
+    .success-popup .popup p {
+      color: #475569;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .success-popup .popup .btn-group {
+      display: flex;
+      gap: 12px;
+      flex-direction: column;
+    }
+
+    .success-popup .popup .btn-group .submit-btn {
+      margin-top: 0;
     }
 
     footer {
@@ -530,6 +566,20 @@
     </div>
   </div>
 
+  <!-- SUCCESS POPUP (Account Created) -->
+  <div class="popup-overlay success-popup" id="successPopup">
+    <div class="popup">
+      <button class="popup-close" id="closeSuccessPopup"><i class="fas fa-times"></i></button>
+      <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+      <h2>Account Created! 🎉</h2>
+      <p>Welcome to the Work From Home family!<br>Please login to get your member ID and start earning.</p>
+      <div class="btn-group">
+        <button class="submit-btn" id="goToLoginBtn"><i class="fas fa-sign-in-alt" style="margin-right:8px;"></i> Login Now</button>
+        <button class="submit-btn secondary" id="continueHomeBtn"><i class="fas fa-home" style="margin-right:8px;"></i> Continue to Home</button>
+      </div>
+    </div>
+  </div>
+
   <!-- LOGIN POPUP -->
   <div class="popup-overlay" id="loginPopup">
     <div class="popup">
@@ -567,14 +617,18 @@
       const passwordPopup = document.getElementById('passwordPopup');
       const confirmPopup = document.getElementById('confirmPopup');
       const loginPopup = document.getElementById('loginPopup');
+      const successPopup = document.getElementById('successPopup');
       
       const openBtns = [document.getElementById('openPopupBtn'), document.getElementById('openPopupBtn2')];
       const closeBtn = document.getElementById('closePopupBtn');
       const closePasswordBtn = document.getElementById('closePasswordPopup');
       const closeConfirmBtn = document.getElementById('closeConfirmPopup');
       const closeLoginBtn = document.getElementById('closeLoginBtn');
+      const closeSuccessBtn = document.getElementById('closeSuccessPopup');
       const openLoginBtn = document.getElementById('openLoginBtn');
       const switchToSignup = document.getElementById('switchToSignup');
+      const goToLoginBtn = document.getElementById('goToLoginBtn');
+      const continueHomeBtn = document.getElementById('continueHomeBtn');
       
       const form = document.getElementById('signupForm');
       const passwordForm = document.getElementById('passwordForm');
@@ -636,11 +690,22 @@
         document.getElementById('loginError').classList.remove('show');
       }
 
+      function openSuccessPopup() {
+        successPopup.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeSuccessPopup() {
+        successPopup.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
       function closeAllPopups() {
         closePopup();
         closePasswordPopup();
         closeConfirmPopup();
         closeLoginPopup();
+        closeSuccessPopup();
         document.body.style.overflow = '';
       }
 
@@ -649,7 +714,18 @@
       closeBtn.addEventListener('click', closePopup);
       openLoginBtn.addEventListener('click', openLoginPopup);
       closeLoginBtn.addEventListener('click', closeLoginPopup);
+      closeSuccessBtn.addEventListener('click', closeSuccessPopup);
       
+      // Success popup buttons
+      goToLoginBtn.addEventListener('click', function() {
+        closeSuccessPopup();
+        openLoginPopup();
+      });
+      
+      continueHomeBtn.addEventListener('click', function() {
+        closeSuccessPopup();
+      });
+
       switchToSignup.addEventListener('click', function(e) {
         e.preventDefault();
         closeLoginPopup();
@@ -659,19 +735,8 @@
       closePasswordBtn.addEventListener('click', closePasswordPopup);
       closeConfirmBtn.addEventListener('click', closeConfirmPopup);
 
-      // Close on backdrop click
-      overlay.addEventListener('click', function(e) {
-        if (e.target === overlay) closePopup();
-      });
-      passwordPopup.addEventListener('click', function(e) {
-        if (e.target === passwordPopup) closePasswordPopup();
-      });
-      confirmPopup.addEventListener('click', function(e) {
-        if (e.target === confirmPopup) closeConfirmPopup();
-      });
-      loginPopup.addEventListener('click', function(e) {
-        if (e.target === loginPopup) closeLoginPopup();
-      });
+      // PREVENT CLICKING OUTSIDE - No backdrop click closing
+      // We simply don't add click listeners to overlays
 
       // FAQ Toggle
       const faqToggles = document.querySelectorAll('.faq-toggle');
@@ -757,9 +822,9 @@
           body: JSON.stringify(payload)
         })
         .then(() => {
-          alert('🎉 Success! Your account has been created.');
+          // Close confirm popup and show success popup
           closeConfirmPopup();
-          closeAllPopups();
+          openSuccessPopup();
           userData = {};
           tempPassword = '';
           form.reset();
