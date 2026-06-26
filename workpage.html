@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
-  <title>Work · tasks</title>
+  <title>Work · Tasks</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
@@ -93,7 +93,6 @@
     .stat-mini-card.viewed .num { color: #0b7e4b; }
     .stat-mini-card.pending .num { color: #b45338; }
 
-    /* ===== TABLE SECTION ===== */
     .table-section {
       margin-top: 1.5rem;
       background: white;
@@ -176,6 +175,110 @@
       color: #4d6a8f;
       text-align: center;
     }
+    .video-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      margin-top: 0.5rem;
+    }
+    .video-item {
+      background: white;
+      border-radius: 28px;
+      padding: 1rem 1.2rem;
+      border: 1px solid #e2eaf5;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      transition: 0.1s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.01);
+    }
+    .video-item .index {
+      font-weight: 600;
+      color: #7789a8;
+      font-size: 0.8rem;
+      min-width: 28px;
+    }
+    .video-item .info {
+      flex: 1;
+    }
+    .video-item .info .title {
+      font-weight: 600;
+      color: #14273f;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .video-item .info .title .badge-id {
+      background: #eef2f8;
+      font-size: 0.6rem;
+      padding: 0.15rem 0.6rem;
+      border-radius: 30px;
+      color: #2f4a6e;
+      font-weight: 600;
+    }
+    .video-item .info .meta {
+      font-size: 0.7rem;
+      color: #6f86a6;
+      margin-top: 3px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .video-item .info .meta .status-badge {
+      font-weight: 600;
+      padding: 0.1rem 0.8rem;
+      border-radius: 40px;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      background: #e6edf8;
+      color: #2d4b70;
+    }
+    .video-item .info .meta .status-badge.viewed {
+      background: #dcfce7;
+      color: #0b6e3f;
+    }
+    .video-item .info .meta .status-badge.pending {
+      background: #ffede8;
+      color: #b45338;
+    }
+    .video-item .action-btn {
+      background: #1d4ed8;
+      border: none;
+      color: white;
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: 0.1s;
+      white-space: nowrap;
+      font-family: 'Inter', sans-serif;
+      border: 1px solid #1d4ed8;
+      box-shadow: 0 4px 8px rgba(29,78,216,0.15);
+    }
+    .video-item .action-btn:disabled {
+      opacity: 0.5;
+      pointer-events: none;
+      filter: grayscale(0.3);
+      background: #a3b9da;
+      border-color: #8aa2c9;
+      box-shadow: none;
+    }
+    .video-item .action-btn i { margin-right: 4px; }
+    .video-item .action-btn:hover:not(:disabled) {
+      background: #1a40b0;
+      transform: scale(1.01);
+    }
+    .video-item .action-btn.viewed-btn {
+      background: #e8edf6;
+      border-color: #cdd9ec;
+      color: #2d4b70;
+      box-shadow: none;
+      cursor: default;
+    }
+    .video-item .action-btn.viewed-btn i { color: #2d4b70; }
     .empty-state {
       background: white;
       border-radius: 40px;
@@ -208,6 +311,16 @@
       font-weight: 500;
       margin: 1rem 0;
     }
+    .user-greeting {
+      background: white;
+      border-radius: 20px;
+      padding: 0.8rem 1.2rem;
+      margin-bottom: 1rem;
+      border: 1px solid #e2eaf5;
+      font-weight: 500;
+      color: #1d2e4a;
+    }
+    .user-greeting i { color: #2563eb; margin-right: 8px; }
     .footer-note {
       margin-top: 2rem;
       font-size: 0.65rem;
@@ -223,6 +336,8 @@
       .table-section { padding: 0.8rem 0.3rem; }
       .task-table { font-size: 0.7rem; min-width: 300px; }
       .task-table th, .task-table td { padding: 0.4rem 0.3rem; }
+      .video-item { flex-wrap: wrap; padding: 0.9rem; }
+      .video-item .action-btn { width: 100%; justify-content: center; }
     }
     .hidden { display: none !important; }
   </style>
@@ -232,6 +347,11 @@
   <div class="top-bar">
     <div class="brand-work"><i class="fas fa-play-circle"></i> WorkTasks</div>
     <div class="secret-tag" id="secretTag"><i class="fas fa-key"></i> <span id="secretShort">••••</span></div>
+  </div>
+
+  <!-- User Greeting -->
+  <div id="userGreeting" class="user-greeting hidden">
+    <i class="fas fa-user-circle"></i> Welcome, <span id="userName">User</span>!
   </div>
 
   <!-- Stats Cards -->
@@ -247,9 +367,9 @@
   <!-- Video List (cards) -->
   <div id="videoListContainer" class="video-list"></div>
 
-  <!-- ===== NEW TABLE SECTION ===== -->
+  <!-- Table Section -->
   <div class="table-section" id="tableSection">
-    <h3><i class="fas fa-table"></i> All Tasks · SL No, URL & Status</h3>
+    <h3><i class="fas fa-table"></i> All Videos · SL No, URL & Status</h3>
     <div id="tableWrapper">
       <table class="task-table" id="taskTable">
         <thead>
@@ -271,8 +391,8 @@
 
 <script>
   (function() {
-    // 🔁 REPLACE WITH YOUR OWN APPS SCRIPT URL
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzdl8wZnpAloF-5xJB4-X4UWvv-oSmLxjzC7zhfY3noxlHOhKorKBfUDSzFhmw0AhnArA/exec';
+    // 🔁 REPLACE WITH YOUR APPS SCRIPT URL
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
 
     const secretTagSpan = document.getElementById('secretShort');
     const totalEl = document.getElementById('totalCount');
@@ -282,6 +402,8 @@
     const loader = document.getElementById('loader');
     const errorMsg = document.getElementById('errorMsg');
     const tableBody = document.getElementById('tableBody');
+    const userGreeting = document.getElementById('userGreeting');
+    const userName = document.getElementById('userName');
 
     let secretCode = '';
     let currentVideos = [];
@@ -312,7 +434,7 @@
     }
 
     // ----- render cards + table -----
-    function renderVideos(videos) {
+    function renderVideos(videos, userInfo) {
       currentVideos = videos;
       const total = videos.length;
       const viewed = videos.filter(v => v.status && v.status.toLowerCase() === 'viewed').length;
@@ -320,6 +442,12 @@
       totalEl.textContent = total;
       viewedEl.textContent = viewed;
       pendingEl.textContent = pending;
+
+      // Show user greeting
+      if (userInfo && userInfo.name) {
+        userGreeting.classList.remove('hidden');
+        userName.textContent = userInfo.name;
+      }
 
       // ---- CARDS ----
       if (!total) {
@@ -335,164 +463,4 @@
           const btnIcon = isViewed ? 'fa-check-circle' : 'fa-play';
 
           html += `
-            <div class="video-item" data-idx="${idx}">
-              <div class="index">#${idx+1}</div>
-              <div class="info">
-                <div class="title">
-                  <span>${escapeHtml(item.title || 'Video')}</span>
-                  <span class="badge-id"><i class="far fa-id-card"></i> ${escapeHtml(item.id || '—')}</span>
-                </div>
-                <div class="meta">
-                  <span class="status-badge ${statusClass}">${statusLabel}</span>
-                  ${item.time ? `<span><i class="far fa-clock"></i> ${escapeHtml(item.time)}</span>` : ''}
-                  ${item.date ? `<span><i class="far fa-calendar-alt"></i> ${escapeHtml(item.date)}</span>` : ''}
-                </div>
-              </div>
-              <button class="action-btn ${btnClass}" data-url="${escapeHtml(item.url || '#')}" data-id="${escapeHtml(item.id || '')}" data-idx="${idx}" ${btnDisabled ? 'disabled' : ''}>
-                <i class="fas ${btnIcon}"></i> ${isViewed ? 'Viewed' : 'Watch'}
-              </button>
-            </div>
-          `;
-        });
-        videoContainer.innerHTML = html;
-
-        // attach click listeners to Watch buttons
-        document.querySelectorAll('.video-item .action-btn:not(.viewed-btn)').forEach(btn => {
-          btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const url = this.getAttribute('data-url');
-            const id = this.getAttribute('data-id');
-            const idx = parseInt(this.getAttribute('data-idx'), 10);
-            if (!url || url === '#') {
-              alert('No valid URL for this video.');
-              return;
-            }
-            window.open(url, '_blank');
-            markVideoViewed(idx, id);
-          });
-        });
-      }
-
-      // ---- TABLE ----
-      renderTable(videos);
-    }
-
-    // ----- render table (SL No, URL, Status) -----
-    function renderTable(videos) {
-      if (!videos || videos.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center;padding:1.5rem;color:#8aa2c9;font-style:italic;">No data to display</td></tr>`;
-        return;
-      }
-
-      let rows = '';
-      videos.forEach((item, idx) => {
-        const isViewed = item.status && item.status.toLowerCase() === 'viewed';
-        const statusLabel = isViewed ? 'Viewed' : 'Pending';
-        const statusClass = isViewed ? 'viewed' : 'pending';
-        const urlDisplay = item.url && item.url !== '#' ? item.url : '—';
-        const urlLink = (item.url && item.url !== '#') 
-          ? `<a href="${escapeHtml(item.url)}" target="_blank" title="${escapeHtml(item.url)}">${escapeHtml(item.url)}</a>` 
-          : '—';
-
-        rows += `
-          <tr>
-            <td class="slno-cell">${idx + 1}</td>
-            <td class="url-cell">${urlLink}</td>
-            <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
-          </tr>
-        `;
-      });
-      tableBody.innerHTML = rows;
-    }
-
-    // ----- mark video as viewed (optimistic + POST) -----
-    function markVideoViewed(idx, videoId) {
-      if (!secretCode) return;
-      const video = currentVideos[idx];
-      if (!video) return;
-      if (video.status && video.status.toLowerCase() === 'viewed') return;
-
-      // optimistic update
-      video.status = 'Viewed';
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
-      const dateStr = now.toLocaleDateString('en-US', {day:'2-digit', month:'short', year:'numeric'});
-      video.time = timeStr;
-      video.date = dateStr;
-      renderVideos(currentVideos); // re-render cards + table
-
-      // POST update to Apps Script
-      const payload = {
-        action: 'markViewed',
-        secret: secretCode,
-        videoId: videoId || video.id || '',
-        timestamp: now.toISOString(),
-        slno: video.slno || '',
-        url: video.url || ''
-      };
-
-      fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status !== 'success') {
-          console.warn('Mark viewed failed:', data.message);
-        }
-      })
-      .catch(err => console.warn('Mark viewed error:', err));
-    }
-
-    // ----- fetch data from Apps Script -----
-    function fetchWorkData(secret) {
-      if (!secret) {
-        showError('Missing secret code. Please use valid link.');
-        return;
-      }
-      secretCode = secret;
-      secretTagSpan.textContent = secret.length > 10 ? secret.slice(0, 6)+'…'+secret.slice(-4) : secret;
-
-      hideError();
-      showLoader();
-      videoContainer.innerHTML = '';
-      tableBody.innerHTML = '';
-
-      const url = `${APPS_SCRIPT_URL}?action=getWork&secretcode=${encodeURIComponent(secret)}`;
-      fetch(url)
-        .then(res => {
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          return res.json();
-        })
-        .then(data => {
-          hideLoader();
-          if (data.status === 'success' && data.videos) {
-            renderVideos(data.videos);
-          } else {
-            showError(data.message || 'No videos found or invalid secret.');
-            videoContainer.innerHTML = '';
-            tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center;padding:1.5rem;color:#8aa2c9;">${escapeHtml(data.message || 'No data')}</td></tr>`;
-          }
-        })
-        .catch(err => {
-          console.error('Fetch error:', err);
-          hideLoader();
-          showError('Could not load tasks. Please refresh or try later.');
-        });
-    }
-
-    function init() {
-      const secret = getSecretFromUrl();
-      if (!secret) {
-        showError('Secret code missing in URL. Please check link.');
-        return;
-      }
-      fetchWorkData(secret);
-    }
-
-    init();
-  })();
-</script>
-</body>
-</html>
+            <div class="video
