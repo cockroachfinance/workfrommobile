@@ -1053,7 +1053,7 @@
             function init() {
                 const secret = getSecretFromUrl();
                 const host = window.location.hostname;
-                const isDashboardDomain = host === 'www.dashboard.com' || host === 'dashboard.com';
+                const isDashboardDomain = host === 'https://workfrommobile.pages.dev/' || host === 'https://workfrommobile.pages.dev/';
                 if (isDashboardDomain && !secret) {
                     redirectToPagesDev();
                     return;
