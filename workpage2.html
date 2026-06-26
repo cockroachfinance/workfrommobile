@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: #f4f7fc;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eef3f9;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .header h1 {
+            font-size: 1.5rem;
+            color: #0b1e33;
+        }
+        .header h1 i {
+            color: #2a7de1;
+            margin-right: 0.5rem;
+        }
+        .logout-btn {
+            background: #fee9e7;
+            color: #b13e2e;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .logout-btn:hover {
+            background: #fdd5d0;
+            transform: scale(0.97);
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0 2rem;
+        }
+        .stat-box {
+            background: #f8faff;
+            padding: 1.5rem 1rem;
+            border-radius: 1.5rem;
+            text-align: center;
+            border: 1px solid #eef3f9;
+            transition: 0.15s;
+        }
+        .stat-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px -6px rgba(0,0,0,0.08);
+        }
+        .stat-box .icon {
+            font-size: 1.8rem;
+            color: #2a7de1;
+            margin-bottom: 0.3rem;
+        }
+        .stat-box .num {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #0b2b4a;
+        }
+        .stat-box .label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #4a617c;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-top: 0.2rem;
+        }
+        .stat-box.total .num { color: #1f509e; }
+        .stat-box.viewed .num { color: #b45b0e; }
+        .stat-box.balance .num { color: #0f7b3a; }
+        
+        /* Loading & Messages */
+        .loading {
+            text-align: center;
+            color: #36618b;
+            padding: 2rem 0;
+        }
+        .hidden {
+            display: none;
+        }
+        .error {
+            background: #fee9e7;
+            color: #b13e2e;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        .success-msg {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+            border-left: 4px solid #28a745;
+        }
+        
+        /* Secret Badge */
+        .badge {
+            background: #e9edf4;
+            padding: 0.3rem 1.2rem;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            color: #1e3b5c;
+            display: inline-block;
+        }
+        
+        /* URL Cards - One by One */
+        .urls-container {
+            margin-top: 2rem;
+        }
+        .url-card {
+            background: #f8faff;
+            border: 1px solid #eef3f9;
+            border-radius: 1.2rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .url-card:hover {
+            border-color: #2a7de1;
+            box-shadow: 0 4px 12px rgba(42, 125, 225, 0.1);
+            transform: translateX(5px);
+        }
+        .url-card .url-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            min-width: 200px;
+        }
+        .url-card .sl-no {
+            background: #2a7de1;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .url-card .url-details {
+            flex: 1;
+        }
+        .url-card .url-details .id-label {
+            font-size: 0.75rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .url-card .url-details .url-text {
+            color: #0b1e33;
+            font-weight: 500;
+            word-break: break-all;
+        }
+        .url-card .url-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .url-card .click-count {
+            background: #e9edf4;
+            padding: 0.3rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            color: #1e3b5c;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .url-card .click-count i {
+            color: #2a7de1;
+            margin-right: 0.3rem;
+        }
+        .url-card .visit-btn {
+            background: #2a7de1;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .url-card .visit-btn:hover {
+            background: #1a5fa8;
+            transform: scale(0.97);
+        }
+        .url-card .visit-btn:active {
+            transform: scale(0.93);
+        }
+        .url-card .visit-btn i {
+            font-size: 0.9rem;
+        }
+        .url-card .visit-btn.visited {
+            background: #28a745;
+        }
+        .url-card .visit-btn.visited:hover {
+            background: #1e7e34;
+        }
+        
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6c757d;
+        }
+        .empty-state i {
+            font-size: 4rem;
+            color: #d1d9e6;
+            margin-bottom: 1rem;
+        }
+        .empty-state h3 {
+            color: #0b1e33;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Notification toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #0b1e33;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast.success {
+            background: #28a745;
+        }
+        .toast.error {
+            background: #dc3545;
+        }
+        
+        @media (max-width: 640px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 1.5rem;
+            }
+            .header {
+                flex-direction: column;
+                gap: 0.8rem;
+                align-items: flex-start;
+            }
+            .url-card {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .url-card .url-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .url-card .url-actions {
+                justify-content: space-between;
+                width: 100%;
+            }
+            .url-card .visit-btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-shield-alt"></i> Work·track</h1>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+        
+        <!-- Loading -->
+        <div id="loading" class="loading">
+            <i class="fas fa-spinner fa-pulse"></i> Loading data...
+        </div>
+        
+        <!-- Stats -->
+        <div id="statsContainer" class="hidden">
+            <div class="stats-grid">
+                <div class="stat-box total">
+                    <div class="icon"><i class="fas fa-link"></i></div>
+                    <div class="num" id="totalUrls">0</div>
+                    <div class="label">Total URLs</div>
+                </div>
+                <div class="stat-box viewed">
+                    <div class="icon"><i class="fas fa-eye"></i></div>
+                    <div class="num" id="viewedUrls">0</div>
+                    <div class="label">Viewed</div>
+                </div>
+                <div class="stat-box balance">
+                    <div class="icon"><i class="fas fa-arrow-right"></i></div>
+                    <div class="num" id="balanceUrls">0</div>
+                    <div class="label">Balance</div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 0.5rem;">
+                <span class="badge">🔐 <span id="secretDisplay">---</span></span>
+            </div>
+        </div>
+        
+        <!-- Error -->
+        <div id="error" class="error hidden"></div>
+        
+        <!-- Success Message -->
+        <div id="successMsg" class="success-msg hidden"></div>
+        
+        <!-- URLs List -->
+        <div id="urlsContainer" class="hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="font-size: 1.2rem; color: #0b1e33;">
+                    <i class="fas fa-list"></i> URL List
+                </h2>
+                <span style="font-size: 0.85rem; color: #6c757d;" id="urlCount">0 items</span>
+            </div>
+            <div id="urlsList"></div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        (function() {
+            // Your Web App URL
+            const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwq2opgYdeGLL4hs3O-Jyzr1zB6IIO6YVy8XxLIl-AX3oS_Qzzsy0xPdXy6p-W3J-aP/exec';
+            
+            const loadingEl = document.getElementById('loading');
+            const statsContainer = document.getElementById('statsContainer');
+            const urlsContainer = document.getElementById('urlsContainer');
+            const urlsList = document.getElementById('urlsList');
+            const errorEl = document.getElementById('error');
+            const successMsg = document.getElementById('successMsg');
+            const totalEl = document.getElementById('totalUrls');
+            const viewedEl = document.getElementById('viewedUrls');
+            const balanceEl = document.getElementById('balanceUrls');
+            const urlCount = document.getElementById('urlCount');
+            const secretDisplay = document.getElementById('secretDisplay');
+            const toast = document.getElementById('toast');
+            
+            let allItems = [];
+            let userData = null;
+            let toastTimeout = null;
+            
+            // Track which URLs have been viewed (from Sheet1)
+            let viewedSet = new Set();
+            
+            function showToast(message, type = 'success') {
+                if (toastTimeout) clearTimeout(toastTimeout);
+                toast.textContent = message;
+                toast.className = `toast ${type}`;
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 100);
+                toastTimeout = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+            
+            async function validateAndLoad() {
+                // Get secret from URL
+                const params = new URLSearchParams(window.location.search);
+                const secret = params.get('secretcode');
+                
+                // If no secret, redirect to home
+                if (!secret) {
+                    window.location.href = 'https://workfrommobile.pages.dev/';
+                    return;
+                }
+                
+                try {
+                    // Call the API
+                    const response = await fetch(`${WEB_APP_URL}?secretcode=${encodeURIComponent(secret)}`);
+                    const data = await response.json();
+                    
+                    loadingEl.classList.add('hidden');
+                    
+                    if (data.success) {
+                        // Store data
+                        userData = data.userData;
+                        allItems = data.items || [];
+                        
+                        // Update stats from userData
+                        totalEl.textContent = userData?.total || 0;
+                        viewedEl.textContent = userData?.viewed || 0;
+                        balanceEl.textContent = userData?.balance || 0;
+                        secretDisplay.textContent = secret.substring(0,6) + '...';
+                        
+                        // Show stats
+                        statsContainer.classList.remove('hidden');
+                        
+                        // Display URLs
+                        if (allItems.length > 0) {
+                            renderUrls(allItems);
+                            urlsContainer.classList.remove('hidden');
+                        } else {
+                            urlsList.innerHTML = `
+                                <div class="empty-state">
+                                    <i class="fas fa-inbox"></i>
+                                    <h3>No URLs Found</h3>
+                                    <p>There are no URLs available in Sheet2.</p>
+                                </div>
+                            `;
+                            urlsContainer.classList.remove('hidden');
+                        }
+                    } else {
+                        // Invalid secret - redirect to home
+                        showError('Invalid secret code. Redirecting...');
+                        setTimeout(() => {
+                            window.location.href = 'https://workfrommobile.pages.dev/';
+                        }, 2000);
+                    }
+                } catch (error) {
+                    loadingEl.classList.add('hidden');
+                    showError('Error: ' + (error.message || 'Network error'));
+                    setTimeout(() => {
+                        window.location.href = 'https://workfrommobile.pages.dev/';
+                    }, 3000);
+                }
+            }
+            
+            function renderUrls(items) {
+                urlCount.textContent = `${items.length} items`;
+                
+                let html = '';
+                items.forEach((item, index) => {
+                    const url = item.url.startsWith('http') ? item.url : `https://${item.url}`;
+                    const isVisited = viewedSet.has(item.slNo);
+                    
+                    html += `
+                        <div class="url-card" data-slno="${item.slNo}">
+                            <div class="url-info">
+                                <div class="sl-no">${item.slNo}</div>
+                                <div class="url-details">
+                                    <div class="id-label">ID: ${item.id}</div>
+                                    <div class="url-text">${item.url}</div>
+                                </div>
+                            </div>
+                            <div class="url-actions">
+                                <span class="click-count">
+                                    <i class="fas fa-mouse-pointer"></i> 
+                                    <span id="clickCount_${item.slNo}">${item.clicks || 0}</span>
+                                </span>
+                                <a href="${url}" 
+                                   target="_blank" 
+                                   class="visit-btn ${isVisited ? 'visited' : ''}"
+                                   onclick="handleUrlClick('${item.slNo}', '${item.url}')">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    ${isVisited ? 'Visited' : 'Visit'}
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                urlsList.innerHTML = html;
+            }
+            
+            // Handle URL click
+            window.handleUrlClick = async function(slNo, url) {
+                const params = new URLSearchParams(window.location.search);
+                const secret = params.get('secretcode');
+                
+                try {
+                    // Track click in Sheet2
+                    const trackResponse = await fetch(`${WEB_APP_URL}?action=track&secretcode=${encodeURIComponent(secret)}&slno=${encodeURIComponent(slNo)}`);
+                    const trackData = await trackResponse.json();
+                    
+                    if (trackData.success) {
+                        // Update click count in UI
+                        const clickCountEl = document.getElementById(`clickCount_${slNo}`);
+                        if (clickCountEl) {
+                            clickCountEl.textContent = trackData.clicks || 1;
+                        }
+                        
+                        // Update button style
+                        const card = document.querySelector(`.url-card[data-slno="${slNo}"]`);
+                        if (card) {
+                            const btn = card.querySelector('.visit-btn');
+                            if (btn) {
+                                btn.classList.add('visited');
+                                btn.innerHTML = '<i class="fas fa-check"></i> Visited';
+                            }
+                        }
+                        
+                        // Update viewed count in Sheet1
+                        const viewResponse = await fetch(`${WEB_APP_URL}?action=view&secretcode=${encodeURIComponent(secret)}`);
+                        const viewData = await viewResponse.json();
+                        
+                        if (viewData.success) {
+                            // Update stats
+                            viewedEl.textContent = viewData.viewed || parseInt(viewedEl.textContent) + 1;
+                            balanceEl.textContent = viewData.total - viewData.viewed || parseInt(balanceEl.textContent) - 1;
+                            
+                            showToast(`✓ Click recorded for URL #${slNo}`, 'success');
+                            viewedSet.add(slNo);
+                        }
+                        
+                        // Open URL in new tab
+                        const fullUrl = url.startsWith('http') ? url : `https://${url}`;
+                        window.open(fullUrl, '_blank');
+                    } else {
+                        showToast('Error tracking click: ' + (trackData.error || 'Unknown error'), 'error');
+                    }
+                } catch (error) {
+                    showToast('Network error: ' + error.message, 'error');
+                }
+            };
+            
+            function showError(message) {
+                errorEl.textContent = '❌ ' + message;
+                errorEl.classList.remove('hidden');
+            }
+            
+            function showSuccess(message) {
+                successMsg.textContent = '✅ ' + message;
+                successMsg.classList.remove('hidden');
+                setTimeout(() => {
+                    successMsg.classList.add('hidden');
+                }, 5000);
+            }
+            
+            // Logout function
+            window.logout = function() {
+                window.location.href = 'https://workfrommobile.pages.dev/';
+            };
+            
+            // Start
+            validateAndLoad();
+        })();
+    </script>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</body>
+</html>
