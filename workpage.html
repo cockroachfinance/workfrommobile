@@ -22,7 +22,6 @@
       max-width: 720px;
       width: 100%;
     }
-    /* header */
     .top-bar {
       display: flex;
       justify-content: space-between;
@@ -61,8 +60,6 @@
       white-space: nowrap;
     }
     .secret-tag i { margin-right: 4px; }
-
-    /* stats cards */
     .stats-mini {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -95,8 +92,6 @@
     .stat-mini-card.total .num { color: #1d4ed8; }
     .stat-mini-card.viewed .num { color: #0b7e4b; }
     .stat-mini-card.pending .num { color: #b45338; }
-
-    /* video list */
     .video-list {
       display: flex;
       flex-direction: column;
@@ -201,7 +196,6 @@
       cursor: default;
     }
     .video-item .action-btn.viewed-btn i { color: #2d4b70; }
-
     .empty-state {
       background: white;
       border-radius: 40px;
@@ -225,7 +219,6 @@
       animation: spin 0.8s linear infinite;
     }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
     .error-box {
       background: #fee9ec;
       color: #a43747;
@@ -235,7 +228,6 @@
       font-weight: 500;
       margin: 1rem 0;
     }
-
     .footer-note {
       margin-top: 2rem;
       font-size: 0.65rem;
@@ -244,7 +236,6 @@
       border-top: 1px solid #e1eaf5;
       padding-top: 1.2rem;
     }
-
     @media (max-width: 480px) {
       .stats-mini { gap: 0.5rem; }
       .stat-mini-card .num { font-size: 1.3rem; }
@@ -257,36 +248,29 @@
 </head>
 <body>
 <div class="work-container" id="app">
-  <!-- top -->
   <div class="top-bar">
     <div class="brand-work"><i class="fas fa-play-circle"></i> WorkTasks</div>
     <div class="secret-tag" id="secretTag"><i class="fas fa-key"></i> <span id="secretShort">••••</span></div>
   </div>
 
-  <!-- stats -->
   <div class="stats-mini" id="statsGrid">
     <div class="stat-mini-card total"><div class="num" id="totalCount">0</div><div class="lbl">total</div></div>
     <div class="stat-mini-card viewed"><div class="num" id="viewedCount">0</div><div class="lbl">viewed</div></div>
     <div class="stat-mini-card pending"><div class="num" id="pendingCount">0</div><div class="lbl">pending</div></div>
   </div>
 
-  <!-- loader / error / list -->
   <div id="loader" class="loader-wrap hidden"><div class="spinner"></div></div>
   <div id="errorMsg" class="error-box hidden"></div>
 
-  <div id="videoListContainer" class="video-list">
-    <!-- dynamic items -->
-  </div>
+  <div id="videoListContainer" class="video-list"></div>
 
   <div class="footer-note"><i class="fas fa-rotate-left"></i> auto-sync · secure</div>
 </div>
 
 <script>
   (function() {
-    // --- CONFIG ---
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyVmExcAjovJTq3bsyAf7aBSSi1btGkLC2MBIgusRAbK6Kpi6Df4JFxHroqqIW1n0oGIA/exec'; // same endpoint
+    const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE'; // REPLACE THIS
 
-    // DOM refs
     const secretTagSpan = document.getElementById('secretShort');
     const totalEl = document.getElementById('totalCount');
     const viewedEl = document.getElementById('viewedCount');
@@ -295,11 +279,9 @@
     const loader = document.getElementById('loader');
     const errorMsg = document.getElementById('errorMsg');
 
-    // state
     let secretCode = '';
     let currentVideos = [];
 
-    // ----- helpers -----
     function getSecretFromUrl() {
       const params = new URLSearchParams(window.location.search);
       return (params.get('secretcode') || params.get('secretCode') || '').trim();
@@ -316,7 +298,17 @@
     function showLoader() { loader.classList.remove('hidden'); }
     function hideLoader() { loader.classList.add('hidden'); }
 
-    // render list & stats
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text).replace(/[&<>"]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        if (m === '"') return '&quot;';
+        return m;
+      });
+    }
+
     function renderVideos(videos) {
       currentVideos = videos;
       const total = videos.length;
@@ -362,7 +354,6 @@
       });
       videoContainer.innerHTML = html;
 
-      // attach click listeners to watch buttons (only for pending)
       document.querySelectorAll('.video-item .action-btn:not(.viewed-btn)').forEach(btn => {
         btn.addEventListener('click', function(e) {
           e.preventDefault();
@@ -373,44 +364,28 @@
             alert('No valid URL for this video.');
             return;
           }
-          // open the video in new tab
           window.open(url, '_blank');
-          // after click, we mark as viewed via Apps Script
           markVideoViewed(idx, id);
         });
       });
     }
 
-    // simple escape
-    function escapeHtml(text) {
-      if (!text) return '';
-      return String(text).replace(/[&<>"]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        if (m === '"') return '&quot;';
-        return m;
-      });
-    }
-
-    // ----- mark video as viewed (update sheet) -----
     function markVideoViewed(idx, videoId) {
       if (!secretCode) return;
-      // find video
       const video = currentVideos[idx];
       if (!video) return;
-      if (video.status && video.status.toLowerCase() === 'viewed') return; // already
+      if (video.status && video.status.toLowerCase() === 'viewed') return;
 
-      // optimistic UI update
+      // Optimistic update
       video.status = 'Viewed';
       const now = new Date();
       const timeStr = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
       const dateStr = now.toLocaleDateString('en-US', {day:'2-digit', month:'short', year:'numeric'});
       video.time = timeStr;
       video.date = dateStr;
-      renderVideos(currentVideos); // re-render
+      renderVideos(currentVideos);
 
-      // send update to Apps Script
+      // Send update - FIXED: proper fetch with CORS
       const payload = {
         action: 'markViewed',
         secret: secretCode,
@@ -420,23 +395,26 @@
         url: video.url || ''
       };
 
-      // fire-and-forget (no-cors)
       fetch(APPS_SCRIPT_URL, {
         method: 'POST',
-        mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      }).catch(err => console.warn('update err (ignored):', err));
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status !== 'success') {
+          console.warn('Mark viewed failed:', data.message);
+        }
+      })
+      .catch(err => console.warn('Mark viewed error:', err));
     }
 
-    // ----- fetch data from Apps Script -----
     function fetchWorkData(secret) {
       if (!secret) {
         showError('Missing secret code. Please use valid link.');
         return;
       }
       secretCode = secret;
-      // show short secret
       secretTagSpan.textContent = secret.length > 10 ? secret.slice(0, 6)+'…'+secret.slice(-4) : secret;
 
       hideError();
@@ -465,7 +443,6 @@
         });
     }
 
-    // ----- init -----
     function init() {
       const secret = getSecretFromUrl();
       if (!secret) {
