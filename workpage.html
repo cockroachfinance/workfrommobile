@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: #f4f7fc;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eef3f9;
+        }
+        .header h1 {
+            font-size: 1.5rem;
+            color: #0b1e33;
+        }
+        .header h1 i {
+            color: #2a7de1;
+            margin-right: 0.5rem;
+        }
+        .logout-btn {
+            background: #fee9e7;
+            color: #b13e2e;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .logout-btn:hover {
+            background: #fdd5d0;
+            transform: scale(0.97);
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0 2rem;
+        }
+        .stat-box {
+            background: #f8faff;
+            padding: 1.5rem 1rem;
+            border-radius: 1.5rem;
+            text-align: center;
+            border: 1px solid #eef3f9;
+            transition: 0.15s;
+        }
+        .stat-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px -6px rgba(0,0,0,0.08);
+        }
+        .stat-box .icon {
+            font-size: 1.8rem;
+            color: #2a7de1;
+            margin-bottom: 0.3rem;
+        }
+        .stat-box .num {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #0b2b4a;
+        }
+        .stat-box .label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #4a617c;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-top: 0.2rem;
+        }
+        .stat-box.total .num { color: #1f509e; }
+        .stat-box.viewed .num { color: #b45b0e; }
+        .stat-box.balance .num { color: #0f7b3a; }
+        
+        /* Loading & Messages */
+        .loading {
+            text-align: center;
+            color: #36618b;
+            padding: 2rem 0;
+        }
+        .hidden {
+            display: none;
+        }
+        .error {
+            background: #fee9e7;
+            color: #b13e2e;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        
+        /* Secret Badge */
+        .badge {
+            background: #e9edf4;
+            padding: 0.3rem 1.2rem;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            color: #1e3b5c;
+            display: inline-block;
+        }
+        
+        @media (max-width: 640px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 1.5rem;
+            }
+            .header {
+                flex-direction: column;
+                gap: 0.8rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-shield-alt"></i> Work·track</h1>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+        
+        <!-- Loading -->
+        <div id="loading" class="loading">
+            <i class="fas fa-spinner fa-pulse"></i> Loading data...
+        </div>
+        
+        <!-- Stats -->
+        <div id="statsContainer" class="hidden">
+            <div class="stats-grid">
+                <div class="stat-box total">
+                    <div class="icon"><i class="fas fa-video"></i></div>
+                    <div class="num" id="totalVideos">0</div>
+                    <div class="label">Total Videos</div>
+                </div>
+                <div class="stat-box viewed">
+                    <div class="icon"><i class="fas fa-eye"></i></div>
+                    <div class="num" id="viewedVideos">0</div>
+                    <div class="label">Viewed</div>
+                </div>
+                <div class="stat-box balance">
+                    <div class="icon"><i class="fas fa-arrow-right"></i></div>
+                    <div class="num" id="balanceVideos">0</div>
+                    <div class="label">Balance</div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 0.5rem;">
+                <span class="badge">🔐 <span id="secretDisplay">---</span></span>
+            </div>
+        </div>
+        
+        <!-- Error -->
+        <div id="error" class="error hidden"></div>
+    </div>
+
+    <script>
+        (function() {
+            // Replace with your Web App URL
+            const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyqWCOP-mNCY_VPMhWTihK--MdKyHqF-yUjz6TyABLwg6-Cb4mKYEoOzrqDaVKUzxj54w/exec';
+            
+            const loadingEl = document.getElementById('loading');
+            const statsContainer = document.getElementById('statsContainer');
+            const errorEl = document.getElementById('error');
+            const totalEl = document.getElementById('totalVideos');
+            const viewedEl = document.getElementById('viewedVideos');
+            const balanceEl = document.getElementById('balanceVideos');
+            const secretDisplay = document.getElementById('secretDisplay');
+            
+            async function validateAndLoad() {
+                // Get secret from URL
+                const params = new URLSearchParams(window.location.search);
+                const secret = params.get('secretcode');
+                
+                // If no secret, redirect to home
+                if (!secret) {
+                    window.location.href = 'https://workfrommobile.pages.dev/';
+                    return;
+                }
+                
+                try {
+                    // Call the validator
+                    const response = await fetch(`${WEB_APP_URL}?secretcode=${encodeURIComponent(secret)}`);
+                    const data = await response.json();
+                    
+                    loadingEl.classList.add('hidden');
+                    
+                    if (data.success) {
+                        // Valid secret - show stats
+                        // For demo, using mock data from columns D, E, F
+                        // In real implementation, your Apps Script would return these values
+                        const mockStats = {
+                            total: 25,
+                            viewed: 12,
+                            balance: 13
+                        };
+                        
+                        // If your Apps Script returns stats, use that instead
+                        // const stats = data.stats || mockStats;
+                        
+                        // For now using mock data (since your current script only validates)
+                        // Update your Apps Script to return stats from columns D, E, F
+                        totalEl.textContent = mockStats.total;
+                        viewedEl.textContent = mockStats.viewed;
+                        balanceEl.textContent = mockStats.balance;
+                        secretDisplay.textContent = secret.substring(0,6) + '...';
+                        
+                        statsContainer.classList.remove('hidden');
+                    } else {
+                        // Invalid secret - redirect to home
+                        showError('Invalid secret code. Redirecting...');
+                        setTimeout(() => {
+                            window.location.href = 'https://workfrommobile.pages.dev/';
+                        }, 2000);
+                    }
+                } catch (error) {
+                    loadingEl.classList.add('hidden');
+                    showError('Error: ' + (error.message || 'Network error'));
+                    setTimeout(() => {
+                        window.location.href = 'https://workfrommobile.pages.dev/';
+                    }, 3000);
+                }
+            }
+            
+            function showError(message) {
+                errorEl.textContent = '❌ ' + message;
+                errorEl.classList.remove('hidden');
+            }
+            
+            // Logout function
+            window.logout = function() {
+                window.location.href = 'https://workfrommobile.pages.dev/';
+            };
+            
+            // Start
+            validateAndLoad();
+        })();
+    </script>
+</body>
+</html>
