@@ -112,7 +112,8 @@
             margin-bottom: 1.5rem;
             justify-content: flex-end;
         }
-        .btn-withdraw {
+        /* Work page - bright blue with arrow */
+        .btn-workpage {
             background: #1d4ed8;
             border: none;
             color: white;
@@ -129,12 +130,13 @@
             font-family: 'Inter', sans-serif;
             border: 1px solid #1d4ed8;
         }
-        .btn-withdraw:hover {
+        .btn-workpage:hover {
             background: #1a40b0;
             border-color: #1a40b0;
             transform: scale(1.01);
         }
-        .btn-workpage {
+        /* Withdraw - light with bank box icon */
+        .btn-withdraw {
             background: #eef4ff;
             border: 1px solid #cdddfa;
             padding: 0.6rem 1.8rem;
@@ -148,7 +150,7 @@
             transition: 0.1s;
             font-family: 'Inter', sans-serif;
         }
-        .btn-workpage:hover {
+        .btn-withdraw:hover {
             background: #dce8fe;
             border-color: #a5bff0;
         }
@@ -574,15 +576,14 @@
                 <h2>WorkFromMobile</h2>
             </div>
             <div class="badge-secret">
-                <!-- Removed lock icon and asterisks, only logout remains -->
                 <button class="logout-badge" id="logoutBadgeBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
         </div>
 
-        <!-- Action bar: Withdraw + Work page side by side (swapped) -->
+        <!-- Action bar: Withdraw (light, bank icon) + Work page (bright blue, arrow) -->
         <div class="action-bar">
-            <button class="btn-withdraw" id="withdrawBtn"><i class="fas fa-arrow-up-right-from-square"></i> Withdraw</button>
-            <button class="btn-workpage" id="workPageBtn"><i class="fas fa-briefcase"></i> Work page</button>
+            <button class="btn-withdraw" id="withdrawBtn"><i class="fas fa-university"></i> Withdraw</button>
+            <button class="btn-workpage" id="workPageBtn"><i class="fas fa-arrow-right"></i> Work page</button>
         </div>
 
         <div id="loadingIndicator" class="loading-spinner hidden">
@@ -625,7 +626,7 @@
 
             <!-- action row: logout removed -->
             <div class="action-row">
-                <!-- empty, no logout button -->
+                <!-- empty -->
             </div>
         </div>
 
