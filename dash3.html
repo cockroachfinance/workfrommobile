@@ -23,7 +23,45 @@
             justify-content: center;
             padding: 1.5rem;
             margin: 0;
+            position: relative;
         }
+
+        /* logout button — top right outside card */
+        .global-logout {
+            position: fixed;
+            top: 20px;
+            right: 24px;
+            z-index: 100;
+            background: white;
+            border: 1px solid #d0ddea;
+            border-radius: 60px;
+            padding: 0.55rem 1.4rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1a2c4a;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.04);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Inter', sans-serif;
+            background: #ffffffcc;
+            backdrop-filter: blur(4px);
+            border: 1px solid #d9e3ef;
+        }
+        .global-logout:hover {
+            background: #fee9ec;
+            border-color: #e6b6be;
+            color: #a43747;
+        }
+        .global-logout i {
+            color: #4f6a8a;
+        }
+        .global-logout:hover i {
+            color: #a43747;
+        }
+
         .dashboard-card {
             max-width: 820px;
             width: 100%;
@@ -34,19 +72,27 @@
             transition: all 0.2s ease;
             border: 1px solid rgba(255, 255, 255, 0.5);
             backdrop-filter: blur(2px);
+            margin-top: 20px;
         }
         @media (max-width: 480px) {
             .dashboard-card {
                 padding: 1.5rem 1.2rem;
                 border-radius: 28px;
             }
+            .global-logout {
+                top: 12px;
+                right: 12px;
+                padding: 0.4rem 1rem;
+                font-size: 0.75rem;
+            }
         }
+
         .dashboard-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
             border-bottom: 1px solid #eef2f6;
             padding-bottom: 1rem;
         }
@@ -81,70 +127,44 @@
             border: 1px solid #d9e3f5;
         }
 
-        .top-actions {
+        /* withdraw button — top right inside card */
+        .withdraw-top {
             display: flex;
-            gap: 0.6rem;
-            align-items: center;
+            justify-content: flex-end;
+            margin-bottom: 1.2rem;
         }
-        .btn-small {
+        .btn-withdraw-top {
+            background: #1d4ed8;
             border: none;
+            color: white;
             font-weight: 600;
-            padding: 0.5rem 1.2rem;
+            padding: 0.6rem 1.8rem;
             border-radius: 60px;
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             cursor: pointer;
+            box-shadow: 0 8px 14px -8px rgba(29, 78, 216, 0.3);
             transition: all 0.15s;
             font-family: 'Inter', sans-serif;
-            background: white;
-            color: #1a2c4a;
-            border: 1px solid #d2ddee;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-        }
-        .btn-small-primary {
-            background: #1d4ed8;
             border: 1px solid #1d4ed8;
-            color: white;
-            box-shadow: 0 4px 10px -6px rgba(29, 78, 216, 0.3);
         }
-        .btn-small-primary i {
-            color: white;
-        }
-        .btn-small-primary:hover {
+        .btn-withdraw-top:hover {
             background: #1a40b0;
             border-color: #1a40b0;
-            transform: scale(1.02);
-        }
-        .btn-small-outline {
-            background: transparent;
-            border: 1px solid #d0ddea;
-        }
-        .btn-small-outline:hover {
-            background: #f0f4fe;
-            border-color: #b0c4e0;
-        }
-        .btn-small-danger {
-            border: 1px solid #f1d8dc;
-            color: #a43747;
-            background: #fff6f7;
-        }
-        .btn-small-danger:hover {
-            background: #fee9ec;
-            border-color: #e6b6be;
+            transform: scale(1.01);
         }
 
-        .user-identity {
+        .user-identity-compact {
             display: flex;
             flex-direction: column;
-            align-items: center;
+            gap: 0.3rem;
             background: #f8fafd;
-            padding: 1.5rem 1.4rem;
+            padding: 1.2rem 1.4rem;
             border-radius: 28px;
             margin-bottom: 1.5rem;
             border: 1px solid #e9edf4;
-            text-align: center;
         }
         .user-name {
             font-weight: 700;
@@ -154,40 +174,38 @@
         }
         .user-mobile {
             font-weight: 500;
-            color: #3b4d66;
+            color: #1f3a5f;
             font-size: 1rem;
-            margin-top: 0.2rem;
             background: #eef2f8;
-            padding: 0.2rem 1.2rem;
+            padding: 0.2rem 1rem;
             border-radius: 40px;
             display: inline-block;
+            width: fit-content;
         }
         .user-email {
             color: #4a5c77;
-            font-size: 0.9rem;
-            margin-top: 0.3rem;
+            font-size: 0.95rem;
             background: white;
-            padding: 0.3rem 1.5rem;
+            padding: 0.3rem 1.2rem;
             border-radius: 40px;
             border: 1px solid #dce3ec;
             display: inline-block;
+            width: fit-content;
         }
-
-        .last-login {
+        .last-login-compact {
             background: #f2f6fd;
             border-radius: 40px;
-            padding: 0.6rem 1.5rem;
+            padding: 0.7rem 1.5rem;
             display: inline-flex;
             align-items: center;
             gap: 10px;
             font-size: 0.9rem;
             color: #1f3a5f;
             border: 1px solid #dce7f5;
-            margin-bottom: 2rem;
-            width: 100%;
-            justify-content: center;
+            margin-bottom: 1.5rem;
+            width: fit-content;
         }
-        .last-login i {
+        .last-login-compact i {
             color: #3b6bc4;
         }
 
@@ -195,7 +213,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 1rem;
-            margin: 0 0 2rem 0;
+            margin: 1.8rem 0 2rem;
         }
         .stat-item {
             background: #fafcff;
@@ -233,37 +251,67 @@
             color: #1d4ed8;
         }
 
-        .center-btn-wrapper {
+        .action-row {
             display: flex;
-            justify-content: center;
-            margin: 1.5rem 0 0.5rem 0;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 1.8rem;
+            border-top: 1px solid #e9eff6;
+            padding-top: 1.8rem;
         }
-        .btn-work {
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+        .btn {
             border: none;
             font-weight: 600;
-            padding: 0.9rem 3rem;
+            padding: 0.8rem 2rem;
             border-radius: 60px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            background: white;
+            color: #1a2c4a;
+            border: 1px solid #d2ddee;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-primary {
             background: #1d4ed8;
             border: 1px solid #1d4ed8;
             color: white;
-            cursor: pointer;
-            transition: all 0.15s;
             box-shadow: 0 8px 14px -8px rgba(29, 78, 216, 0.3);
-            font-family: 'Inter', sans-serif;
         }
-        .btn-work i {
+        .btn-primary i {
             color: white;
         }
-        .btn-work:hover {
+        .btn-primary:hover {
             background: #1a40b0;
             border-color: #1a40b0;
-            transform: scale(1.02);
+            transform: scale(1.01);
         }
-
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #d0ddea;
+        }
+        .btn-outline:hover {
+            background: #f0f4fe;
+            border-color: #b0c4e0;
+        }
+        .btn i {
+            font-size: 1rem;
+            color: #3f5b81;
+        }
+        .btn-primary i {
+            color: white;
+        }
         .secret-chip {
             background: #e6edf8;
             padding: 0.3rem 1.2rem;
@@ -273,8 +321,57 @@
             font-size: 0.9rem;
             color: #1e3b66;
             border: 1px dashed #9db6d9;
-            display: inline-block;
-            margin-top: 0.5rem;
+        }
+
+        .work-page-btn {
+            background: #eef4ff;
+            border: 1px solid #cdddfa;
+            padding: 0.6rem 1.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            color: #1d4ed8;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.1s;
+            font-family: 'Inter', sans-serif;
+            margin-top: 0.2rem;
+            width: fit-content;
+        }
+        .work-page-btn:hover {
+            background: #dce8fe;
+            border-color: #a5bff0;
+        }
+
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.7rem;
+            }
+            .stat-item .value {
+                font-size: 1.4rem;
+            }
+            .action-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn-group {
+                justify-content: center;
+            }
+            .btn {
+                justify-content: center;
+                padding: 0.7rem 1.2rem;
+                flex: 1;
+            }
+            .user-name {
+                font-size: 1.3rem;
+            }
+        }
+        @media (max-width: 420px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .footnote {
@@ -288,7 +385,6 @@
         .footnote i {
             margin-right: 6px;
         }
-
         .hidden {
             display: none !important;
         }
@@ -310,12 +406,8 @@
             animation: spin 0.8s linear infinite;
         }
         @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         .error-message {
             background: #fee9ec;
@@ -327,6 +419,7 @@
             font-weight: 500;
         }
 
+        /* popup */
         .popup-overlay {
             position: fixed;
             top: 0;
@@ -349,17 +442,37 @@
             padding: 2rem 1.8rem;
             box-shadow: 0 40px 60px -20px rgba(0, 0, 0, 0.3);
             animation: popIn 0.2s ease;
+            position: relative;
         }
         @keyframes popIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.96) translateY(10px);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
+            0% { opacity: 0; transform: scale(0.96) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
         }
+        /* close button top corner */
+        .popup-close {
+            position: absolute;
+            top: 16px;
+            right: 18px;
+            background: #f0f4fc;
+            border: none;
+            border-radius: 40px;
+            width: 36px;
+            height: 36px;
+            font-size: 1.2rem;
+            color: #1f3a5f;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.15s;
+            border: 1px solid #dce3ec;
+        }
+        .popup-close:hover {
+            background: #fee9ec;
+            color: #a43747;
+            border-color: #e6b6be;
+        }
+
         .popup-card h3 {
             font-size: 1.4rem;
             font-weight: 700;
@@ -379,7 +492,7 @@
             font-size: 0.85rem;
             color: #1f3a5f;
             display: block;
-            margin-top: 1.2rem;
+            margin-top: 1rem;
             margin-bottom: 0.3rem;
         }
         .popup-card input {
@@ -416,35 +529,6 @@
         .popup-actions .btn {
             flex: 1;
             justify-content: center;
-            border: none;
-            font-weight: 600;
-            padding: 0.8rem 2rem;
-            border-radius: 60px;
-            font-size: 0.95rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: all 0.15s;
-            font-family: 'Inter', sans-serif;
-            background: white;
-            color: #1a2c4a;
-            border: 1px solid #d2ddee;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-        }
-        .popup-actions .btn-primary {
-            background: #1d4ed8;
-            border: 1px solid #1d4ed8;
-            color: white;
-            box-shadow: 0 8px 14px -8px rgba(29, 78, 216, 0.3);
-        }
-        .popup-actions .btn-primary i {
-            color: white;
-        }
-        .popup-actions .btn-primary:hover {
-            background: #1a40b0;
-            border-color: #1a40b0;
-            transform: scale(1.01);
         }
         .popup-actions .btn-secondary {
             background: #eef2f8;
@@ -461,66 +545,69 @@
             align-items: center;
             gap: 4px;
         }
-        .popup-step {
+        .popup-step { display: block; }
+        .popup-step.hidden { display: none; }
+        .balance-hint {
+            font-weight: 500;
+            color: #1d4ed8;
+            background: #eef4ff;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-left: 6px;
+        }
+
+        /* tabs for step2 */
+        .tab-bar {
+            display: flex;
+            gap: 4px;
+            background: #f0f4fc;
+            border-radius: 60px;
+            padding: 4px;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e9f2;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 0.5rem 0.8rem;
+            border: none;
+            border-radius: 40px;
+            background: transparent;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #4f6a8a;
+            cursor: pointer;
+            transition: 0.15s;
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-btn.active {
+            background: white;
+            color: #1d4ed8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #d3dfed;
+        }
+        .tab-btn:hover:not(.active) {
+            background: #e6edf8;
+        }
+        .tab-panel {
+            display: none;
+        }
+        .tab-panel.active {
             display: block;
         }
-        .popup-step.hidden {
-            display: none;
+        .tab-panel label {
+            margin-top: 0.2rem;
         }
-
-        .session-warning {
-            background: #fff8e1;
-            border: 1px solid #ffd54f;
-            color: #6d4c00;
-            padding: 0.5rem 1rem;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            margin-bottom: 1rem;
-            display: none;
-            align-items: center;
-            gap: 8px;
-        }
-        .session-warning.show {
-            display: flex;
-        }
-
-        @media (max-width: 600px) {
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 0.7rem;
-            }
-            .stat-item .value {
-                font-size: 1.4rem;
-            }
-            .user-name {
-                font-size: 1.3rem;
-            }
-            .top-actions .btn-small {
-                padding: 0.4rem 0.9rem;
-                font-size: 0.75rem;
-            }
-            .btn-work {
-                padding: 0.8rem 2rem;
-                font-size: 0.9rem;
-            }
-        }
-        @media (max-width: 420px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            .dashboard-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.8rem;
-            }
-            .top-actions {
-                width: 100%;
-                justify-content: flex-end;
-            }
+        .tab-panel input {
+            margin-bottom: 0.2rem;
         }
     </style>
 </head>
 <body>
+
+    <!-- Logout button OUTSIDE card, top right corner -->
+    <button class="global-logout" id="globalLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
 
     <div class="dashboard-card" id="dashboardMain">
         <div class="dashboard-header">
@@ -528,19 +615,14 @@
                 <i class="fas fa-layer-group"></i>
                 <h2>WorkFromMobile</h2>
             </div>
-            <div class="top-actions">
-                <button class="btn-small btn-small-primary" id="withdrawBtn">
-                    <i class="fas fa-arrow-up-right-from-square"></i> Withdraw
-                </button>
-                <button class="btn-small btn-small-danger" id="logoutBtn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
+            <div class="badge-secret">
+                <i class="fas fa-lock"></i> <span id="secretCodeDisplay">••••••</span>
             </div>
         </div>
 
-        <div id="sessionWarning" class="session-warning">
-            <i class="fas fa-exclamation-triangle"></i>
-            <span>Session will expire in <span id="sessionTimer">5:00</span></span>
+        <!-- Withdraw button at top corner inside box -->
+        <div class="withdraw-top">
+            <button class="btn-withdraw-top" id="withdrawBtn"><i class="fas fa-arrow-up-right-from-square"></i> Withdraw</button>
         </div>
 
         <div id="loadingIndicator" class="loading-spinner hidden">
@@ -551,18 +633,24 @@
         <div id="errorContainer" class="error-message hidden"></div>
 
         <div id="dashboardContent">
-            <div class="user-identity">
+            <!-- compact user info: name, mobile, email -->
+            <div class="user-identity-compact">
                 <div class="user-name" id="userNameDisplay">—</div>
                 <div class="user-mobile" id="userMobileDisplay"><i class="fas fa-phone-alt" style="margin-right: 6px;"></i>—</div>
-                <div class="user-email" id="userEmailDisplay"><i class="far fa-envelope" style="margin-right: 6px;"></i> —</div>
+                <div class="user-email" id="userEmailDisplay"><i class="far fa-envelope"></i> —</div>
             </div>
 
-            <div class="last-login">
+            <!-- last login -->
+            <div class="last-login-compact">
                 <i class="fas fa-clock"></i>
                 <span>Last login: </span>
                 <strong id="lastLoginDisplay">—</strong>
             </div>
 
+            <!-- work page button (below last login) -->
+            <button class="work-page-btn" id="workPageBtn"><i class="fas fa-briefcase"></i> Work page</button>
+
+            <!-- stats -->
             <div class="stats-grid">
                 <div class="stat-item highlight">
                     <div class="label"><i class="fas fa-wallet"></i> Total earning</div>
@@ -578,13 +666,10 @@
                 </div>
             </div>
 
-            <div class="center-btn-wrapper">
-                <button class="btn-work" id="workBtn">
-                    <i class="fas fa-briefcase"></i> Go to Work
-                </button>
-            </div>
-
-            <div style="text-align: center; margin-top: 1rem;">
+            <div class="action-row">
+                <div class="btn-group">
+                    <button class="btn btn-outline" id="logoutBtnInside"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
                 <div class="secret-chip">
                     <i class="fas fa-key"></i> SECRET: <span id="secretCodeChip">—</span>
                 </div>
@@ -596,8 +681,12 @@
         </div>
     </div>
 
+    <!-- WITHDRAW POPUP -->
     <div id="withdrawPopup" class="popup-overlay hidden">
         <div class="popup-card">
+            <!-- close button top corner -->
+            <button class="popup-close" id="popupCloseBtn"><i class="fas fa-times"></i></button>
+
             <div id="stepAmount" class="popup-step">
                 <h3><i class="fas fa-hand-holding-usd" style="color:#1d4ed8;"></i> Withdraw</h3>
                 <div class="sub">Enter amount (max balance <span id="popupBalanceHint">₹0</span>)</div>
@@ -615,16 +704,27 @@
 
             <div id="stepDetails" class="popup-step hidden">
                 <h3><i class="fas fa-university" style="color:#1d4ed8;"></i> Payment details</h3>
-                <div class="sub">Enter UPI ID or Account number &amp; IFSC</div>
+                <div class="sub">Choose payment method</div>
 
-                <label for="upiInput">UPI ID <span style="font-weight:400;color:#4f6a8a;">(or)</span></label>
-                <input type="text" id="upiInput" placeholder="example@upi" />
+                <!-- tabs -->
+                <div class="tab-bar" id="tabBar">
+                    <button class="tab-btn active" data-tab="tabUPI">UPI</button>
+                    <button class="tab-btn" data-tab="tabBank">Bank</button>
+                </div>
 
-                <label for="accountInput">Account number</label>
-                <input type="text" id="accountInput" placeholder="1234567890" />
+                <!-- UPI panel -->
+                <div id="tabUPI" class="tab-panel active">
+                    <label for="upiInput">UPI ID</label>
+                    <input type="text" id="upiInput" placeholder="example@upi" />
+                </div>
 
-                <label for="ifscInput">IFSC code</label>
-                <input type="text" id="ifscInput" placeholder="SBIN0001234" />
+                <!-- Bank panel -->
+                <div id="tabBank" class="tab-panel">
+                    <label for="accountInput">Account number</label>
+                    <input type="text" id="accountInput" placeholder="1234567890" />
+                    <label for="ifscInput">IFSC code</label>
+                    <input type="text" id="ifscInput" placeholder="SBIN0001234" />
+                </div>
 
                 <div id="detailsError" class="inline-error hidden"><i class="fas fa-exclamation-circle"></i> <span></span></div>
                 <div class="popup-actions">
@@ -637,11 +737,10 @@
 
     <script>
         (function() {
-            // ---- CONFIG ----
             const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCP7i_BmRycTLuvlO8oVTYfolbcfH1C8eHbxjH1CyQh1WEloDGffQXQTQa9GlAnXl8/exec';
-            const SESSION_TIMEOUT = 5 * 60 * 1000;
 
             // DOM refs
+            const secretDisplay = document.getElementById('secretCodeDisplay');
             const secretChip = document.getElementById('secretCodeChip');
             const userName = document.getElementById('userNameDisplay');
             const userMobile = document.getElementById('userMobileDisplay');
@@ -654,12 +753,11 @@
             const errorContainer = document.getElementById('errorContainer');
             const dashboardContent = document.getElementById('dashboardContent');
             const withdrawBtn = document.getElementById('withdrawBtn');
-            const logoutBtn = document.getElementById('logoutBtn');
-            const workBtn = document.getElementById('workBtn');
-            const sessionWarning = document.getElementById('sessionWarning');
-            const sessionTimer = document.getElementById('sessionTimer');
+            const logoutBtnInside = document.getElementById('logoutBtnInside');
+            const globalLogoutBtn = document.getElementById('globalLogoutBtn');
+            const workPageBtn = document.getElementById('workPageBtn');
 
-            // Popup elements
+            // popup
             const popupOverlay = document.getElementById('withdrawPopup');
             const stepAmount = document.getElementById('stepAmount');
             const stepDetails = document.getElementById('stepDetails');
@@ -674,84 +772,26 @@
             const accountInput = document.getElementById('accountInput');
             const ifscInput = document.getElementById('ifscInput');
             const detailsError = document.getElementById('detailsError');
+            const popupCloseBtn = document.getElementById('popupCloseBtn');
 
-            // internal state
+            // tabs
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabPanels = {
+                upi: document.getElementById('tabUPI'),
+                bank: document.getElementById('tabBank')
+            };
+
             let currentUser = null;
             let currentSecret = '';
             let withdrawalAmount = 0;
-            let sessionTimerInterval = null;
 
-            // Helper: redirect
             function redirectToPagesDev() {
                 window.location.href = 'https://workfrommobile.pages.dev/';
             }
 
-            function redirectToWork() {
-                window.location.href = 'https://workfrommobile.pages.dev/work';
-            }
-
-            // Get secret from URL or session storage
-            function getSecret() {
-                const storedSecret = sessionStorage.getItem('userSecret');
-                if (storedSecret) {
-                    return storedSecret;
-                }
-
+            function getSecretFromUrl() {
                 const params = new URLSearchParams(window.location.search);
-                const urlSecret = (params.get('secretcode') || params.get('secretCode') || '').trim();
-                
-                if (urlSecret) {
-                    sessionStorage.setItem('userSecret', urlSecret);
-                    cleanUrl();
-                    return urlSecret;
-                }
-                
-                return '';
-            }
-
-            function cleanUrl() {
-                const url = new URL(window.location.href);
-                url.searchParams.delete('secretcode');
-                url.searchParams.delete('secretCode');
-                window.history.replaceState({}, document.title, url.toString());
-            }
-
-            function isSessionValid() {
-                const sessionTime = sessionStorage.getItem('sessionTimestamp');
-                if (!sessionTime) return false;
-                const elapsed = Date.now() - parseInt(sessionTime);
-                return elapsed < SESSION_TIMEOUT;
-            }
-
-            function startSessionTimer() {
-                sessionStorage.setItem('sessionTimestamp', Date.now().toString());
-                sessionWarning.classList.add('show');
-                
-                if (sessionTimerInterval) clearInterval(sessionTimerInterval);
-                
-                sessionTimerInterval = setInterval(() => {
-                    const elapsed = Date.now() - parseInt(sessionStorage.getItem('sessionTimestamp'));
-                    const remaining = Math.max(0, SESSION_TIMEOUT - elapsed);
-                    
-                    if (remaining <= 0) {
-                        clearInterval(sessionTimerInterval);
-                        sessionWarning.classList.remove('show');
-                        alert('Your session has expired. Please login again.');
-                        sessionStorage.clear();
-                        redirectToPagesDev();
-                        return;
-                    }
-                    
-                    const minutes = Math.floor(remaining / 60000);
-                    const seconds = Math.floor((remaining % 60000) / 1000);
-                    sessionTimer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                }, 1000);
-            }
-
-            function resetSessionTimer() {
-                if (currentSecret) {
-                    sessionStorage.setItem('sessionTimestamp', Date.now().toString());
-                }
+                return (params.get('secretcode') || params.get('secretCode') || '').trim();
             }
 
             function showError(message) {
@@ -759,11 +799,6 @@
                 errorContainer.classList.remove('hidden');
                 dashboardContent.style.display = 'none';
                 loadingIndicator.classList.add('hidden');
-            }
-
-            function formatCurrency(amount) {
-                const num = Number(amount) || 0;
-                return '₹' + num.toLocaleString('en-IN');
             }
 
             function renderDashboard(row) {
@@ -774,21 +809,16 @@
                 currentUser = row;
                 currentSecret = row.secret || '';
 
-                if (!sessionStorage.getItem('userSecret')) {
-                    sessionStorage.setItem('userSecret', currentSecret);
-                }
-
-                startSessionTimer();
-
+                secretDisplay.textContent = '••••••';
                 secretChip.textContent = '••••••';
 
                 userName.textContent = row.name || '—';
                 userMobile.textContent = row.mobile || '—';
                 userEmail.textContent = row.email || '—';
                 lastLogin.textContent = row.lastLogin || '—';
-                totalEarning.textContent = formatCurrency(row.totalEarning);
-                withdrawed.textContent = formatCurrency(row.withdrawed);
-                balance.textContent = formatCurrency(row.balance);
+                totalEarning.textContent = row.totalEarning ? `₹${Number(row.totalEarning).toLocaleString()}` : '₹0';
+                withdrawed.textContent = row.withdrawed ? `₹${Number(row.withdrawed).toLocaleString()}` : '₹0';
+                balance.textContent = row.balance ? `₹${Number(row.balance).toLocaleString()}` : '₹0';
 
                 dashboardContent.style.display = 'block';
                 errorContainer.classList.add('hidden');
@@ -800,13 +830,6 @@
                     redirectToPagesDev();
                     return;
                 }
-                
-                if (!isSessionValid()) {
-                    sessionStorage.clear();
-                    redirectToPagesDev();
-                    return;
-                }
-
                 loadingIndicator.classList.remove('hidden');
                 dashboardContent.style.display = 'none';
                 errorContainer.classList.add('hidden');
@@ -830,22 +853,26 @@
                     });
             }
 
-            // ----- WITHDRAW POPUP LOGIC -----
+            // ----- WITHDRAW -----
             function getBalance() {
                 if (!currentUser) return 0;
                 return Number(currentUser.balance) || 0;
             }
 
             function openPopup() {
-                resetSessionTimer();
                 const bal = getBalance();
-                popupBalanceHint.textContent = formatCurrency(bal);
+                popupBalanceHint.textContent = `₹${bal.toLocaleString()}`;
                 withdrawAmount.value = '';
                 amountError.classList.add('hidden');
                 detailsError.classList.add('hidden');
                 upiInput.value = '';
                 accountInput.value = '';
                 ifscInput.value = '';
+                // reset to UPI tab
+                tabBtns.forEach(b => b.classList.remove('active'));
+                document.querySelector('[data-tab="tabUPI"]').classList.add('active');
+                tabPanels.upi.classList.add('active');
+                tabPanels.bank.classList.remove('active');
 
                 stepAmount.classList.remove('hidden');
                 stepDetails.classList.add('hidden');
@@ -858,7 +885,6 @@
             }
 
             function validateAmount() {
-                resetSessionTimer();
                 const val = parseFloat(withdrawAmount.value);
                 const bal = getBalance();
                 if (isNaN(val) || val <= 0) {
@@ -868,7 +894,7 @@
                 }
                 if (val > bal) {
                     amountError.classList.remove('hidden');
-                    amountError.querySelector('span').textContent = `Amount exceeds balance (${formatCurrency(bal)}).`;
+                    amountError.querySelector('span').textContent = `Amount exceeds balance (₹${bal.toFixed(2)}).`;
                     return false;
                 }
                 amountError.classList.add('hidden');
@@ -881,7 +907,14 @@
                 stepAmount.classList.add('hidden');
                 stepDetails.classList.remove('hidden');
                 detailsError.classList.add('hidden');
-                setTimeout(() => upiInput.focus(), 100);
+                // focus first visible input
+                setTimeout(() => {
+                    const activePanel = document.querySelector('.tab-panel.active');
+                    if (activePanel) {
+                        const inp = activePanel.querySelector('input');
+                        if (inp) inp.focus();
+                    }
+                }, 100);
             }
 
             function goToStep1() {
@@ -892,38 +925,27 @@
             }
 
             function submitWithdrawal() {
-                resetSessionTimer();
-                
-                if (!isSessionValid()) {
-                    alert('Session expired. Please login again.');
-                    sessionStorage.clear();
-                    redirectToPagesDev();
-                    return;
-                }
+                // determine which tab is active
+                const isUpi = tabPanels.upi.classList.contains('active');
+                let upi = '',
+                    acc = '',
+                    ifsc = '';
 
-                const upi = upiInput.value.trim();
-                const acc = accountInput.value.trim();
-                const ifsc = ifscInput.value.trim();
-
-                if (!upi && (!acc || !ifsc)) {
-                    detailsError.classList.remove('hidden');
-                    detailsError.querySelector('span').textContent = 'Enter UPI ID OR Account number + IFSC.';
-                    return;
-                }
-                if (upi && (acc || ifsc)) {
-                    detailsError.classList.remove('hidden');
-                    detailsError.querySelector('span').textContent = 'Provide either UPI OR Bank details, not both.';
-                    return;
-                }
-                if (acc && !ifsc) {
-                    detailsError.classList.remove('hidden');
-                    detailsError.querySelector('span').textContent = 'IFSC code is required for bank account.';
-                    return;
-                }
-                if (ifsc && !acc) {
-                    detailsError.classList.remove('hidden');
-                    detailsError.querySelector('span').textContent = 'Account number is required for bank.';
-                    return;
+                if (isUpi) {
+                    upi = upiInput.value.trim();
+                    if (!upi) {
+                        detailsError.classList.remove('hidden');
+                        detailsError.querySelector('span').textContent = 'Please enter a UPI ID.';
+                        return;
+                    }
+                } else {
+                    acc = accountInput.value.trim();
+                    ifsc = ifscInput.value.trim();
+                    if (!acc || !ifsc) {
+                        detailsError.classList.remove('hidden');
+                        detailsError.querySelector('span').textContent = 'Please enter both Account number and IFSC.';
+                        return;
+                    }
                 }
                 detailsError.classList.add('hidden');
 
@@ -961,14 +983,38 @@
                     });
             }
 
+            // ---- TAB LOGIC ----
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const target = this.dataset.tab; // "tabUPI" or "tabBank"
+                    // toggle panels
+                    Object.keys(tabPanels).forEach(key => {
+                        const panel = tabPanels[key];
+                        // panel id is "tabUPI" or "tabBank"
+                        const panelId = panel.id;
+                        if (panelId === target) {
+                            panel.classList.add('active');
+                        } else {
+                            panel.classList.remove('active');
+                        }
+                    });
+                    detailsError.classList.add('hidden');
+                    // clear fields
+                    upiInput.value = '';
+                    accountInput.value = '';
+                    ifscInput.value = '';
+                });
+            });
+
             // ---- EVENT BINDINGS ----
             withdrawBtn.addEventListener('click', openPopup);
-
             popupCancelBtn.addEventListener('click', closePopup);
+            popupCloseBtn.addEventListener('click', closePopup);
             popupOverlay.addEventListener('click', function(e) {
                 if (e.target === popupOverlay) closePopup();
             });
-
             popupNextBtn.addEventListener('click', goToStep2);
             withdrawAmount.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
@@ -976,10 +1022,10 @@
                     goToStep2();
                 }
             });
-
             popupBackBtn.addEventListener('click', goToStep1);
             popupSubmitBtn.addEventListener('click', submitWithdrawal);
 
+            // Enter key on details fields
             [upiInput, accountInput, ifscInput].forEach(field => {
                 field.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') {
@@ -989,44 +1035,35 @@
                 });
             });
 
-            workBtn.addEventListener('click', redirectToWork);
-
-            document.addEventListener('click', resetSessionTimer);
-            document.addEventListener('keydown', resetSessionTimer);
-            document.addEventListener('scroll', resetSessionTimer);
-            document.addEventListener('touchstart', resetSessionTimer);
-
-            logoutBtn.addEventListener('click', function() {
-                if (confirm('Logout and clear session?')) {
-                    sessionStorage.clear();
-                    if (sessionTimerInterval) {
-                        clearInterval(sessionTimerInterval);
-                    }
+            // Logout
+            function handleLogout() {
+                if (confirm('Logout and redirect to workfrommobile.pages.dev?')) {
                     redirectToPagesDev();
                 }
+            }
+            globalLogoutBtn.addEventListener('click', handleLogout);
+            logoutBtnInside.addEventListener('click', handleLogout);
+
+            // Work page
+            workPageBtn.addEventListener('click', function() {
+                window.location.href = 'https://workfrommobile.pages.dev/';
             });
 
             // ---- INIT ----
             function init() {
-                const secret = getSecret();
-                
-                // FIX: Don't check for dashboard.com domain
-                // Just check if we have a secret
+                const secret = getSecretFromUrl();
+                const host = window.location.hostname;
+                const isDashboardDomain = host === 'www.dashboard.com' || host === 'dashboard.com';
+                if (isDashboardDomain && !secret) {
+                    redirectToPagesDev();
+                    return;
+                }
                 if (secret) {
-                    // Check if session is valid
-                    if (!isSessionValid()) {
-                        sessionStorage.clear();
-                        // Clean URL and redirect to home with error
-                        window.location.href = 'https://workfrommobile.pages.dev/?error=session_expired';
-                        return;
-                    }
                     fetchUserData(secret);
                 } else {
-                    // No secret found, redirect to home
-                    window.location.href = 'https://workfrommobile.pages.dev/?error=no_secret';
+                    redirectToPagesDev();
                 }
             }
-
             init();
         })();
     </script>
