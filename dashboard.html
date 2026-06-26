@@ -23,43 +23,6 @@
             justify-content: center;
             padding: 1.5rem;
             margin: 0;
-            position: relative;
-        }
-
-        /* logout button — top right outside card */
-        .global-logout {
-            position: fixed;
-            top: 20px;
-            right: 24px;
-            z-index: 100;
-            background: white;
-            border: 1px solid #d0ddea;
-            border-radius: 60px;
-            padding: 0.55rem 1.4rem;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #1a2c4a;
-            box-shadow: 0 6px 14px rgba(0,0,0,0.04);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: all 0.15s;
-            font-family: 'Inter', sans-serif;
-            background: #ffffffcc;
-            backdrop-filter: blur(4px);
-            border: 1px solid #d9e3ef;
-        }
-        .global-logout:hover {
-            background: #fee9ec;
-            border-color: #e6b6be;
-            color: #a43747;
-        }
-        .global-logout i {
-            color: #4f6a8a;
-        }
-        .global-logout:hover i {
-            color: #a43747;
         }
 
         .dashboard-card {
@@ -72,18 +35,11 @@
             transition: all 0.2s ease;
             border: 1px solid rgba(255, 255, 255, 0.5);
             backdrop-filter: blur(2px);
-            margin-top: 20px;
         }
         @media (max-width: 480px) {
             .dashboard-card {
                 padding: 1.5rem 1.2rem;
                 border-radius: 28px;
-            }
-            .global-logout {
-                top: 12px;
-                right: 12px;
-                padding: 0.4rem 1rem;
-                font-size: 0.75rem;
             }
         }
 
@@ -126,14 +82,37 @@
             gap: 6px;
             border: 1px solid #d9e3f5;
         }
-
-        /* withdraw button — top right inside card */
-        .withdraw-top {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 1.2rem;
+        .badge-secret .logout-badge {
+            background: transparent;
+            border: none;
+            color: #4f6a8a;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 0 0 0 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.15s;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-left: 1px solid #cbd8ea;
+            padding-left: 10px;
+            margin-left: 4px;
         }
-        .btn-withdraw-top {
+        .badge-secret .logout-badge:hover {
+            color: #a43747;
+        }
+
+        /* action bar: withdraw + work page side by side */
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            justify-content: flex-end;
+        }
+        .btn-withdraw {
             background: #1d4ed8;
             border: none;
             color: white;
@@ -150,10 +129,28 @@
             font-family: 'Inter', sans-serif;
             border: 1px solid #1d4ed8;
         }
-        .btn-withdraw-top:hover {
+        .btn-withdraw:hover {
             background: #1a40b0;
             border-color: #1a40b0;
             transform: scale(1.01);
+        }
+        .btn-workpage {
+            background: #eef4ff;
+            border: 1px solid #cdddfa;
+            padding: 0.6rem 1.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            color: #1d4ed8;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.1s;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-workpage:hover {
+            background: #dce8fe;
+            border-color: #a5bff0;
         }
 
         .user-identity-compact {
@@ -255,17 +252,13 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-end;
             gap: 1rem;
             margin-top: 1.8rem;
             border-top: 1px solid #e9eff6;
             padding-top: 1.8rem;
         }
-        .btn-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-        }
+
         .btn {
             border: none;
             font-weight: 600;
@@ -312,37 +305,6 @@
         .btn-primary i {
             color: white;
         }
-        .secret-chip {
-            background: #e6edf8;
-            padding: 0.3rem 1.2rem;
-            border-radius: 40px;
-            font-family: monospace;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #1e3b66;
-            border: 1px dashed #9db6d9;
-        }
-
-        .work-page-btn {
-            background: #eef4ff;
-            border: 1px solid #cdddfa;
-            padding: 0.6rem 1.8rem;
-            border-radius: 60px;
-            font-weight: 600;
-            color: #1d4ed8;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: 0.1s;
-            font-family: 'Inter', sans-serif;
-            margin-top: 0.2rem;
-            width: fit-content;
-        }
-        .work-page-btn:hover {
-            background: #dce8fe;
-            border-color: #a5bff0;
-        }
 
         @media (max-width: 600px) {
             .stats-grid {
@@ -356,7 +318,12 @@
                 flex-direction: column;
                 align-items: stretch;
             }
-            .btn-group {
+            .action-bar {
+                justify-content: stretch;
+            }
+            .action-bar .btn-withdraw,
+            .action-bar .btn-workpage {
+                flex: 1;
                 justify-content: center;
             }
             .btn {
@@ -366,6 +333,14 @@
             }
             .user-name {
                 font-size: 1.3rem;
+            }
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.6rem;
+            }
+            .badge-secret {
+                align-self: flex-start;
             }
         }
         @media (max-width: 420px) {
@@ -448,7 +423,6 @@
             0% { opacity: 0; transform: scale(0.96) translateY(10px); }
             100% { opacity: 1; transform: scale(1) translateY(0); }
         }
-        /* close button top corner */
         .popup-close {
             position: absolute;
             top: 16px;
@@ -472,7 +446,6 @@
             color: #a43747;
             border-color: #e6b6be;
         }
-
         .popup-card h3 {
             font-size: 1.4rem;
             font-weight: 700;
@@ -547,18 +520,6 @@
         }
         .popup-step { display: block; }
         .popup-step.hidden { display: none; }
-        .balance-hint {
-            font-weight: 500;
-            color: #1d4ed8;
-            background: #eef4ff;
-            padding: 0.2rem 1rem;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            display: inline-block;
-            margin-left: 6px;
-        }
-
-        /* tabs for step2 */
         .tab-bar {
             display: flex;
             gap: 4px;
@@ -606,9 +567,6 @@
 </head>
 <body>
 
-    <!-- Logout button OUTSIDE card, top right corner -->
-    <button class="global-logout" id="globalLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
-
     <div class="dashboard-card" id="dashboardMain">
         <div class="dashboard-header">
             <div class="brand">
@@ -617,12 +575,14 @@
             </div>
             <div class="badge-secret">
                 <i class="fas fa-lock"></i> <span id="secretCodeDisplay">••••••</span>
+                <button class="logout-badge" id="logoutBadgeBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
         </div>
 
-        <!-- Withdraw button at top corner inside box -->
-        <div class="withdraw-top">
-            <button class="btn-withdraw-top" id="withdrawBtn"><i class="fas fa-arrow-up-right-from-square"></i> Withdraw</button>
+        <!-- Action bar: Withdraw + Work page side by side -->
+        <div class="action-bar">
+            <button class="btn-workpage" id="workPageBtn"><i class="fas fa-briefcase"></i> Work page</button>
+            <button class="btn-withdraw" id="withdrawBtn"><i class="fas fa-arrow-up-right-from-square"></i> Withdraw</button>
         </div>
 
         <div id="loadingIndicator" class="loading-spinner hidden">
@@ -647,9 +607,6 @@
                 <strong id="lastLoginDisplay">—</strong>
             </div>
 
-            <!-- work page button (below last login) -->
-            <button class="work-page-btn" id="workPageBtn"><i class="fas fa-briefcase"></i> Work page</button>
-
             <!-- stats -->
             <div class="stats-grid">
                 <div class="stat-item highlight">
@@ -666,13 +623,9 @@
                 </div>
             </div>
 
+            <!-- action row: only logout button remains (secret removed) -->
             <div class="action-row">
-                <div class="btn-group">
-                    <button class="btn btn-outline" id="logoutBtnInside"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                </div>
-                <div class="secret-chip">
-                    <i class="fas fa-key"></i> SECRET: <span id="secretCodeChip">—</span>
-                </div>
+                <button class="btn btn-outline" id="logoutBtnInside"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
         </div>
 
@@ -684,9 +637,7 @@
     <!-- WITHDRAW POPUP -->
     <div id="withdrawPopup" class="popup-overlay hidden">
         <div class="popup-card">
-            <!-- close button top corner -->
             <button class="popup-close" id="popupCloseBtn"><i class="fas fa-times"></i></button>
-
             <div id="stepAmount" class="popup-step">
                 <h3><i class="fas fa-hand-holding-usd" style="color:#1d4ed8;"></i> Withdraw</h3>
                 <div class="sub">Enter amount (max balance <span id="popupBalanceHint">₹0</span>)</div>
@@ -701,31 +652,23 @@
                     <button class="btn btn-primary" id="popupNextBtn">Next <i class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
-
             <div id="stepDetails" class="popup-step hidden">
                 <h3><i class="fas fa-university" style="color:#1d4ed8;"></i> Payment details</h3>
                 <div class="sub">Choose payment method</div>
-
-                <!-- tabs -->
                 <div class="tab-bar" id="tabBar">
                     <button class="tab-btn active" data-tab="tabUPI">UPI</button>
                     <button class="tab-btn" data-tab="tabBank">Bank</button>
                 </div>
-
-                <!-- UPI panel -->
                 <div id="tabUPI" class="tab-panel active">
                     <label for="upiInput">UPI ID</label>
                     <input type="text" id="upiInput" placeholder="example@upi" />
                 </div>
-
-                <!-- Bank panel -->
                 <div id="tabBank" class="tab-panel">
                     <label for="accountInput">Account number</label>
                     <input type="text" id="accountInput" placeholder="1234567890" />
                     <label for="ifscInput">IFSC code</label>
                     <input type="text" id="ifscInput" placeholder="SBIN0001234" />
                 </div>
-
                 <div id="detailsError" class="inline-error hidden"><i class="fas fa-exclamation-circle"></i> <span></span></div>
                 <div class="popup-actions">
                     <button class="btn btn-secondary" id="popupBackBtn"><i class="fas fa-arrow-left"></i> Back</button>
@@ -741,7 +684,6 @@
 
             // DOM refs
             const secretDisplay = document.getElementById('secretCodeDisplay');
-            const secretChip = document.getElementById('secretCodeChip');
             const userName = document.getElementById('userNameDisplay');
             const userMobile = document.getElementById('userMobileDisplay');
             const userEmail = document.getElementById('userEmailDisplay');
@@ -754,7 +696,7 @@
             const dashboardContent = document.getElementById('dashboardContent');
             const withdrawBtn = document.getElementById('withdrawBtn');
             const logoutBtnInside = document.getElementById('logoutBtnInside');
-            const globalLogoutBtn = document.getElementById('globalLogoutBtn');
+            const logoutBadgeBtn = document.getElementById('logoutBadgeBtn');
             const workPageBtn = document.getElementById('workPageBtn');
 
             // popup
@@ -774,7 +716,6 @@
             const detailsError = document.getElementById('detailsError');
             const popupCloseBtn = document.getElementById('popupCloseBtn');
 
-            // tabs
             const tabBtns = document.querySelectorAll('.tab-btn');
             const tabPanels = {
                 upi: document.getElementById('tabUPI'),
@@ -810,7 +751,6 @@
                 currentSecret = row.secret || '';
 
                 secretDisplay.textContent = '••••••';
-                secretChip.textContent = '••••••';
 
                 userName.textContent = row.name || '—';
                 userMobile.textContent = row.mobile || '—';
@@ -853,7 +793,6 @@
                     });
             }
 
-            // ----- WITHDRAW -----
             function getBalance() {
                 if (!currentUser) return 0;
                 return Number(currentUser.balance) || 0;
@@ -868,7 +807,6 @@
                 upiInput.value = '';
                 accountInput.value = '';
                 ifscInput.value = '';
-                // reset to UPI tab
                 tabBtns.forEach(b => b.classList.remove('active'));
                 document.querySelector('[data-tab="tabUPI"]').classList.add('active');
                 tabPanels.upi.classList.add('active');
@@ -907,7 +845,6 @@
                 stepAmount.classList.add('hidden');
                 stepDetails.classList.remove('hidden');
                 detailsError.classList.add('hidden');
-                // focus first visible input
                 setTimeout(() => {
                     const activePanel = document.querySelector('.tab-panel.active');
                     if (activePanel) {
@@ -925,7 +862,6 @@
             }
 
             function submitWithdrawal() {
-                // determine which tab is active
                 const isUpi = tabPanels.upi.classList.contains('active');
                 let upi = '',
                     acc = '',
@@ -983,16 +919,13 @@
                     });
             }
 
-            // ---- TAB LOGIC ----
             tabBtns.forEach(btn => {
                 btn.addEventListener('click', function() {
                     tabBtns.forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
-                    const target = this.dataset.tab; // "tabUPI" or "tabBank"
-                    // toggle panels
+                    const target = this.dataset.tab;
                     Object.keys(tabPanels).forEach(key => {
                         const panel = tabPanels[key];
-                        // panel id is "tabUPI" or "tabBank"
                         const panelId = panel.id;
                         if (panelId === target) {
                             panel.classList.add('active');
@@ -1001,14 +934,12 @@
                         }
                     });
                     detailsError.classList.add('hidden');
-                    // clear fields
                     upiInput.value = '';
                     accountInput.value = '';
                     ifscInput.value = '';
                 });
             });
 
-            // ---- EVENT BINDINGS ----
             withdrawBtn.addEventListener('click', openPopup);
             popupCancelBtn.addEventListener('click', closePopup);
             popupCloseBtn.addEventListener('click', closePopup);
@@ -1025,7 +956,6 @@
             popupBackBtn.addEventListener('click', goToStep1);
             popupSubmitBtn.addEventListener('click', submitWithdrawal);
 
-            // Enter key on details fields
             [upiInput, accountInput, ifscInput].forEach(field => {
                 field.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') {
@@ -1035,26 +965,30 @@
                 });
             });
 
-            // Logout
             function handleLogout() {
                 if (confirm('Logout and redirect to workfrommobile.pages.dev?')) {
                     redirectToPagesDev();
                 }
             }
-            globalLogoutBtn.addEventListener('click', handleLogout);
+            logoutBadgeBtn.addEventListener('click', handleLogout);
             logoutBtnInside.addEventListener('click', handleLogout);
 
-            // Work page
             workPageBtn.addEventListener('click', function() {
-                window.location.href = 'https://workfrommobile.pages.dev/';
+                const secret = getSecretFromUrl();
+                if (secret) {
+                    window.location.href = `https://workfrommobile.pages.dev/workpage?secretcode=${encodeURIComponent(secret)}`;
+                } else if (currentSecret) {
+                    window.location.href = `https://workfrommobile.pages.dev/workpage?secretcode=${encodeURIComponent(currentSecret)}`;
+                } else {
+                    alert('No secret code found. Please login again.');
+                    redirectToPagesDev();
+                }
             });
 
-            // ---- INIT ----
             function init() {
                 const secret = getSecretFromUrl();
                 const host = window.location.hostname;
-                const isDashboardDomain = host === 'https://workfrommobile.pages.dev/' || host === 'https://workfrommobile.pages.dev/';
-                if (isDashboardDomain && !secret) {
+                if ((host === 'workfrommobile.pages.dev' || host === 'www.workfrommobile.pages.dev') && !secret) {
                     redirectToPagesDev();
                     return;
                 }
