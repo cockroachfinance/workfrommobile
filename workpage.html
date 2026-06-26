@@ -392,7 +392,7 @@
 <script>
   (function() {
     // 🔁 REPLACE WITH YOUR APPS SCRIPT URL
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyX814KAVPX38Bt2Cqj5XFoAGJXOR2KWwUQ5Y6JDMNf85_wfIwPe_8AD-6ew_bOMy54LA/exec';
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
 
     const secretTagSpan = document.getElementById('secretShort');
     const totalEl = document.getElementById('totalCount');
@@ -463,4 +463,163 @@
           const btnIcon = isViewed ? 'fa-check-circle' : 'fa-play';
 
           html += `
-            <div class="video
+            <div class="video-item" data-idx="${idx}">
+              <div class="index">#${idx+1}</div>
+              <div class="info">
+                <div class="title">
+                  <span>${escapeHtml(item.title || 'Video')}</span>
+                  <span class="badge-id"><i class="far fa-id-card"></i> ${escapeHtml(item.id || '—')}</span>
+                </div>
+                <div class="meta">
+                  <span class="status-badge ${statusClass}">${statusLabel}</span>
+                  ${item.time ? `<span><i class="far fa-clock"></i> ${escapeHtml(item.time)}</span>` : ''}
+                  ${item.date ? `<span><i class="far fa-calendar-alt"></i> ${escapeHtml(item.date)}</span>` : ''}
+                </div>
+              </div>
+              <button class="action-btn ${btnClass}" data-url="${escapeHtml(item.url || '#')}" data-id="${escapeHtml(item.id || '')}" data-idx="${idx}" ${btnDisabled ? 'disabled' : ''}>
+                <i class="fas ${btnIcon}"></i> ${isViewed ? 'Viewed' : 'Watch'}
+              </button>
+            </div>
+          `;
+        });
+        videoContainer.innerHTML = html;
+
+        // attach click listeners to Watch buttons
+        document.querySelectorAll('.video-item .action-btn:not(.viewed-btn)').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const url = this.getAttribute('data-url');
+            const id = this.getAttribute('data-id');
+            const idx = parseInt(this.getAttribute('data-idx'), 10);
+            if (!url || url === '#') {
+              alert('No valid URL for this video.');
+              return;
+            }
+            window.open(url, '_blank');
+            markVideoViewed(idx, id);
+          });
+        });
+      }
+
+      // ---- TABLE ----
+      renderTable(videos);
+    }
+
+    // ----- render table -----
+    function renderTable(videos) {
+      if (!videos || videos.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center;padding:1.5rem;color:#8aa2c9;font-style:italic;">No data to display</td></tr>`;
+        return;
+      }
+
+      let rows = '';
+      videos.forEach((item, idx) => {
+        const isViewed = item.status && item.status.toLowerCase() === 'viewed';
+        const statusLabel = isViewed ? 'Viewed' : 'Pending';
+        const statusClass = isViewed ? 'viewed' : 'pending';
+        const urlLink = (item.url && item.url !== '#') 
+          ? `<a href="${escapeHtml(item.url)}" target="_blank" title="${escapeHtml(item.url)}">${escapeHtml(item.url)}</a>` 
+          : '—';
+
+        rows += `
+          <tr>
+            <td class="slno-cell">${idx + 1}</td>
+            <td class="url-cell">${urlLink}</td>
+            <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+          </tr>
+        `;
+      });
+      tableBody.innerHTML = rows;
+    }
+
+    // ----- mark video as viewed -----
+    function markVideoViewed(idx, videoId) {
+      if (!secretCode) return;
+      const video = currentVideos[idx];
+      if (!video) return;
+      if (video.status && video.status.toLowerCase() === 'viewed') return;
+
+      // optimistic update
+      video.status = 'Viewed';
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+      const dateStr = now.toLocaleDateString('en-US', {day:'2-digit', month:'short', year:'numeric'});
+      video.time = timeStr;
+      video.date = dateStr;
+      renderVideos(currentVideos);
+
+      // POST update to Apps Script
+      const payload = {
+        action: 'markViewed',
+        secret: secretCode,
+        videoId: videoId || video.id || '',
+        timestamp: now.toISOString(),
+        slno: video.slno || '',
+        url: video.url || ''
+      };
+
+      fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status !== 'success') {
+          console.warn('Mark viewed failed:', data.message);
+        }
+      })
+      .catch(err => console.warn('Mark viewed error:', err));
+    }
+
+    // ----- fetch data -----
+    function fetchWorkData(secret) {
+      if (!secret) {
+        showError('Missing secret code. Please use valid link.');
+        return;
+      }
+      secretCode = secret;
+      secretTagSpan.textContent = secret.length > 10 ? secret.slice(0, 6)+'…'+secret.slice(-4) : secret;
+
+      hideError();
+      showLoader();
+      videoContainer.innerHTML = '';
+      tableBody.innerHTML = '';
+
+      const url = `${APPS_SCRIPT_URL}?action=getWork&secretcode=${encodeURIComponent(secret)}`;
+      fetch(url)
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then(data => {
+          hideLoader();
+          if (data.status === 'success' && data.data && data.data.videos) {
+            renderVideos(data.data.videos, data.data.userInfo);
+          } else {
+            showError(data.message || 'No videos found or invalid secret.');
+            videoContainer.innerHTML = '';
+            tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center;padding:1.5rem;color:#8aa2c9;">${escapeHtml(data.message || 'No data')}</td></tr>`;
+          }
+        })
+        .catch(err => {
+          console.error('Fetch error:', err);
+          hideLoader();
+          showError('Could not load tasks. Please refresh or try later.');
+        });
+    }
+
+    function init() {
+      const secret = getSecretFromUrl();
+      if (!secret) {
+        showError('Secret code missing in URL. Please check link.');
+        return;
+      }
+      fetchWorkData(secret);
+    }
+
+    init();
+  })();
+</script>
+</body>
+</html>
