@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: #f4f7fc;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eef3f9;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .header h1 {
+            font-size: 1.5rem;
+            color: #0b1e33;
+        }
+        .header h1 i {
+            color: #2a7de1;
+            margin-right: 0.5rem;
+        }
+        .logout-btn {
+            background: #fee9e7;
+            color: #b13e2e;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .logout-btn:hover {
+            background: #fdd5d0;
+            transform: scale(0.97);
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0 2rem;
+        }
+        .stat-box {
+            background: #f8faff;
+            padding: 1.5rem 1rem;
+            border-radius: 1.5rem;
+            text-align: center;
+            border: 1px solid #eef3f9;
+            transition: 0.15s;
+        }
+        .stat-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px -6px rgba(0,0,0,0.08);
+        }
+        .stat-box .icon {
+            font-size: 1.8rem;
+            color: #2a7de1;
+            margin-bottom: 0.3rem;
+        }
+        .stat-box .num {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #0b2b4a;
+        }
+        .stat-box .label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #4a617c;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-top: 0.2rem;
+        }
+        .stat-box.total .num { color: #1f509e; }
+        .stat-box.viewed .num { color: #b45b0e; }
+        .stat-box.balance .num { color: #0f7b3a; }
+        
+        /* Loading & Messages */
+        .loading {
+            text-align: center;
+            color: #36618b;
+            padding: 2rem 0;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .error {
+            background: #fee9e7;
+            color: #b13e2e;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        .success-msg {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+            border-left: 4px solid #28a745;
+        }
+        
+        /* Timer Badge */
+        .timer-badge {
+            display: none;
+        }
+        
+        /* URL Cards */
+        .urls-container {
+            margin-top: 2rem;
+        }
+        .url-card {
+            background: #f8faff;
+            border: 1px solid #eef3f9;
+            border-radius: 1.2rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .url-card.blocked {
+            background: #f5f5f5;
+            opacity: 0.75;
+            border-color: #e0e0e0;
+        }
+        .url-card.blocked .url-details .url-text {
+            color: #999;
+        }
+        .url-card.blocked .sl-no {
+            background: #999;
+        }
+        .url-card.blocked .click-count {
+            background: #e8e8e8;
+            color: #999;
+        }
+        .url-card.blocked .visit-btn {
+            background: #d1d1d1;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .url-card.blocked .visit-btn:hover {
+            transform: none;
+        }
+        .url-card.blocked .visit-btn i {
+            color: #999;
+        }
+        
+        .url-card:hover {
+            border-color: #2a7de1;
+            box-shadow: 0 4px 12px rgba(42, 125, 225, 0.1);
+            transform: translateX(5px);
+        }
+        .url-card.blocked:hover {
+            transform: none;
+            border-color: #e0e0e0;
+            box-shadow: none;
+        }
+        
+        .url-card .url-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            min-width: 200px;
+        }
+        .url-card .sl-no {
+            background: #2a7de1;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .url-card .url-details {
+            flex: 1;
+        }
+        .url-card .url-details .id-label {
+            font-size: 0.75rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .url-card .url-details .url-text {
+            color: #0b1e33;
+            font-weight: 500;
+            word-break: break-all;
+        }
+        .url-card .url-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .url-card .click-count {
+            background: #e9edf4;
+            padding: 0.3rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            color: #1e3b5c;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .url-card .click-count i {
+            color: #2a7de1;
+            margin-right: 0.3rem;
+        }
+        .url-card .visit-btn {
+            background: #2a7de1;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .url-card .visit-btn:hover {
+            background: #1a5fa8;
+            transform: scale(0.97);
+        }
+        .url-card .visit-btn:active {
+            transform: scale(0.93);
+        }
+        .url-card .visit-btn i {
+            font-size: 0.9rem;
+        }
+        .url-card .visit-btn.visited {
+            background: #28a745;
+        }
+        .url-card .visit-btn.visited:hover {
+            background: #1e7e34;
+        }
+        .url-card .visit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Time spent indicator */
+        .time-spent {
+            font-size: 0.7rem;
+            color: #6c757d;
+            background: #e9edf4;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 0.2rem;
+        }
+        .time-spent i {
+            color: #28a745;
+        }
+        
+        /* Click History */
+        .click-details {
+            margin-top: 0.5rem;
+            padding: 0.5rem 0.8rem;
+            background: #f8f9fa;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            color: #495057;
+            border-left: 3px solid #2a7de1;
+            width: 100%;
+        }
+        .click-details span {
+            margin-right: 1rem;
+        }
+        .click-details .label {
+            font-weight: 600;
+            color: #6c757d;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6c757d;
+        }
+        .empty-state i {
+            font-size: 4rem;
+            color: #d1d9e6;
+            margin-bottom: 1rem;
+        }
+        .empty-state h3 {
+            color: #0b1e33;
+            margin-bottom: 0.5rem;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #0b1e33;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            max-width: 400px;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast.success {
+            background: #28a745;
+        }
+        .toast.error {
+            background: #dc3545;
+        }
+        .toast .toast-title {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+        .toast .toast-detail {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        
+        .refresh-btn {
+            background: #e9edf4;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #1e3b5c;
+            transition: 0.15s;
+            margin-left: 0.5rem;
+        }
+        .refresh-btn:hover {
+            background: #d1dbe8;
+        }
+        
+        .filter-section {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0 1.5rem;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 0.4rem 1.2rem;
+            border: 2px solid #e9edf4;
+            border-radius: 40px;
+            background: white;
+            color: #4a617c;
+            font-weight: 500;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover {
+            border-color: #2a7de1;
+            color: #2a7de1;
+        }
+        .filter-btn.active {
+            border-color: #2a7de1;
+            background: #2a7de1;
+            color: white;
+        }
+        
+        .viewed-badge {
+            display: inline-block;
+            background: #ffe5e5;
+            color: #c62828;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            margin-left: 0.5rem;
+        }
+        
+        /* Pending verification badge */
+        .pending-badge {
+            display: inline-block;
+            background: #fff3cd;
+            color: #856404;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            margin-left: 0.5rem;
+        }
+        
+        @media (max-width: 640px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 1.5rem;
+            }
+            .header {
+                flex-direction: column;
+                gap: 0.8rem;
+                align-items: flex-start;
+            }
+            .url-card {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .url-card .url-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .url-card .url-actions {
+                justify-content: space-between;
+                width: 100%;
+            }
+            .url-card .visit-btn {
+                flex: 1;
+                justify-content: center;
+            }
+            .click-details span {
+                display: block;
+                margin-bottom: 0.3rem;
+            }
+            .filter-section {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+            .filter-btn {
+                flex-shrink: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <div class="header">
+            <h1><i class="fas fa-shield-alt"></i> Work·track</h1>
+            <div>
+                <button class="refresh-btn" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+        
+        <div id="loading" class="loading">
+            <i class="fas fa-spinner fa-pulse"></i> Loading data...
+        </div>
+        
+        <div id="statsContainer" class="hidden">
+            <div class="stats-grid">
+                <div class="stat-box total">
+                    <div class="icon"><i class="fas fa-link"></i></div>
+                    <div class="num" id="totalUrls">0</div>
+                    <div class="label">Total URLs</div>
+                </div>
+                <div class="stat-box viewed">
+                    <div class="icon"><i class="fas fa-eye"></i></div>
+                    <div class="num" id="viewedUrls">0</div>
+                    <div class="label">Viewed</div>
+                </div>
+                <div class="stat-box balance">
+                    <div class="icon"><i class="fas fa-arrow-right"></i></div>
+                    <div class="num" id="balanceUrls">0</div>
+                    <div class="label">Balance</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="error" class="error hidden"></div>
+        <div id="successMsg" class="success-msg hidden"></div>
+        
+        <div id="urlsContainer" class="hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                <h2 style="font-size: 1.2rem; color: #0b1e33;">
+                    <i class="fas fa-list"></i> URL List
+                </h2>
+                <span style="font-size: 0.85rem; color: #6c757d;" id="urlCount">0 items</span>
+            </div>
+            
+            <div class="filter-section">
+                <button class="filter-btn active" data-filter="all" onclick="filterUrls('all')">All</button>
+                <button class="filter-btn" data-filter="available" onclick="filterUrls('available')">Available</button>
+                <button class="filter-btn" data-filter="viewed" onclick="filterUrls('viewed')">Viewed</button>
+                <button class="filter-btn" data-filter="pending" onclick="filterUrls('pending')">Pending Verify</button>
+            </div>
+            
+            <div id="urlsList"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        (function() {
+            const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzoHGVIEEmpOf2S8arfC7EaY-DLHo4IwebJHA-2OstNfD6ulQf0aj4DeHecN-B4xRmq/exec';
+            
+            const loadingEl = document.getElementById('loading');
+            const statsContainer = document.getElementById('statsContainer');
+            const urlsContainer = document.getElementById('urlsContainer');
+            const urlsList = document.getElementById('urlsList');
+            const errorEl = document.getElementById('error');
+            const successMsg = document.getElementById('successMsg');
+            const totalEl = document.getElementById('totalUrls');
+            const viewedEl = document.getElementById('viewedUrls');
+            const balanceEl = document.getElementById('balanceUrls');
+            const urlCount = document.getElementById('urlCount');
+            const toast = document.getElementById('toast');
+            
+            let allItems = [];
+            let toastTimeout = null;
+            let currentFilter = 'all';
+            let secret = '';
+            let viewedSlNos = new Set();
+            let pendingVerification = new Set(); // Track URLs being verified
+            
+            // Store start times for each URL visit
+            const visitStartTimes = new Map();
+            // Store interval IDs for each URL
+            const visitIntervals = new Map();
+            
+            // Minimum time required in seconds (60 seconds = 1 minute)
+            const MIN_TIME_SECONDS = 60;
+            
+            function showToast(message, type = 'success', detail = '') {
+                if (toastTimeout) clearTimeout(toastTimeout);
+                
+                let html = `<div class="toast-title">${message}</div>`;
+                if (detail) {
+                    html += `<div class="toast-detail">${detail}</div>`;
+                }
+                toast.innerHTML = html;
+                toast.className = `toast ${type}`;
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 100);
+                toastTimeout = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 4000);
+            }
+            
+            async function validateAndLoad() {
+                const params = new URLSearchParams(window.location.search);
+                secret = params.get('secretcode');
+                
+                if (!secret) {
+                    window.location.href = 'https://workfrommobile.pages.dev/';
+                    return;
+                }
+                
+                try {
+                    loadingEl.classList.remove('hidden');
+                    statsContainer.classList.add('hidden');
+                    urlsContainer.classList.add('hidden');
+                    errorEl.classList.add('hidden');
+                    
+                    const response = await fetch(`${WEB_APP_URL}?secretcode=${encodeURIComponent(secret)}`);
+                    const data = await response.json();
+                    
+                    loadingEl.classList.add('hidden');
+                    
+                    if (data.success) {
+                        allItems = data.items || [];
+                        
+                        viewedSlNos = new Set();
+                        allItems.forEach(item => {
+                            if (item.isViewed || item.isBlocked) {
+                                viewedSlNos.add(Number(item.slNo));
+                            }
+                        });
+                        
+                        totalEl.textContent = data.totalItems || 0;
+                        viewedEl.textContent = data.viewedCount || viewedSlNos.size || 0;
+                        balanceEl.textContent = data.remainingUrls || (allItems.length - viewedSlNos.size) || 0;
+                        
+                        statsContainer.classList.remove('hidden');
+                        
+                        if (allItems.length > 0) {
+                            renderUrls(allItems);
+                            urlsContainer.classList.remove('hidden');
+                        } else {
+                            urlsList.innerHTML = `
+                                <div class="empty-state">
+                                    <i class="fas fa-inbox"></i>
+                                    <h3>No URLs Found</h3>
+                                    <p>There are no URLs available in Sheet2.</p>
+                                </div>
+                            `;
+                            urlsContainer.classList.remove('hidden');
+                        }
+                    } else {
+                        showError('Invalid secret code. Redirecting...');
+                        setTimeout(() => {
+                            window.location.href = 'https://workfrommobile.pages.dev/';
+                        }, 2000);
+                    }
+                } catch (error) {
+                    loadingEl.classList.add('hidden');
+                    showError('Error: ' + (error.message || 'Network error'));
+                    setTimeout(() => {
+                        window.location.href = 'https://workfrommobile.pages.dev/';
+                    }, 3000);
+                }
+            }
+            
+            function renderUrls(items) {
+                let filteredItems = items;
+                if (currentFilter === 'available') {
+                    filteredItems = items.filter(item => !viewedSlNos.has(Number(item.slNo)) && !pendingVerification.has(Number(item.slNo)));
+                } else if (currentFilter === 'viewed') {
+                    filteredItems = items.filter(item => viewedSlNos.has(Number(item.slNo)));
+                } else if (currentFilter === 'pending') {
+                    filteredItems = items.filter(item => pendingVerification.has(Number(item.slNo)));
+                }
+                
+                urlCount.textContent = `${filteredItems.length} items`;
+                
+                if (filteredItems.length === 0) {
+                    urlsList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <h3>No ${currentFilter === 'all' ? '' : currentFilter} URLs</h3>
+                            <p>${currentFilter === 'available' ? 'You have viewed all available URLs!' : currentFilter === 'pending' ? 'No URLs pending verification.' : 'No viewed URLs yet.'}</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                filteredItems.forEach((item) => {
+                    const slNo = Number(item.slNo);
+                    const isBlocked = viewedSlNos.has(slNo);
+                    const isPending = pendingVerification.has(slNo);
+                    const cardClass = isBlocked ? 'url-card blocked' : 'url-card';
+                    
+                    // Calculate time spent if pending
+                    let timeSpentHtml = '';
+                    if (isPending && visitStartTimes.has(slNo)) {
+                        const elapsed = Math.floor((Date.now() - visitStartTimes.get(slNo)) / 1000);
+                        const remaining = Math.max(0, MIN_TIME_SECONDS - elapsed);
+                        timeSpentHtml = `<div class="time-spent"><i class="fas fa-clock"></i> ${elapsed}s / ${MIN_TIME_SECONDS}s (${remaining}s remaining)</div>`;
+                    }
+                    
+                    html += `
+                        <div class="${cardClass}" data-slno="${slNo}">
+                            <div class="url-info">
+                                <div class="sl-no">${slNo}</div>
+                                <div class="url-details">
+                                    <div class="id-label">
+                                        ID: ${item.id}
+                                        ${isBlocked ? '<span class="viewed-badge">✓ VIEWED</span>' : ''}
+                                        ${isPending ? '<span class="pending-badge">⏳ VERIFYING...</span>' : ''}
+                                    </div>
+                                    <div class="url-text">${item.url}</div>
+                                    ${timeSpentHtml}
+                                    ${item.lastClickDate ? `
+                                        <div class="click-details">
+                                            <span><span class="label">📅 Date:</span> ${item.lastClickDate}</span>
+                                            <span><span class="label">⏰ Time:</span> ${item.lastClickTime}</span>
+                                            <span><span class="label">🔄 Clicks:</span> ${item.clicks || 0}</span>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            <div class="url-actions">
+                                <span class="click-count">
+                                    <i class="fas fa-mouse-pointer"></i> 
+                                    <span id="clickCount_${slNo}">${item.clicks || 0}</span>
+                                </span>
+                                ${isBlocked ? `
+                                    <button class="visit-btn" disabled style="background:#d1d1d1; cursor:not-allowed;">
+                                        <i class="fas fa-lock"></i> Blocked
+                                    </button>
+                                ` : isPending ? `
+                                    <button class="visit-btn" disabled style="background:#ffc107; cursor:wait;">
+                                        <i class="fas fa-hourglass-half"></i> Verifying...
+                                    </button>
+                                ` : `
+                                    <button class="visit-btn" 
+                                            onclick="handleUrlClick('${slNo}', '${item.id}', '${item.url}')">
+                                        <i class="fas fa-external-link-alt"></i> Visit
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                urlsList.innerHTML = html;
+            }
+            
+            // Check if user spent enough time on the page
+            function checkTimeSpent(slNo) {
+                const startTime = visitStartTimes.get(slNo);
+                if (!startTime) return false;
+                
+                const elapsedSeconds = (Date.now() - startTime) / 1000;
+                return elapsedSeconds >= MIN_TIME_SECONDS;
+            }
+            
+            // Start monitoring time for a URL
+            function startTimeMonitoring(slNo, url) {
+                const startTime = Date.now();
+                visitStartTimes.set(slNo, startTime);
+                pendingVerification.add(slNo);
+                
+                // Update UI every second
+                const intervalId = setInterval(() => {
+                    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                    
+                    // Update the time display
+                    const card = document.querySelector(`.url-card[data-slno="${slNo}"]`);
+                    if (card) {
+                        const timeSpentEl = card.querySelector('.time-spent');
+                        if (timeSpentEl) {
+                            const remaining = Math.max(0, MIN_TIME_SECONDS - elapsed);
+                            timeSpentEl.innerHTML = `<i class="fas fa-clock"></i> ${elapsed}s / ${MIN_TIME_SECONDS}s (${remaining}s remaining)`;
+                        }
+                    }
+                    
+                    // Check if minimum time is met
+                    if (elapsed >= MIN_TIME_SECONDS) {
+                        clearInterval(intervalId);
+                        visitIntervals.delete(slNo);
+                        completeVerification(slNo);
+                    }
+                }, 1000);
+                
+                visitIntervals.set(slNo, intervalId);
+                
+                // Also set a timeout as a fallback
+                setTimeout(() => {
+                    if (pendingVerification.has(slNo) && checkTimeSpent(slNo)) {
+                        clearInterval(visitIntervals.get(slNo));
+                        visitIntervals.delete(slNo);
+                        completeVerification(slNo);
+                    }
+                }, (MIN_TIME_SECONDS + 2) * 1000);
+            }
+            
+            // Complete verification after time is met
+            async function completeVerification(slNo) {
+                if (!pendingVerification.has(slNo)) return;
+                
+                // Check if already viewed (could have been completed by another process)
+                if (viewedSlNos.has(slNo)) {
+                    pendingVerification.delete(slNo);
+                    visitStartTimes.delete(slNo);
+                    renderUrls(allItems);
+                    return;
+                }
+                
+                try {
+                    // Track the click in the backend
+                    const trackResponse = await fetch(`${WEB_APP_URL}?action=track&secretcode=${encodeURIComponent(secret)}&slno=${encodeURIComponent(slNo)}`);
+                    const trackData = await trackResponse.json();
+                    
+                    if (trackData.success) {
+                        viewedSlNos.add(slNo);
+                        pendingVerification.delete(slNo);
+                        visitStartTimes.delete(slNo);
+                        
+                        // Update click count in UI
+                        const clickCountEl = document.getElementById(`clickCount_${slNo}`);
+                        if (clickCountEl) {
+                            clickCountEl.textContent = trackData.clicks || 1;
+                        }
+                        
+                        // Update stats
+                        const total = parseInt(totalEl.textContent) || 0;
+                        const viewed = viewedSlNos.size;
+                        viewedEl.textContent = viewed;
+                        balanceEl.textContent = total - viewed;
+                        
+                        showToast(`✓ Verified! Spent ${MIN_TIME_SECONDS}s on SL ${slNo}`, 'success', 'Click recorded');
+                        
+                        renderUrls(allItems);
+                    } else {
+                        // Tracking failed, but we still mark as viewed since time was spent
+                        viewedSlNos.add(slNo);
+                        pendingVerification.delete(slNo);
+                        visitStartTimes.delete(slNo);
+                        renderUrls(allItems);
+                        showToast(`⚠️ Time verified but tracking failed: ${trackData.error || 'Unknown'}`, 'error');
+                    }
+                } catch (error) {
+                    // Even if tracking fails, mark as viewed since time was spent
+                    viewedSlNos.add(slNo);
+                    pendingVerification.delete(slNo);
+                    visitStartTimes.delete(slNo);
+                    renderUrls(allItems);
+                    showToast(`⚠️ Time verified but network error`, 'error');
+                }
+            }
+            
+            // Handle URL click with time verification
+            window.handleUrlClick = async function(slNo, id, url) {
+                slNo = Number(slNo);
+                
+                if (viewedSlNos.has(slNo)) {
+                    showToast('This URL has already been viewed!', 'error');
+                    return;
+                }
+                
+                if (pendingVerification.has(slNo)) {
+                    showToast('This URL is already being verified!', 'error');
+                    return;
+                }
+                
+                // Disable button
+                const card = document.querySelector(`.url-card[data-slno="${slNo}"]`);
+                const btn = card?.querySelector('.visit-btn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Opening...';
+                }
+                
+                // Open URL in new tab
+                const fullUrl = url.startsWith('http') ? url : `https://${url}`;
+                const newTab = window.open(fullUrl, '_blank');
+                
+                if (!newTab) {
+                    showToast('Please allow popups to open links', 'error');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-external-link-alt"></i> Visit';
+                    }
+                    return;
+                }
+                
+                // Start monitoring time
+                startTimeMonitoring(slNo, url);
+                
+                // Update the button to show verifying state
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-hourglass-half"></i> Verifying...';
+                    btn.style.background = '#ffc107';
+                }
+                
+                // Re-render to show pending state
+                renderUrls(allItems);
+                
+                showToast(`⏳ Please spend at least ${MIN_TIME_SECONDS} seconds on the page`, 'success', 'Timer started');
+            };
+            
+            // Filter URLs
+            window.filterUrls = function(filter) {
+                currentFilter = filter;
+                
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector(`.filter-btn[data-filter="${filter}"]`)?.classList.add('active');
+                
+                renderUrls(allItems);
+            };
+            
+            // Refresh data
+            window.refreshData = function() {
+                validateAndLoad();
+                showToast('Refreshing data...', 'success');
+            };
+            
+            function showError(message) {
+                errorEl.textContent = '❌ ' + message;
+                errorEl.classList.remove('hidden');
+                setTimeout(() => {
+                    errorEl.classList.add('hidden');
+                }, 5000);
+            }
+            
+            function showSuccess(message) {
+                successMsg.textContent = '✅ ' + message;
+                successMsg.classList.remove('hidden');
+                setTimeout(() => {
+                    successMsg.classList.add('hidden');
+                }, 5000);
+            }
+            
+            window.logout = function() {
+                window.location.href = 'https://workfrommobile.pages.dev/';
+            };
+            
+            // Handle page visibility change - if user switches back, check time
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'visible') {
+                    // Check each pending URL
+                    pendingVerification.forEach(slNo => {
+                        if (checkTimeSpent(slNo) && !viewedSlNos.has(slNo)) {
+                            completeVerification(slNo);
+                        }
+                    });
+                }
+            });
+            
+            // Start
+            validateAndLoad();
+        })();
+    </script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</body>
+</html>
