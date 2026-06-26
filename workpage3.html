@@ -275,7 +275,6 @@
             opacity: 0;
             transition: all 0.3s ease;
             z-index: 1000;
-            max-width: 90%;
         }
         .toast.show {
             transform: translateY(0);
@@ -377,241 +376,199 @@
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
 
-    <script>
-        (function() {
-            // Your Web App URL
-            const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwq2opgYdeGLL4hs3O-Jyzr1zB6IIO6YVy8XxLIl-AX3oS_Qzzsy0xPdXy6p-W3J-aP/exec';
+   <script>
+    (function() {
+        // Your Web App URL
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxg7Xg6vZIB2lCHZka3WTYhzU4eKJk9kstMJYH55RyvqnPJPJoLU21YJnTSpYSqT8-V/exec';
+        
+        const loadingEl = document.getElementById('loading');
+        const statsContainer = document.getElementById('statsContainer');
+        const urlsContainer = document.getElementById('urlsContainer');
+        const urlsList = document.getElementById('urlsList');
+        const errorEl = document.getElementById('error');
+        const successMsg = document.getElementById('successMsg');
+        const totalEl = document.getElementById('totalUrls');
+        const viewedEl = document.getElementById('viewedUrls');
+        const balanceEl = document.getElementById('balanceUrls');
+        const urlCount = document.getElementById('urlCount');
+        const secretDisplay = document.getElementById('secretDisplay');
+        const toast = document.getElementById('toast');
+        
+        let allItems = [];
+        let userData = null;
+        let toastTimeout = null;
+        let viewedSet = new Set();
+        
+        function showToast(message, type = 'success') {
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        async function validateAndLoad() {
+            const params = new URLSearchParams(window.location.search);
+            const secret = params.get('secretcode');
             
-            const loadingEl = document.getElementById('loading');
-            const statsContainer = document.getElementById('statsContainer');
-            const urlsContainer = document.getElementById('urlsContainer');
-            const urlsList = document.getElementById('urlsList');
-            const errorEl = document.getElementById('error');
-            const successMsg = document.getElementById('successMsg');
-            const totalEl = document.getElementById('totalUrls');
-            const viewedEl = document.getElementById('viewedUrls');
-            const balanceEl = document.getElementById('balanceUrls');
-            const urlCount = document.getElementById('urlCount');
-            const secretDisplay = document.getElementById('secretDisplay');
-            const toast = document.getElementById('toast');
-            
-            let allItems = [];
-            let userData = null;
-            let toastTimeout = null;
-            
-            // Track which URLs have been viewed (from Sheet1)
-            let viewedSet = new Set();
-            
-            // Function to properly format URL
-            function formatUrl(url) {
-                if (!url) return '';
-                
-                // Trim whitespace
-                url = url.trim();
-                
-                // If URL doesn't have http:// or https://, add https://
-                if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                    // Check if it has www. or not
-                    if (!url.startsWith('www.')) {
-                        url = 'www.' + url;
-                    }
-                    url = 'https://' + url;
-                }
-                
-                return url;
+            if (!secret) {
+                window.location.href = 'https://workfrommobile.pages.dev/';
+                return;
             }
             
-            function showToast(message, type = 'success') {
-                if (toastTimeout) clearTimeout(toastTimeout);
-                toast.textContent = message;
-                toast.className = `toast ${type}`;
-                setTimeout(() => {
-                    toast.classList.add('show');
-                }, 100);
-                toastTimeout = setTimeout(() => {
-                    toast.classList.remove('show');
-                }, 3000);
-            }
-            
-            async function validateAndLoad() {
-                // Get secret from URL
-                const params = new URLSearchParams(window.location.search);
-                const secret = params.get('secretcode');
+            try {
+                const response = await fetch(`${WEB_APP_URL}?secretcode=${encodeURIComponent(secret)}`);
+                const data = await response.json();
                 
-                // If no secret, redirect to home
-                if (!secret) {
-                    window.location.href = 'https://workfrommobile.pages.dev/';
-                    return;
-                }
+                loadingEl.classList.add('hidden');
                 
-                try {
-                    // Call the API
-                    const response = await fetch(`${WEB_APP_URL}?secretcode=${encodeURIComponent(secret)}`);
-                    const data = await response.json();
+                if (data.success) {
+                    userData = data.userData;
+                    allItems = data.items || [];
                     
-                    loadingEl.classList.add('hidden');
+                    totalEl.textContent = userData?.total || 0;
                     
-                    if (data.success) {
-                        // Store data
-                        userData = data.userData;
-                        allItems = data.items || [];
-                        
-                        // Update stats from userData
-                        totalEl.textContent = userData?.total || 0;
-                        viewedEl.textContent = userData?.viewed || 0;
-                        balanceEl.textContent = userData?.balance || 0;
-                        secretDisplay.textContent = secret.substring(0,6) + '...';
-                        
-                        // Show stats
-                        statsContainer.classList.remove('hidden');
-                        
-                        // Display URLs
-                        if (allItems.length > 0) {
-                            renderUrls(allItems);
-                            urlsContainer.classList.remove('hidden');
-                        } else {
-                            urlsList.innerHTML = `
-                                <div class="empty-state">
-                                    <i class="fas fa-inbox"></i>
-                                    <h3>No URLs Found</h3>
-                                    <p>There are no URLs available in Sheet2.</p>
-                                </div>
-                            `;
-                            urlsContainer.classList.remove('hidden');
-                        }
+                    // Count viewed from the data returned
+                    const viewedCount = allItems.filter(item => item.isClicked).length;
+                    viewedEl.textContent = viewedCount;
+                    balanceEl.textContent = (userData?.total || 0) - viewedCount;
+                    
+                    secretDisplay.textContent = secret.substring(0,6) + '...';
+                    
+                    statsContainer.classList.remove('hidden');
+                    
+                    if (allItems.length > 0) {
+                        renderUrls(allItems);
+                        urlsContainer.classList.remove('hidden');
                     } else {
-                        // Invalid secret - redirect to home
-                        showError('Invalid secret code. Redirecting...');
-                        setTimeout(() => {
-                            window.location.href = 'https://workfrommobile.pages.dev/';
-                        }, 2000);
+                        urlsList.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <h3>No URLs Found</h3>
+                                <p>There are no URLs available in Sheet2.</p>
+                            </div>
+                        `;
+                        urlsContainer.classList.remove('hidden');
                     }
-                } catch (error) {
-                    loadingEl.classList.add('hidden');
-                    showError('Error: ' + (error.message || 'Network error'));
+                } else {
+                    showError('Invalid secret code. Redirecting...');
                     setTimeout(() => {
                         window.location.href = 'https://workfrommobile.pages.dev/';
-                    }, 3000);
+                    }, 2000);
                 }
+            } catch (error) {
+                loadingEl.classList.add('hidden');
+                showError('Error: ' + (error.message || 'Network error'));
+                setTimeout(() => {
+                    window.location.href = 'https://workfrommobile.pages.dev/';
+                }, 3000);
             }
+        }
+        
+        function renderUrls(items) {
+            urlCount.textContent = `${items.length} items`;
             
-            function renderUrls(items) {
-                urlCount.textContent = `${items.length} items`;
+            let html = '';
+            items.forEach((item, index) => {
+                const url = item.url.startsWith('http') ? item.url : `https://${item.url}`;
+                const isVisited = item.isClicked || false;
+                const clickCount = item.clicks || 0;
                 
-                let html = '';
-                items.forEach((item, index) => {
-                    const formattedUrl = formatUrl(item.url);
-                    const displayUrl = item.url;
-                    const isVisited = viewedSet.has(item.slNo);
-                    
-                    html += `
-                        <div class="url-card" data-slno="${item.slNo}">
-                            <div class="url-info">
-                                <div class="sl-no">${item.slNo}</div>
-                                <div class="url-details">
-                                    <div class="id-label">ID: ${item.id}</div>
-                                    <div class="url-text">${displayUrl}</div>
-                                </div>
-                            </div>
-                            <div class="url-actions">
-                                <span class="click-count">
-                                    <i class="fas fa-mouse-pointer"></i> 
-                                    <span id="clickCount_${item.slNo}">${item.clicks || 0}</span>
-                                </span>
-                                <button 
-                                   class="visit-btn ${isVisited ? 'visited' : ''}"
-                                   onclick="handleUrlClick('${item.slNo}', '${item.url}')">
-                                    <i class="fas fa-external-link-alt"></i>
-                                    ${isVisited ? 'Visited' : 'Visit'}
-                                </button>
+                html += `
+                    <div class="url-card" data-slno="${item.slNo}">
+                        <div class="url-info">
+                            <div class="sl-no">${item.slNo}</div>
+                            <div class="url-details">
+                                <div class="id-label">ID: ${item.id}</div>
+                                <div class="url-text">${item.url}</div>
                             </div>
                         </div>
-                    `;
-                });
-                
-                urlsList.innerHTML = html;
-            }
+                        <div class="url-actions">
+                            <span class="click-count">
+                                <i class="fas fa-mouse-pointer"></i> 
+                                <span id="clickCount_${item.slNo}">${clickCount}</span>
+                            </span>
+                            <a href="${url}" 
+                               target="_blank" 
+                               class="visit-btn ${isVisited ? 'visited' : ''}"
+                               onclick="handleUrlClick('${item.slNo}', '${item.url}')">
+                                <i class="fas fa-external-link-alt"></i>
+                                ${isVisited ? 'Visited' : 'Visit'}
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
             
-            // Handle URL click
-            window.handleUrlClick = async function(slNo, rawUrl) {
-                const params = new URLSearchParams(window.location.search);
-                const secret = params.get('secretcode');
+            urlsList.innerHTML = html;
+        }
+        
+        window.handleUrlClick = async function(slNo, url) {
+            const params = new URLSearchParams(window.location.search);
+            const secret = params.get('secretcode');
+            
+            try {
+                const trackResponse = await fetch(`${WEB_APP_URL}?action=track&secretcode=${encodeURIComponent(secret)}&slno=${encodeURIComponent(slNo)}`);
+                const trackData = await trackResponse.json();
                 
-                // Format the URL properly
-                const formattedUrl = formatUrl(rawUrl);
-                
-                try {
-                    // Track click in Sheet2
-                    const trackResponse = await fetch(`${WEB_APP_URL}?action=track&secretcode=${encodeURIComponent(secret)}&slno=${encodeURIComponent(slNo)}`);
-                    const trackData = await trackResponse.json();
-                    
-                    if (trackData.success) {
-                        // Update click count in UI
-                        const clickCountEl = document.getElementById(`clickCount_${slNo}`);
-                        if (clickCountEl) {
-                            clickCountEl.textContent = trackData.clicks || 1;
-                        }
-                        
-                        // Update button style
-                        const card = document.querySelector(`.url-card[data-slno="${slNo}"]`);
-                        if (card) {
-                            const btn = card.querySelector('.visit-btn');
-                            if (btn) {
-                                btn.classList.add('visited');
-                                btn.innerHTML = '<i class="fas fa-check"></i> Visited';
-                            }
-                        }
-                        
-                        // Update viewed count in Sheet1
-                        const viewResponse = await fetch(`${WEB_APP_URL}?action=view&secretcode=${encodeURIComponent(secret)}`);
-                        const viewData = await viewResponse.json();
-                        
-                        if (viewData.success) {
-                            // Update stats
-                            viewedEl.textContent = viewData.viewed || parseInt(viewedEl.textContent) + 1;
-                            balanceEl.textContent = viewData.total - viewData.viewed || parseInt(balanceEl.textContent) - 1;
-                            
-                            showToast(`✓ Click recorded for URL #${slNo}`, 'success');
-                            viewedSet.add(slNo);
-                        }
-                        
-                        // Open URL in new tab
-                        console.log('Opening URL:', formattedUrl);
-                        window.open(formattedUrl, '_blank');
-                    } else {
-                        showToast('Error tracking click: ' + (trackData.error || 'Unknown error'), 'error');
-                        // Still open the URL even if tracking fails
-                        window.open(formattedUrl, '_blank');
+                if (trackData.success) {
+                    const clickCountEl = document.getElementById(`clickCount_${slNo}`);
+                    if (clickCountEl) {
+                        clickCountEl.textContent = trackData.clicks || 1;
                     }
-                } catch (error) {
-                    showToast('Network error: ' + error.message, 'error');
-                    // Still open the URL even if network fails
-                    window.open(formattedUrl, '_blank');
+                    
+                    const card = document.querySelector(`.url-card[data-slno="${slNo}"]`);
+                    if (card) {
+                        const btn = card.querySelector('.visit-btn');
+                        if (btn) {
+                            btn.classList.add('visited');
+                            btn.innerHTML = '<i class="fas fa-check"></i> Visited';
+                        }
+                    }
+                    
+                    const viewResponse = await fetch(`${WEB_APP_URL}?action=view&secretcode=${encodeURIComponent(secret)}`);
+                    const viewData = await viewResponse.json();
+                    
+                    if (viewData.success) {
+                        viewedEl.textContent = viewData.viewed || 0;
+                        balanceEl.textContent = viewData.balance || 0;
+                        
+                        showToast(`✓ Click recorded for URL #${slNo}`, 'success');
+                    }
+                    
+                    window.open(url.startsWith('http') ? url : `https://${url}`, '_blank');
+                } else {
+                    showToast('Error tracking click: ' + (trackData.error || 'Unknown error'), 'error');
                 }
-            };
-            
-            function showError(message) {
-                errorEl.textContent = '❌ ' + message;
-                errorEl.classList.remove('hidden');
+            } catch (error) {
+                showToast('Network error: ' + error.message, 'error');
             }
-            
-            function showSuccess(message) {
-                successMsg.textContent = '✅ ' + message;
-                successMsg.classList.remove('hidden');
-                setTimeout(() => {
-                    successMsg.classList.add('hidden');
-                }, 5000);
-            }
-            
-            // Logout function
-            window.logout = function() {
-                window.location.href = 'https://workfrommobile.pages.dev/';
-            };
-            
-            // Start
-            validateAndLoad();
-        })();
-    </script>
+        };
+        
+        function showError(message) {
+            errorEl.textContent = '❌ ' + message;
+            errorEl.classList.remove('hidden');
+        }
+        
+        function showSuccess(message) {
+            successMsg.textContent = '✅ ' + message;
+            successMsg.classList.remove('hidden');
+            setTimeout(() => {
+                successMsg.classList.add('hidden');
+            }, 5000);
+        }
+        
+        window.logout = function() {
+            window.location.href = 'https://workfrommobile.pages.dev/';
+        };
+        
+        validateAndLoad();
+    })();
+</script>
     
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
