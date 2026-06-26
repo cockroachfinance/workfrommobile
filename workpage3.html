@@ -245,6 +245,25 @@
             background: #1e7e34;
         }
         
+        /* Click History / Details Modal */
+        .click-details {
+            margin-top: 0.5rem;
+            padding: 0.5rem 0.8rem;
+            background: #f8f9fa;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            color: #495057;
+            border-left: 3px solid #2a7de1;
+            width: 100%;
+        }
+        .click-details span {
+            margin-right: 1rem;
+        }
+        .click-details .label {
+            font-weight: 600;
+            color: #6c757d;
+        }
+        
         /* Empty state */
         .empty-state {
             text-align: center;
@@ -275,6 +294,7 @@
             opacity: 0;
             transition: all 0.3s ease;
             z-index: 1000;
+            max-width: 400px;
         }
         .toast.show {
             transform: translateY(0);
@@ -285,6 +305,30 @@
         }
         .toast.error {
             background: #dc3545;
+        }
+        .toast .toast-title {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+        .toast .toast-detail {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        
+        /* Refresh button */
+        .refresh-btn {
+            background: #e9edf4;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #1e3b5c;
+            transition: 0.15s;
+            margin-left: 0.5rem;
+        }
+        .refresh-btn:hover {
+            background: #d1dbe8;
         }
         
         @media (max-width: 640px) {
@@ -315,6 +359,10 @@
                 flex: 1;
                 justify-content: center;
             }
+            .click-details span {
+                display: block;
+                margin-bottom: 0.3rem;
+            }
         }
     </style>
 </head>
@@ -323,7 +371,10 @@
         <!-- Header -->
         <div class="header">
             <h1><i class="fas fa-shield-alt"></i> Work·track</h1>
-            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            <div>
+                <button class="refresh-btn" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
         </div>
         
         <!-- Loading -->
@@ -363,7 +414,7 @@
         
         <!-- URLs List -->
         <div id="urlsContainer" class="hidden">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.5rem;">
                 <h2 style="font-size: 1.2rem; color: #0b1e33;">
                     <i class="fas fa-list"></i> URL List
                 </h2>
@@ -376,199 +427,285 @@
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
 
-   <script>
-    (function() {
-        // Your Web App URL
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxg7Xg6vZIB2lCHZka3WTYhzU4eKJk9kstMJYH55RyvqnPJPJoLU21YJnTSpYSqT8-V/exec';
-        
-        const loadingEl = document.getElementById('loading');
-        const statsContainer = document.getElementById('statsContainer');
-        const urlsContainer = document.getElementById('urlsContainer');
-        const urlsList = document.getElementById('urlsList');
-        const errorEl = document.getElementById('error');
-        const successMsg = document.getElementById('successMsg');
-        const totalEl = document.getElementById('totalUrls');
-        const viewedEl = document.getElementById('viewedUrls');
-        const balanceEl = document.getElementById('balanceUrls');
-        const urlCount = document.getElementById('urlCount');
-        const secretDisplay = document.getElementById('secretDisplay');
-        const toast = document.getElementById('toast');
-        
-        let allItems = [];
-        let userData = null;
-        let toastTimeout = null;
-        let viewedSet = new Set();
-        
-        function showToast(message, type = 'success') {
-            if (toastTimeout) clearTimeout(toastTimeout);
-            toast.textContent = message;
-            toast.className = `toast ${type}`;
-            setTimeout(() => {
-                toast.classList.add('show');
-            }, 100);
-            toastTimeout = setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-        
-        async function validateAndLoad() {
-            const params = new URLSearchParams(window.location.search);
-            const secret = params.get('secretcode');
+    <script>
+        (function() {
+            // Your Web App URL
+            const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwq2opgYdeGLL4hs3O-Jyzr1zB6IIO6YVy8XxLIl-AX3oS_Qzzsy0xPdXy6p-W3J-aP/exec';
             
-            if (!secret) {
-                window.location.href = 'https://workfrommobile.pages.dev/';
-                return;
+            const loadingEl = document.getElementById('loading');
+            const statsContainer = document.getElementById('statsContainer');
+            const urlsContainer = document.getElementById('urlsContainer');
+            const urlsList = document.getElementById('urlsList');
+            const errorEl = document.getElementById('error');
+            const successMsg = document.getElementById('successMsg');
+            const totalEl = document.getElementById('totalUrls');
+            const viewedEl = document.getElementById('viewedUrls');
+            const balanceEl = document.getElementById('balanceUrls');
+            const urlCount = document.getElementById('urlCount');
+            const secretDisplay = document.getElementById('secretDisplay');
+            const toast = document.getElementById('toast');
+            
+            let allItems = [];
+            let userData = null;
+            let toastTimeout = null;
+            let clickHistory = {}; // Store click history for each SL No
+            
+            // Track which URLs have been viewed (from Sheet1)
+            let viewedSet = new Set();
+            
+            function showToast(message, type = 'success', detail = '') {
+                if (toastTimeout) clearTimeout(toastTimeout);
+                
+                let html = `<div class="toast-title">${message}</div>`;
+                if (detail) {
+                    html += `<div class="toast-detail">${detail}</div>`;
+                }
+                toast.innerHTML = html;
+                toast.className = `toast ${type}`;
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 100);
+                toastTimeout = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 4000);
             }
             
-            try {
-                const response = await fetch(`${WEB_APP_URL}?secretcode=${encodeURIComponent(secret)}`);
-                const data = await response.json();
+            async function validateAndLoad() {
+                // Get secret from URL
+                const params = new URLSearchParams(window.location.search);
+                const secret = params.get('secretcode');
                 
-                loadingEl.classList.add('hidden');
+                // If no secret, redirect to home
+                if (!secret) {
+                    window.location.href = 'https://workfrommobile.pages.dev/';
+                    return;
+                }
                 
-                if (data.success) {
-                    userData = data.userData;
-                    allItems = data.items || [];
+                try {
+                    loadingEl.classList.remove('hidden');
                     
-                    totalEl.textContent = userData?.total || 0;
+                    // Call the API
+                    const response = await fetch(`${WEB_APP_URL}?secretcode=${encodeURIComponent(secret)}`);
+                    const data = await response.json();
                     
-                    // Count viewed from the data returned
-                    const viewedCount = allItems.filter(item => item.isClicked).length;
-                    viewedEl.textContent = viewedCount;
-                    balanceEl.textContent = (userData?.total || 0) - viewedCount;
+                    loadingEl.classList.add('hidden');
                     
-                    secretDisplay.textContent = secret.substring(0,6) + '...';
-                    
-                    statsContainer.classList.remove('hidden');
-                    
-                    if (allItems.length > 0) {
-                        renderUrls(allItems);
-                        urlsContainer.classList.remove('hidden');
+                    if (data.success) {
+                        // Store data
+                        userData = data.userData;
+                        allItems = data.items || [];
+                        
+                        // Update stats from userData
+                        totalEl.textContent = userData?.total || 0;
+                        viewedEl.textContent = userData?.viewed || 0;
+                        balanceEl.textContent = userData?.balance || 0;
+                        secretDisplay.textContent = secret.substring(0,6) + '...';
+                        
+                        // Show stats
+                        statsContainer.classList.remove('hidden');
+                        
+                        // Display URLs
+                        if (allItems.length > 0) {
+                            renderUrls(allItems);
+                            urlsContainer.classList.remove('hidden');
+                        } else {
+                            urlsList.innerHTML = `
+                                <div class="empty-state">
+                                    <i class="fas fa-inbox"></i>
+                                    <h3>No URLs Found</h3>
+                                    <p>There are no URLs available in Sheet2.</p>
+                                </div>
+                            `;
+                            urlsContainer.classList.remove('hidden');
+                        }
                     } else {
-                        urlsList.innerHTML = `
-                            <div class="empty-state">
-                                <i class="fas fa-inbox"></i>
-                                <h3>No URLs Found</h3>
-                                <p>There are no URLs available in Sheet2.</p>
-                            </div>
-                        `;
-                        urlsContainer.classList.remove('hidden');
+                        // Invalid secret - redirect to home
+                        showError('Invalid secret code. Redirecting...');
+                        setTimeout(() => {
+                            window.location.href = 'https://workfrommobile.pages.dev/';
+                        }, 2000);
                     }
-                } else {
-                    showError('Invalid secret code. Redirecting...');
+                } catch (error) {
+                    loadingEl.classList.add('hidden');
+                    showError('Error: ' + (error.message || 'Network error'));
                     setTimeout(() => {
                         window.location.href = 'https://workfrommobile.pages.dev/';
-                    }, 2000);
+                    }, 3000);
                 }
-            } catch (error) {
-                loadingEl.classList.add('hidden');
-                showError('Error: ' + (error.message || 'Network error'));
-                setTimeout(() => {
-                    window.location.href = 'https://workfrommobile.pages.dev/';
-                }, 3000);
             }
-        }
-        
-        function renderUrls(items) {
-            urlCount.textContent = `${items.length} items`;
             
-            let html = '';
-            items.forEach((item, index) => {
-                const url = item.url.startsWith('http') ? item.url : `https://${item.url}`;
-                const isVisited = item.isClicked || false;
-                const clickCount = item.clicks || 0;
+            function renderUrls(items) {
+                urlCount.textContent = `${items.length} items`;
                 
-                html += `
-                    <div class="url-card" data-slno="${item.slNo}">
-                        <div class="url-info">
-                            <div class="sl-no">${item.slNo}</div>
-                            <div class="url-details">
-                                <div class="id-label">ID: ${item.id}</div>
-                                <div class="url-text">${item.url}</div>
+                let html = '';
+                items.forEach((item, index) => {
+                    const url = item.url.startsWith('http') ? item.url : `https://${item.url}`;
+                    const isVisited = viewedSet.has(item.slNo);
+                    
+                    // Get click history for this item
+                    const history = clickHistory[item.slNo] || null;
+                    
+                    html += `
+                        <div class="url-card" data-slno="${item.slNo}">
+                            <div class="url-info">
+                                <div class="sl-no">${item.slNo}</div>
+                                <div class="url-details">
+                                    <div class="id-label">ID: ${item.id}</div>
+                                    <div class="url-text">${item.url}</div>
+                                    ${history ? `
+                                        <div class="click-details">
+                                            <span><span class="label">📅 Date:</span> ${history.date}</span>
+                                            <span><span class="label">⏰ Time:</span> ${history.time}</span>
+                                            <span><span class="label">🔄 Clicks:</span> ${history.clicks}</span>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            <div class="url-actions">
+                                <span class="click-count">
+                                    <i class="fas fa-mouse-pointer"></i> 
+                                    <span id="clickCount_${item.slNo}">${item.clicks || 0}</span>
+                                </span>
+                                <button class="visit-btn ${isVisited ? 'visited' : ''}"
+                                        onclick="handleUrlClick('${item.slNo}', '${item.id}', '${item.url}')">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    ${isVisited ? 'Visited' : 'Visit'}
+                                </button>
                             </div>
                         </div>
-                        <div class="url-actions">
-                            <span class="click-count">
-                                <i class="fas fa-mouse-pointer"></i> 
-                                <span id="clickCount_${item.slNo}">${clickCount}</span>
-                            </span>
-                            <a href="${url}" 
-                               target="_blank" 
-                               class="visit-btn ${isVisited ? 'visited' : ''}"
-                               onclick="handleUrlClick('${item.slNo}', '${item.url}')">
-                                <i class="fas fa-external-link-alt"></i>
-                                ${isVisited ? 'Visited' : 'Visit'}
-                            </a>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            urlsList.innerHTML = html;
-        }
-        
-        window.handleUrlClick = async function(slNo, url) {
-            const params = new URLSearchParams(window.location.search);
-            const secret = params.get('secretcode');
-            
-            try {
-                const trackResponse = await fetch(`${WEB_APP_URL}?action=track&secretcode=${encodeURIComponent(secret)}&slno=${encodeURIComponent(slNo)}`);
-                const trackData = await trackResponse.json();
+                    `;
+                });
                 
-                if (trackData.success) {
-                    const clickCountEl = document.getElementById(`clickCount_${slNo}`);
-                    if (clickCountEl) {
-                        clickCountEl.textContent = trackData.clicks || 1;
-                    }
+                urlsList.innerHTML = html;
+            }
+            
+            // Handle URL click
+            window.handleUrlClick = async function(slNo, id, url) {
+                const params = new URLSearchParams(window.location.search);
+                const secret = params.get('secretcode');
+                
+                // Disable button temporarily to prevent double clicks
+                const card = document.querySelector(`.url-card[data-slno="${slNo}"]`);
+                const btn = card?.querySelector('.visit-btn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.6';
+                }
+                
+                try {
+                    // Track click in Sheet2
+                    const trackResponse = await fetch(`${WEB_APP_URL}?action=track&secretcode=${encodeURIComponent(secret)}&slno=${encodeURIComponent(slNo)}`);
+                    const trackData = await trackResponse.json();
                     
-                    const card = document.querySelector(`.url-card[data-slno="${slNo}"]`);
-                    if (card) {
-                        const btn = card.querySelector('.visit-btn');
+                    if (trackData.success) {
+                        // Get current date and time
+                        const now = new Date();
+                        const dateStr = now.toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'short', 
+                            day: 'numeric' 
+                        });
+                        const timeStr = now.toLocaleTimeString('en-US', { 
+                            hour: '2-digit', 
+                            minute: '2-digit', 
+                            second: '2-digit' 
+                        });
+                        
+                        // Update click count in UI
+                        const clickCountEl = document.getElementById(`clickCount_${slNo}`);
+                        const newCount = trackData.clicks || 1;
+                        if (clickCountEl) {
+                            clickCountEl.textContent = newCount;
+                        }
+                        
+                        // Store click history
+                        clickHistory[slNo] = {
+                            date: dateStr,
+                            time: timeStr,
+                            clicks: newCount
+                        };
+                        
+                        // Update button style
+                        if (card) {
+                            const btn = card.querySelector('.visit-btn');
+                            if (btn) {
+                                btn.classList.add('visited');
+                                btn.innerHTML = '<i class="fas fa-check"></i> Visited';
+                                btn.disabled = false;
+                                btn.style.opacity = '1';
+                            }
+                        }
+                        
+                        // Update viewed count in Sheet1
+                        const viewResponse = await fetch(`${WEB_APP_URL}?action=view&secretcode=${encodeURIComponent(secret)}`);
+                        const viewData = await viewResponse.json();
+                        
+                        if (viewData.success) {
+                            // Update stats
+                            viewedEl.textContent = viewData.viewed || parseInt(viewedEl.textContent) + 1;
+                            balanceEl.textContent = viewData.total - viewData.viewed || parseInt(balanceEl.textContent) - 1;
+                            
+                            // Show detailed toast notification
+                            const detailMsg = `SL No: ${slNo} | ID: ${id} | Time: ${timeStr}`;
+                            showToast(`✓ Click Recorded Successfully!`, 'success', detailMsg);
+                            
+                            // Add to viewed set
+                            viewedSet.add(slNo);
+                            
+                            // Re-render to show click details
+                            renderUrls(allItems);
+                        }
+                        
+                        // Open URL in new tab after a small delay
+                        setTimeout(() => {
+                            const fullUrl = url.startsWith('http') ? url : `https://${url}`;
+                            window.open(fullUrl, '_blank');
+                        }, 300);
+                        
+                    } else {
+                        showToast('Error tracking click: ' + (trackData.error || 'Unknown error'), 'error');
                         if (btn) {
-                            btn.classList.add('visited');
-                            btn.innerHTML = '<i class="fas fa-check"></i> Visited';
+                            btn.disabled = false;
+                            btn.style.opacity = '1';
                         }
                     }
-                    
-                    const viewResponse = await fetch(`${WEB_APP_URL}?action=view&secretcode=${encodeURIComponent(secret)}`);
-                    const viewData = await viewResponse.json();
-                    
-                    if (viewData.success) {
-                        viewedEl.textContent = viewData.viewed || 0;
-                        balanceEl.textContent = viewData.balance || 0;
-                        
-                        showToast(`✓ Click recorded for URL #${slNo}`, 'success');
+                } catch (error) {
+                    showToast('Network error: ' + error.message, 'error');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
                     }
-                    
-                    window.open(url.startsWith('http') ? url : `https://${url}`, '_blank');
-                } else {
-                    showToast('Error tracking click: ' + (trackData.error || 'Unknown error'), 'error');
                 }
-            } catch (error) {
-                showToast('Network error: ' + error.message, 'error');
+            };
+            
+            // Refresh data
+            window.refreshData = function() {
+                validateAndLoad();
+                showToast('Refreshing data...', 'success');
+            };
+            
+            function showError(message) {
+                errorEl.textContent = '❌ ' + message;
+                errorEl.classList.remove('hidden');
             }
-        };
-        
-        function showError(message) {
-            errorEl.textContent = '❌ ' + message;
-            errorEl.classList.remove('hidden');
-        }
-        
-        function showSuccess(message) {
-            successMsg.textContent = '✅ ' + message;
-            successMsg.classList.remove('hidden');
-            setTimeout(() => {
-                successMsg.classList.add('hidden');
-            }, 5000);
-        }
-        
-        window.logout = function() {
-            window.location.href = 'https://workfrommobile.pages.dev/';
-        };
-        
-        validateAndLoad();
-    })();
-</script>
+            
+            function showSuccess(message) {
+                successMsg.textContent = '✅ ' + message;
+                successMsg.classList.remove('hidden');
+                setTimeout(() => {
+                    successMsg.classList.add('hidden');
+                }, 5000);
+            }
+            
+            // Logout function
+            window.logout = function() {
+                window.location.href = 'https://workfrommobile.pages.dev/';
+            };
+            
+            // Start
+            validateAndLoad();
+        })();
+    </script>
     
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
