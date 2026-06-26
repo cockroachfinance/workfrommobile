@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
-        /* ... (keep all existing styles) ... */
         * {
             margin: 0;
             padding: 0;
@@ -24,7 +23,45 @@
             justify-content: center;
             padding: 1.5rem;
             margin: 0;
+            position: relative;
         }
+
+        /* logout button — top right outside card */
+        .global-logout {
+            position: fixed;
+            top: 20px;
+            right: 24px;
+            z-index: 100;
+            background: white;
+            border: 1px solid #d0ddea;
+            border-radius: 60px;
+            padding: 0.55rem 1.4rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1a2c4a;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.04);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Inter', sans-serif;
+            background: #ffffffcc;
+            backdrop-filter: blur(4px);
+            border: 1px solid #d9e3ef;
+        }
+        .global-logout:hover {
+            background: #fee9ec;
+            border-color: #e6b6be;
+            color: #a43747;
+        }
+        .global-logout i {
+            color: #4f6a8a;
+        }
+        .global-logout:hover i {
+            color: #a43747;
+        }
+
         .dashboard-card {
             max-width: 820px;
             width: 100%;
@@ -35,21 +72,29 @@
             transition: all 0.2s ease;
             border: 1px solid rgba(255, 255, 255, 0.5);
             backdrop-filter: blur(2px);
+            margin-top: 20px;
         }
         @media (max-width: 480px) {
             .dashboard-card {
                 padding: 1.5rem 1.2rem;
                 border-radius: 28px;
             }
+            .global-logout {
+                top: 12px;
+                right: 12px;
+                padding: 0.4rem 1rem;
+                font-size: 0.75rem;
+            }
         }
+
         .dashboard-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            margin-bottom: 2.2rem;
+            margin-bottom: 1.2rem;
             border-bottom: 1px solid #eef2f6;
-            padding-bottom: 1.2rem;
+            padding-bottom: 1rem;
         }
         .brand {
             display: flex;
@@ -81,41 +126,89 @@
             gap: 6px;
             border: 1px solid #d9e3f5;
         }
-        .user-identity {
+
+        /* withdraw button — top right inside card */
+        .withdraw-top {
             display: flex;
-            flex-wrap: wrap;
-            align-items: baseline;
-            justify-content: space-between;
+            justify-content: flex-end;
+            margin-bottom: 1.2rem;
+        }
+        .btn-withdraw-top {
+            background: #1d4ed8;
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.6rem 1.8rem;
+            border-radius: 60px;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 8px 14px -8px rgba(29, 78, 216, 0.3);
+            transition: all 0.15s;
+            font-family: 'Inter', sans-serif;
+            border: 1px solid #1d4ed8;
+        }
+        .btn-withdraw-top:hover {
+            background: #1a40b0;
+            border-color: #1a40b0;
+            transform: scale(1.01);
+        }
+
+        .user-identity-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
             background: #f8fafd;
-            padding: 1rem 1.4rem;
+            padding: 1.2rem 1.4rem;
             border-radius: 28px;
-            margin-bottom: 1.8rem;
+            margin-bottom: 1.5rem;
             border: 1px solid #e9edf4;
         }
-        .user-name h3 {
+        .user-name {
             font-weight: 700;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             color: #0b1a33;
             letter-spacing: -0.2px;
         }
-        .user-name .mobile {
+        .user-mobile {
             font-weight: 500;
-            color: #3b4d66;
-            font-size: 0.95rem;
-            margin-left: 0.75rem;
+            color: #1f3a5f;
+            font-size: 1rem;
             background: #eef2f8;
-            padding: 0.2rem 0.9rem;
+            padding: 0.2rem 1rem;
             border-radius: 40px;
             display: inline-block;
+            width: fit-content;
         }
         .user-email {
             color: #4a5c77;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             background: white;
             padding: 0.3rem 1.2rem;
             border-radius: 40px;
             border: 1px solid #dce3ec;
+            display: inline-block;
+            width: fit-content;
         }
+        .last-login-compact {
+            background: #f2f6fd;
+            border-radius: 40px;
+            padding: 0.7rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #1f3a5f;
+            border: 1px solid #dce7f5;
+            margin-bottom: 1.5rem;
+            width: fit-content;
+        }
+        .last-login-compact i {
+            color: #3b6bc4;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -157,21 +250,7 @@
         .stat-item.highlight .value {
             color: #1d4ed8;
         }
-        .last-login {
-            background: #f2f6fd;
-            border-radius: 40px;
-            padding: 0.7rem 1.5rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-            color: #1f3a5f;
-            border: 1px solid #dce7f5;
-            margin-bottom: 2rem;
-        }
-        .last-login i {
-            color: #3b6bc4;
-        }
+
         .action-row {
             display: flex;
             flex-wrap: wrap;
@@ -252,6 +331,28 @@
             color: #1e3b66;
             border: 1px dashed #9db6d9;
         }
+
+        .work-page-btn {
+            background: #eef4ff;
+            border: 1px solid #cdddfa;
+            padding: 0.6rem 1.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            color: #1d4ed8;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.1s;
+            font-family: 'Inter', sans-serif;
+            margin-top: 0.2rem;
+            width: fit-content;
+        }
+        .work-page-btn:hover {
+            background: #dce8fe;
+            border-color: #a5bff0;
+        }
+
         @media (max-width: 600px) {
             .stats-grid {
                 grid-template-columns: 1fr 1fr;
@@ -259,14 +360,6 @@
             }
             .stat-item .value {
                 font-size: 1.4rem;
-            }
-            .user-identity {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-            .user-email {
-                margin-left: 0;
             }
             .action-row {
                 flex-direction: column;
@@ -280,12 +373,16 @@
                 padding: 0.7rem 1.2rem;
                 flex: 1;
             }
+            .user-name {
+                font-size: 1.3rem;
+            }
         }
         @media (max-width: 420px) {
             .stats-grid {
                 grid-template-columns: 1fr;
             }
         }
+
         .footnote {
             margin-top: 2rem;
             text-align: center;
@@ -318,12 +415,8 @@
             animation: spin 0.8s linear infinite;
         }
         @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         .error-message {
             background: #fee9ec;
@@ -334,6 +427,8 @@
             text-align: center;
             font-weight: 500;
         }
+
+        /* popup */
         .popup-overlay {
             position: fixed;
             top: 0;
@@ -358,14 +453,8 @@
             animation: popIn 0.2s ease;
         }
         @keyframes popIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.96) translateY(10px);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
+            0% { opacity: 0; transform: scale(0.96) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
         }
         .popup-card h3 {
             font-size: 1.4rem;
@@ -439,12 +528,8 @@
             align-items: center;
             gap: 4px;
         }
-        .popup-step {
-            display: block;
-        }
-        .popup-step.hidden {
-            display: none;
-        }
+        .popup-step { display: block; }
+        .popup-step.hidden { display: none; }
         .balance-hint {
             font-weight: 500;
             color: #1d4ed8;
@@ -455,25 +540,12 @@
             display: inline-block;
             margin-left: 6px;
         }
-        /* Session timeout warning */
-        .session-warning {
-            background: #fff8e1;
-            border: 1px solid #ffd54f;
-            color: #6d4c00;
-            padding: 0.5rem 1rem;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            margin-bottom: 1rem;
-            display: none;
-            align-items: center;
-            gap: 8px;
-        }
-        .session-warning.show {
-            display: flex;
-        }
     </style>
 </head>
 <body>
+
+    <!-- Logout button OUTSIDE card, top right corner -->
+    <button class="global-logout" id="globalLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
 
     <div class="dashboard-card" id="dashboardMain">
         <div class="dashboard-header">
@@ -486,9 +558,9 @@
             </div>
         </div>
 
-        <div id="sessionWarning" class="session-warning">
-            <i class="fas fa-exclamation-triangle"></i>
-            <span>Session will expire in <span id="sessionTimer">5:00</span></span>
+        <!-- Withdraw button at top corner inside box -->
+        <div class="withdraw-top">
+            <button class="btn-withdraw-top" id="withdrawBtn"><i class="fas fa-arrow-up-right-from-square"></i> Withdraw</button>
         </div>
 
         <div id="loadingIndicator" class="loading-spinner hidden">
@@ -499,20 +571,24 @@
         <div id="errorContainer" class="error-message hidden"></div>
 
         <div id="dashboardContent">
-            <div class="user-identity">
-                <div class="user-name">
-                    <span id="userNameDisplay">—</span>
-                    <span class="mobile" id="userMobileDisplay"><i class="fas fa-phone-alt" style="margin-right: 4px;"></i>—</span>
-                </div>
+            <!-- compact user info: name, mobile, email -->
+            <div class="user-identity-compact">
+                <div class="user-name" id="userNameDisplay">—</div>
+                <div class="user-mobile" id="userMobileDisplay"><i class="fas fa-phone-alt" style="margin-right: 6px;"></i>—</div>
                 <div class="user-email" id="userEmailDisplay"><i class="far fa-envelope"></i> —</div>
             </div>
 
-            <div class="last-login">
+            <!-- last login -->
+            <div class="last-login-compact">
                 <i class="fas fa-clock"></i>
                 <span>Last login: </span>
                 <strong id="lastLoginDisplay">—</strong>
             </div>
 
+            <!-- work page button (below last login) -->
+            <button class="work-page-btn" id="workPageBtn"><i class="fas fa-briefcase"></i> Work page</button>
+
+            <!-- stats -->
             <div class="stats-grid">
                 <div class="stat-item highlight">
                     <div class="label"><i class="fas fa-wallet"></i> Total earning</div>
@@ -530,8 +606,8 @@
 
             <div class="action-row">
                 <div class="btn-group">
-                    <button class="btn btn-primary" id="withdrawBtn"><i class="fas fa-arrow-up-right-from-square"></i> Withdraw</button>
-                    <button class="btn btn-outline" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    <!-- withdraw button also here (optional), but we keep it minimal, already top -->
+                    <button class="btn btn-outline" id="logoutBtnInside"><i class="fas fa-sign-out-alt"></i> Logout</button>
                 </div>
                 <div class="secret-chip">
                     <i class="fas fa-key"></i> SECRET: <span id="secretCodeChip">—</span>
@@ -561,20 +637,15 @@
                     <button class="btn btn-primary" id="popupNextBtn">Next <i class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
-
             <div id="stepDetails" class="popup-step hidden">
                 <h3><i class="fas fa-university" style="color:#1d4ed8;"></i> Payment details</h3>
                 <div class="sub">Enter UPI ID or Account number &amp; IFSC</div>
-
                 <label for="upiInput">UPI ID <span style="font-weight:400;color:#4f6a8a;">(or)</span></label>
                 <input type="text" id="upiInput" placeholder="example@upi" />
-
                 <label for="accountInput">Account number</label>
                 <input type="text" id="accountInput" placeholder="1234567890" />
-
                 <label for="ifscInput">IFSC code</label>
                 <input type="text" id="ifscInput" placeholder="SBIN0001234" />
-
                 <div id="detailsError" class="inline-error hidden"><i class="fas fa-exclamation-circle"></i> <span></span></div>
                 <div class="popup-actions">
                     <button class="btn btn-secondary" id="popupBackBtn"><i class="fas fa-arrow-left"></i> Back</button>
@@ -586,9 +657,7 @@
 
     <script>
         (function() {
-            // ---- CONFIG ----
             const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCP7i_BmRycTLuvlO8oVTYfolbcfH1C8eHbxjH1CyQh1WEloDGffQXQTQa9GlAnXl8/exec';
-            const SESSION_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 
             // DOM refs
             const secretDisplay = document.getElementById('secretCodeDisplay');
@@ -604,11 +673,11 @@
             const errorContainer = document.getElementById('errorContainer');
             const dashboardContent = document.getElementById('dashboardContent');
             const withdrawBtn = document.getElementById('withdrawBtn');
-            const logoutBtn = document.getElementById('logoutBtn');
-            const sessionWarning = document.getElementById('sessionWarning');
-            const sessionTimer = document.getElementById('sessionTimer');
+            const logoutBtnInside = document.getElementById('logoutBtnInside');
+            const globalLogoutBtn = document.getElementById('globalLogoutBtn');
+            const workPageBtn = document.getElementById('workPageBtn');
 
-            // Popup elements
+            // popup
             const popupOverlay = document.getElementById('withdrawPopup');
             const stepAmount = document.getElementById('stepAmount');
             const stepDetails = document.getElementById('stepDetails');
@@ -624,92 +693,17 @@
             const ifscInput = document.getElementById('ifscInput');
             const detailsError = document.getElementById('detailsError');
 
-            // internal state
             let currentUser = null;
             let currentSecret = '';
             let withdrawalAmount = 0;
-            let sessionTimerInterval = null;
 
-            // Helper: redirect
             function redirectToPagesDev() {
                 window.location.href = 'https://workfrommobile.pages.dev/';
             }
 
-            // Get secret from URL or session storage
-            function getSecret() {
-                // First check session storage
-                const storedSecret = sessionStorage.getItem('userSecret');
-                if (storedSecret) {
-                    return storedSecret;
-                }
-
-                // If not in session, check URL
+            function getSecretFromUrl() {
                 const params = new URLSearchParams(window.location.search);
-                const urlSecret = (params.get('secretcode') || params.get('secretCode') || '').trim();
-                
-                if (urlSecret) {
-                    // Store in session and clean URL
-                    sessionStorage.setItem('userSecret', urlSecret);
-                    cleanUrl();
-                    return urlSecret;
-                }
-                
-                return '';
-            }
-
-            // Clean URL by removing secret parameters
-            function cleanUrl() {
-                const url = new URL(window.location.href);
-                url.searchParams.delete('secretcode');
-                url.searchParams.delete('secretCode');
-                // Replace URL without reloading the page
-                window.history.replaceState({}, document.title, url.toString());
-            }
-
-            // Check if session is valid
-            function isSessionValid() {
-                const sessionTime = sessionStorage.getItem('sessionTimestamp');
-                if (!sessionTime) return false;
-                
-                const elapsed = Date.now() - parseInt(sessionTime);
-                return elapsed < SESSION_TIMEOUT;
-            }
-
-            // Start session timer
-            function startSessionTimer() {
-                const startTime = Date.now();
-                sessionStorage.setItem('sessionTimestamp', startTime.toString());
-                
-                sessionWarning.classList.add('show');
-                
-                if (sessionTimerInterval) {
-                    clearInterval(sessionTimerInterval);
-                }
-                
-                sessionTimerInterval = setInterval(() => {
-                    const elapsed = Date.now() - parseInt(sessionStorage.getItem('sessionTimestamp'));
-                    const remaining = Math.max(0, SESSION_TIMEOUT - elapsed);
-                    
-                    if (remaining <= 0) {
-                        clearInterval(sessionTimerInterval);
-                        sessionWarning.classList.remove('show');
-                        alert('Your session has expired. Please login again.');
-                        sessionStorage.clear();
-                        redirectToPagesDev();
-                        return;
-                    }
-                    
-                    const minutes = Math.floor(remaining / 60000);
-                    const seconds = Math.floor((remaining % 60000) / 1000);
-                    sessionTimer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                }, 1000);
-            }
-
-            // Reset session timer on user activity
-            function resetSessionTimer() {
-                if (currentSecret) {
-                    sessionStorage.setItem('sessionTimestamp', Date.now().toString());
-                }
+                return (params.get('secretcode') || params.get('secretCode') || '').trim();
             }
 
             function showError(message) {
@@ -727,15 +721,6 @@
                 currentUser = row;
                 currentSecret = row.secret || '';
 
-                // Store secret in session if not already stored
-                if (!sessionStorage.getItem('userSecret')) {
-                    sessionStorage.setItem('userSecret', currentSecret);
-                }
-
-                // Start session timer
-                startSessionTimer();
-
-                // Hide secret from UI
                 secretDisplay.textContent = '••••••';
                 secretChip.textContent = '••••••';
 
@@ -757,14 +742,6 @@
                     redirectToPagesDev();
                     return;
                 }
-                
-                // Check session validity
-                if (!isSessionValid()) {
-                    sessionStorage.clear();
-                    redirectToPagesDev();
-                    return;
-                }
-
                 loadingIndicator.classList.remove('hidden');
                 dashboardContent.style.display = 'none';
                 errorContainer.classList.add('hidden');
@@ -788,14 +765,13 @@
                     });
             }
 
-            // ----- WITHDRAW POPUP LOGIC -----
+            // ----- WITHDRAW -----
             function getBalance() {
                 if (!currentUser) return 0;
                 return Number(currentUser.balance) || 0;
             }
 
             function openPopup() {
-                resetSessionTimer();
                 const bal = getBalance();
                 popupBalanceHint.textContent = `$${bal.toLocaleString()}`;
                 withdrawAmount.value = '';
@@ -804,7 +780,6 @@
                 upiInput.value = '';
                 accountInput.value = '';
                 ifscInput.value = '';
-
                 stepAmount.classList.remove('hidden');
                 stepDetails.classList.add('hidden');
                 popupOverlay.classList.remove('hidden');
@@ -816,7 +791,6 @@
             }
 
             function validateAmount() {
-                resetSessionTimer();
                 const val = parseFloat(withdrawAmount.value);
                 const bal = getBalance();
                 if (isNaN(val) || val <= 0) {
@@ -850,16 +824,6 @@
             }
 
             function submitWithdrawal() {
-                resetSessionTimer();
-                
-                // Check session again before submitting
-                if (!isSessionValid()) {
-                    alert('Session expired. Please login again.');
-                    sessionStorage.clear();
-                    redirectToPagesDev();
-                    return;
-                }
-
                 const upi = upiInput.value.trim();
                 const acc = accountInput.value.trim();
                 const ifsc = ifscInput.value.trim();
@@ -922,12 +886,10 @@
 
             // ---- EVENT BINDINGS ----
             withdrawBtn.addEventListener('click', openPopup);
-
             popupCancelBtn.addEventListener('click', closePopup);
             popupOverlay.addEventListener('click', function(e) {
                 if (e.target === popupOverlay) closePopup();
             });
-
             popupNextBtn.addEventListener('click', goToStep2);
             withdrawAmount.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
@@ -935,10 +897,8 @@
                     goToStep2();
                 }
             });
-
             popupBackBtn.addEventListener('click', goToStep1);
             popupSubmitBtn.addEventListener('click', submitWithdrawal);
-
             [upiInput, accountInput, ifscInput].forEach(field => {
                 field.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') {
@@ -948,48 +908,35 @@
                 });
             });
 
-            // Reset session on any user interaction
-            document.addEventListener('click', resetSessionTimer);
-            document.addEventListener('keydown', resetSessionTimer);
-            document.addEventListener('scroll', resetSessionTimer);
-            document.addEventListener('touchstart', resetSessionTimer);
-
-            logoutBtn.addEventListener('click', function() {
-                if (confirm('Logout and clear session?')) {
-                    sessionStorage.clear();
-                    if (sessionTimerInterval) {
-                        clearInterval(sessionTimerInterval);
-                    }
+            // Logout buttons
+            function handleLogout() {
+                if (confirm('Logout and redirect to workfrommobile.pages.dev?')) {
                     redirectToPagesDev();
                 }
+            }
+            globalLogoutBtn.addEventListener('click', handleLogout);
+            logoutBtnInside.addEventListener('click', handleLogout);
+
+            // Work page button
+            workPageBtn.addEventListener('click', function() {
+                window.location.href = 'https://workfrommobile.pages.dev/';
             });
 
             // ---- INIT ----
             function init() {
-                const secret = getSecret();
-                
-                // Check if we're on the dashboard domain
+                const secret = getSecretFromUrl();
                 const host = window.location.hostname;
                 const isDashboardDomain = host === 'www.dashboard.com' || host === 'dashboard.com';
-
                 if (isDashboardDomain && !secret) {
                     redirectToPagesDev();
                     return;
                 }
-                
                 if (secret) {
-                    // Check if session is still valid
-                    if (!isSessionValid()) {
-                        sessionStorage.clear();
-                        redirectToPagesDev();
-                        return;
-                    }
                     fetchUserData(secret);
                 } else {
                     redirectToPagesDev();
                 }
             }
-
             init();
         })();
     </script>
