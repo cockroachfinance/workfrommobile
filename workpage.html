@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>work · secure tracker</title>
-    <!-- Font Awesome Icons (free) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Secure Tracker</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            font-family: system-ui, -apple-system, sans-serif;
         }
         body {
             background: #f4f7fc;
@@ -21,450 +19,138 @@
             align-items: center;
             padding: 1.5rem;
         }
-        .glass-card {
-            max-width: 1000px;
+        .container {
+            max-width: 500px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            border-radius: 2.5rem;
-            box-shadow: 0 25px 50px -10px rgba(0, 20, 40, 0.25);
-            padding: 2rem 2rem 2.8rem;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            transition: all 0.2s ease;
+            background: white;
+            border-radius: 2rem;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .icon {
+            font-size: 3rem;
+            color: #2a7de1;
+            margin-bottom: 1rem;
         }
         h1 {
-            font-size: 1.9rem;
-            font-weight: 600;
-            letter-spacing: -0.02em;
             color: #0b1e33;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1.2rem;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
         }
-        h1 i {
-            color: #2a7de1;
-            font-size: 2rem;
-        }
-        .badge-secret {
-            background: #e9edf4;
-            padding: 0.25rem 1rem;
-            border-radius: 60px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #1e3b5c;
-            margin-left: 0.75rem;
-            letter-spacing: 0.3px;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.2rem;
-            margin: 2rem 0 2.5rem;
-        }
-        .stat-box {
-            background: white;
-            padding: 1.4rem 0.8rem;
-            border-radius: 2rem;
-            box-shadow: 0 8px 18px -6px rgba(0,0,0,0.08);
-            text-align: center;
-            border: 1px solid #ffffff70;
-            transition: 0.15s;
-        }
-        .stat-box:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 14px 24px -10px rgba(0, 40, 80, 0.12);
-        }
-        .stat-box .num {
-            font-size: 2.7rem;
-            font-weight: 700;
-            color: #0b2b4a;
-            letter-spacing: -0.02em;
-            line-height: 1.2;
-        }
-        .stat-box .label {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #4a617c;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            margin-top: 0.2rem;
-        }
-        .stat-box .icon {
-            font-size: 1.6rem;
-            color: #2a7de1;
-            margin-bottom: 0.2rem;
-        }
-        .stat-box.balance .num { color: #0f7b3a; }
-        .stat-box.viewed .num { color: #b45b0e; }
-        .stat-box.total .num { color: #1f509e; }
-
-        .url-section {
-            background: white;
-            border-radius: 2rem;
-            padding: 1.5rem 1.5rem 1.2rem;
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.02);
-            border: 1px solid #eef3f9;
-        }
-        .url-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 1.2rem;
-        }
-        .url-header h3 {
-            font-weight: 600;
-            color: #1c3b5c;
-            font-size: 1.2rem;
-        }
-        .url-header h3 i {
-            margin-right: 0.6rem;
-            color: #2a7de1;
-        }
-        .url-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
-        }
-        .url-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f8faff;
-            padding: 0.8rem 1.2rem;
-            border-radius: 60px;
-            border: 1px solid #e3ebf5;
-            transition: 0.1s;
-        }
-        .url-item:hover {
-            background: #f0f6ff;
-            border-color: #b7cef0;
-        }
-        .url-item .url-text {
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: #1d3c61;
-            word-break: break-all;
-            padding-right: 1rem;
-        }
-        .url-item .url-id {
-            background: #dce6f2;
-            border-radius: 40px;
-            padding: 0.2rem 1rem;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #1a3760;
-        }
-        .click-btn {
-            background: #1f509e;
-            border: none;
-            color: white;
-            padding: 0.35rem 1.2rem;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            cursor: pointer;
-            transition: 0.15s;
-            box-shadow: 0 4px 8px rgba(28, 78, 168, 0.2);
-            border: 1px solid #2a6bcb;
-        }
-        .click-btn i { font-size: 0.7rem; }
-        .click-btn:hover {
-            background: #123b7a;
-            transform: scale(0.97);
-            box-shadow: 0 2px 6px rgba(20, 60, 140, 0.3);
-        }
-        .click-btn:active { transform: scale(0.94); }
-
-        .footnote {
-            margin-top: 2rem;
-            font-size: 0.8rem;
+        .subtitle {
             color: #6f8aa8;
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            border-top: 1px solid #dde6f0;
-            padding-top: 1.5rem;
+            margin-bottom: 2rem;
         }
-        .footnote span i { margin-right: 0.3rem; }
         .loading {
-            text-align: center;
-            padding: 2rem 0;
             color: #36618b;
+            padding: 1rem 0;
         }
-        .alert-box {
-            background: #ffecdf;
-            padding: 1.2rem 2rem;
+        .error {
+            background: #fee9e7;
+            color: #b13e2e;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+        }
+        .success {
+            background: #e3f0fa;
+            color: #1a4d7a;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
+        }
+        .hidden {
+            display: none;
+        }
+        .badge {
+            background: #e9edf4;
+            padding: 0.5rem 1.5rem;
             border-radius: 60px;
-            color: #a1421a;
-            font-weight: 500;
-            border-left: 6px solid #d95c1a;
-        }
-        .hidden { display: none; }
-        .btn-reset {
-            background: transparent;
-            border: 1px solid #b4c8e0;
-            padding: 0.25rem 1.2rem;
-            border-radius: 40px;
-            color: #1f3b5a;
-            font-weight: 500;
-        }
-        @media (max-width: 640px) {
-            .stats-grid { grid-template-columns: 1fr; }
-            .glass-card { padding: 1.5rem; }
-            .url-item { flex-wrap: wrap; gap: 0.6rem; }
+            font-size: 0.9rem;
+            color: #1e3b5c;
+            display: inline-block;
+            margin-top: 1rem;
         }
     </style>
 </head>
 <body>
-<div class="glass-card" id="appContainer">
-    <!-- header -->
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-        <h1>
-            <i class="fas fa-shield-alt"></i> Work<span style="font-weight:300;">·</span>track
-            <span class="badge-secret" id="secretBadge">🔐 secret</span>
-        </h1>
-        <div style="display: flex; gap: 0.5rem;">
-            <span id="sheetStatus" style="background:#eef3f9; padding:0.2rem 1rem; border-radius:60px; font-size:0.75rem; color:#1f4b78;"><i class="far fa-clock"></i> live</span>
-        </div>
-    </div>
-
-    <!-- stats boxes -->
-    <div class="stats-grid" id="statsGrid">
-        <div class="stat-box total"><div class="icon"><i class="fas fa-video"></i></div><div class="num" id="totalVideos">—</div><div class="label">Total videos</div></div>
-        <div class="stat-box viewed"><div class="icon"><i class="fas fa-eye"></i></div><div class="num" id="viewedVideos">—</div><div class="label">Viewed</div></div>
-        <div class="stat-box balance"><div class="icon"><i class="fas fa-arrow-right"></i></div><div class="num" id="balanceVideos">—</div><div class="label">Balance</div></div>
-    </div>
-
-    <!-- url list -->
-    <div class="url-section">
-        <div class="url-header">
-            <h3><i class="fas fa-link"></i> URL sheet · click to log</h3>
-            <span style="font-size:0.75rem; background:#e6eefa; padding:0.2rem 0.9rem; border-radius:40px;" id="urlCount">0 urls</span>
-        </div>
-        <div id="urlListContainer">
-            <div class="loading" id="loadingUrls"><i class="fas fa-spinner fa-pulse"></i> loading urls...</div>
-            <div id="urlItems" class="url-list"></div>
-        </div>
-    </div>
-
-    <div class="footnote">
-        <span><i class="far fa-calendar-alt"></i> <span id="currentTime"></span></span>
-        <span><i class="fas fa-database"></i> sheet: <span id="sheetNameDisplay">—</span></span>
-        <span style="opacity:0.7;"><i class="fas fa-code"></i> auto-log on click</span>
-    </div>
-    <div id="messageBox" style="margin-top: 0.8rem; font-size:0.9rem;"></div>
-</div>
-
-<script>
-    (function() {
-        // ---------- CONFIG ----------
-        // Replace with your Web App URL
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzegvGF7QOh74nej8Y9Be2Ar-7zWVK3ofHaHamBkQJPHl5cJ_-4348Pc63vbhkFat2XgA/exec'; // e.g., 'https://script.google.com/macros/s/.../exec'
+    <div class="container" id="app">
+        <div class="icon">🔐</div>
+        <h1>Secure Tracker</h1>
+        <p class="subtitle">Checking your access...</p>
         
-        // DOM refs
-        const totalEl = document.getElementById('totalVideos');
-        const viewedEl = document.getElementById('viewedVideos');
-        const balanceEl = document.getElementById('balanceVideos');
-        const urlItemsContainer = document.getElementById('urlItems');
-        const loadingUrls = document.getElementById('loadingUrls');
-        const urlCountSpan = document.getElementById('urlCount');
-        const sheetNameDisplay = document.getElementById('sheetNameDisplay');
-        const currentTimeSpan = document.getElementById('currentTime');
-        const messageBox = document.getElementById('messageBox');
-        const secretBadge = document.getElementById('secretBadge');
+        <div id="loading" class="loading">
+            <i class="fas fa-spinner fa-pulse"></i> Verifying secret code...
+        </div>
+        
+        <div id="result"></div>
+    </div>
 
-        // state
-        let currentSecret = '';
-        let urlData = [];
-        let stats = { total: 0, viewed: 0, balance: 0 };
-
-        // ---------- helper: show message ----------
-        function showMessage(msg, isError = false) {
-            messageBox.innerHTML = `<span style="background:${isError?'#fee9e7':'#e3f0fa'}; padding:0.3rem 1.5rem; border-radius:40px; color:${isError?'#b13e2e':'#1a4d7a'};">${msg}</span>`;
-            setTimeout(() => { messageBox.innerHTML = ''; }, 4000);
-        }
-
-        // ---------- update UI stats ----------
-        function updateStatsUI(s) {
-            totalEl.textContent = s.total ?? 0;
-            viewedEl.textContent = s.viewed ?? 0;
-            balanceEl.textContent = s.balance ?? 0;
-        }
-
-        // ---------- render URL list ----------
-        function renderUrls(urls) {
-            urlItemsContainer.innerHTML = '';
-            if (!urls || urls.length === 0) {
-                urlItemsContainer.innerHTML = '<div style="padding:1.2rem; text-align:center; color:#687e9a;"><i class="fas fa-link"></i> no urls in sheet</div>';
-                urlCountSpan.textContent = '0 urls';
-                return;
-            }
-            urlCountSpan.textContent = urls.length + ' urls';
-            urls.forEach((item, idx) => {
-                const div = document.createElement('div');
-                div.className = 'url-item';
-                div.innerHTML = `
-                    <span class="url-text"><i class="fas fa-arrow-right" style="color:#2a7de1; margin-right:8px;"></i>${item.url}</span>
-                    <span style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-                        <span class="url-id">#${item.id || idx+1}</span>
-                        <button class="click-btn" data-id="${item.id || idx+1}" data-url="${item.url}" data-index="${idx}"><i class="fas fa-mouse-pointer"></i> click</button>
-                    </span>
-                `;
-                urlItemsContainer.appendChild(div);
-            });
-
-            // attach click listeners to buttons
-            document.querySelectorAll('.click-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const url = this.dataset.url;
-                    const id = this.dataset.id;
-                    handleUrlClick(url, id);
-                });
-            });
-        }
-
-        // ---------- handle url click: call appscript ----------
-        async function handleUrlClick(url, id) {
-            if (!currentSecret) {
-                showMessage('❌ secret missing', true);
-                return;
+    <script>
+        (function() {
+            // Replace with your Web App URL
+            const WEB_APP_URL = 'YOUR_WEB_APP_URL_HERE';
+            
+            const loadingEl = document.getElementById('loading');
+            const resultEl = document.getElementById('result');
+            
+            async function validateSecret() {
+                // Get secret from URL
+                const params = new URLSearchParams(window.location.search);
+                const secret = params.get('secretcode');
+                
+                // If no secret, redirect to home
+                if (!secret) {
+                    window.location.href = 'https://workfrommobile.pages.dev/';
+                    return;
+                }
+                
+                try {
+                    // Call the validator
+                    const response = await fetch(`${WEB_APP_URL}?secretcode=${encodeURIComponent(secret)}`);
+                    const data = await response.json();
+                    
+                    loadingEl.classList.add('hidden');
+                    
+                    if (data.success) {
+                        // Valid secret - show success
+                        resultEl.innerHTML = `
+                            <div class="success">
+                                ✅ <strong>Access Granted</strong>
+                                <p style="margin-top:0.5rem;font-size:0.9rem;">Welcome! You have valid access.</p>
+                            </div>
+                            <div class="badge">🔐 ${secret.substring(0,6)}...</div>
+                        `;
+                    } else {
+                        // Invalid secret - redirect to home
+                        resultEl.innerHTML = `
+                            <div class="error">
+                                ❌ <strong>Access Denied</strong>
+                                <p style="margin-top:0.5rem;font-size:0.9rem;">Invalid secret code. Redirecting...</p>
+                            </div>
+                        `;
+                        setTimeout(() => {
+                            window.location.href = 'https://workfrommobile.pages.dev/';
+                        }, 2000);
+                    }
+                } catch (error) {
+                    loadingEl.classList.add('hidden');
+                    resultEl.innerHTML = `
+                        <div class="error">
+                            ❌ <strong>Error</strong>
+                            <p style="margin-top:0.5rem;font-size:0.9rem;">${error.message || 'Network error'}</p>
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        window.location.href = 'https://workfrommobile.pages.dev/';
+                    }, 3000);
+                }
             }
             
-            // Optimistic UI: increment viewed +1
-            stats.viewed = (stats.viewed || 0) + 1;
-            stats.balance = Math.max(0, (stats.total || 0) - (stats.viewed || 0));
-            updateStatsUI(stats);
-            showMessage(`📌 logged: ${url.substring(0,40)}...`);
-
-            try {
-                // Call the log endpoint
-                const response = await fetch(`${WEB_APP_URL}?action=log&secretcode=${encodeURIComponent(currentSecret)}&url=${encodeURIComponent(url)}&urlid=${encodeURIComponent(id)}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Update stats with server response
-                    stats.total = data.total || stats.total;
-                    stats.viewed = data.viewed || stats.viewed;
-                    stats.balance = data.balance || stats.balance;
-                    updateStatsUI(stats);
-                    showMessage('✅ updated +1 viewed');
-                } else {
-                    showMessage('⚠️ ' + (data.message || 'error'), true);
-                    // Revert optimistic update
-                    stats.viewed = Math.max(0, stats.viewed - 1);
-                    stats.balance = Math.max(0, (stats.total || 0) - (stats.viewed || 0));
-                    updateStatsUI(stats);
-                }
-            } catch (error) {
-                showMessage('❌ server error: ' + error.message, true);
-                // Revert optimistic update
-                stats.viewed = Math.max(0, stats.viewed - 1);
-                stats.balance = Math.max(0, (stats.total || 0) - (stats.viewed || 0));
-                updateStatsUI(stats);
-            }
-        }
-
-        // ---------- validate secret with server ----------
-        async function validateSecret(secret) {
-            try {
-                const response = await fetch(`${WEB_APP_URL}?action=validate&secretcode=${encodeURIComponent(secret)}`);
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('Validation error:', error);
-                return { success: false, message: 'Network error' };
-            }
-        }
-
-        // ---------- fetch data from server ----------
-        async function fetchData(secret) {
-            if (!secret) return;
-            currentSecret = secret;
-            sheetNameDisplay.textContent = secret.substring(0,6)+'…';
-
-            try {
-                const response = await fetch(`${WEB_APP_URL}?action=data&secretcode=${encodeURIComponent(secret)}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    if (data.stats) {
-                        stats = data.stats;
-                        updateStatsUI(stats);
-                    }
-                    if (data.urls) {
-                        urlData = data.urls;
-                        renderUrls(urlData);
-                    } else {
-                        renderUrls([]);
-                    }
-                    if (data.secret) {
-                        secretBadge.textContent = '🔐 ' + data.secret.substring(0,4)+'…';
-                    }
-                } else {
-                    showMessage('⚠️ ' + (data.message || 'Failed to load data'), true);
-                    renderUrls([]);
-                }
-                loadingUrls.classList.add('hidden');
-            } catch (error) {
-                loadingUrls.classList.add('hidden');
-                urlItemsContainer.innerHTML = `<div class="alert-box"><i class="fas fa-exclamation-triangle"></i> ${error.message || 'server error'}</div>`;
-                showMessage('⚠️ failed to load data', true);
-            }
-        }
-
-        // ---------- extract secret from URL ----------
-        function getSecretFromURL() {
-            const params = new URLSearchParams(window.location.search);
-            const secret = params.get('secretcode');
-            return secret;
-        }
-
-        // ---------- init ----------
-        async function init() {
-            // update clock
-            function updateClock() {
-                const now = new Date();
-                currentTimeSpan.textContent = now.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            }
-            updateClock();
-            setInterval(updateClock, 10000);
-
-            const secret = getSecretFromURL();
-            if (!secret) {
-                // redirect to home
-                window.location.href = 'https://workfrommobile.pages.dev/';
-                return;
-            }
-
-            // First validate the secret
-            const validation = await validateSecret(secret);
-            if (!validation.success) {
-                showMessage('❌ Invalid secret code', true);
-                setTimeout(() => {
-                    window.location.href = 'https://workfrommobile.pages.dev/';
-                }, 2000);
-                return;
-            }
-
-            // Secret is valid, proceed
-            currentSecret = secret;
-            secretBadge.textContent = '🔐 ' + secret.substring(0,4)+'…';
-            fetchData(secret);
-        }
-
-        // expose for debugging
-        window.__app = { init, fetchData, handleUrlClick, validateSecret };
-
-        // start
-        init();
-    })();
-</script>
+            // Start validation
+            validateSecret();
+        })();
+    </script>
 </body>
 </html>
