@@ -185,7 +185,7 @@
 
     <script>
         (function() {
-            // Replace with your Web App URL
+            // Your Web App URL
             const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyhSGwx-JqPcc4Sn-yab4l9IkQC8OTr6E75hI__gJ-G9aGlIOwlp5SvVNMsUGbPE8Br/exec';
             
             const loadingEl = document.getElementById('loading');
@@ -208,30 +208,17 @@
                 }
                 
                 try {
-                    // Call the validator
+                    // Call the API
                     const response = await fetch(`${WEB_APP_URL}?secretcode=${encodeURIComponent(secret)}`);
                     const data = await response.json();
                     
                     loadingEl.classList.add('hidden');
                     
-                    if (data.success) {
-                        // Valid secret - show stats
-                        // For demo, using mock data from columns D, E, F
-                        // In real implementation, your Apps Script would return these values
-                        const mockStats = {
-                            total: ,
-                            viewed: ,
-                            balance: 
-                        };
-                        
-                        // If your Apps Script returns stats, use that instead
-                        // const stats = data.stats || mockStats;
-                        
-                        // For now using mock data (since your current script only validates)
-                        // Update your Apps Script to return stats from columns D, E, F
-                        totalEl.textContent = mockStats.total;
-                        viewedEl.textContent = mockStats.viewed;
-                        balanceEl.textContent = mockStats.balance;
+                    if (data.success && data.stats) {
+                        // ✅ USE REAL DATA FROM API
+                        totalEl.textContent = data.stats.total || 0;
+                        viewedEl.textContent = data.stats.viewed || 0;
+                        balanceEl.textContent = data.stats.balance || 0;
                         secretDisplay.textContent = secret.substring(0,6) + '...';
                         
                         statsContainer.classList.remove('hidden');
