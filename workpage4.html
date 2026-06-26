@@ -3,52 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Tracker</title>
+    <title>Tracker · work</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, -apple-system, sans-serif;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
         }
         body {
-            background: #f4f7fc;
+            background: #f2f6fc;
             min-height: 100vh;
             padding: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .container {
-            max-width: 900px;
+            max-width: 880px;
+            width: 100%;
             margin: 0 auto;
             background: white;
-            border-radius: 2rem;
-            padding: 2rem;
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
+            border-radius: 2.5rem;
+            padding: 2rem 2rem 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
         }
-        
-        /* Header */
+
+        /* header */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #eef3f9;
             flex-wrap: wrap;
             gap: 1rem;
+            margin-bottom: 1.8rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid #eef2f7;
         }
         .header h1 {
-            font-size: 1.5rem;
-            color: #0b1e33;
+            font-size: 1.7rem;
+            font-weight: 650;
+            color: #0b1f33;
+            letter-spacing: -0.3px;
         }
         .header h1 i {
-            color: #2a7de1;
-            margin-right: 0.5rem;
+            color: #1f6fdf;
+            margin-right: 0.4rem;
+        }
+        .header-actions {
+            display: flex;
+            gap: 0.6rem;
+            align-items: center;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #d0dae8;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #1f3a5e;
+            cursor: pointer;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .btn-outline:hover {
+            background: #eef4fc;
+            border-color: #a0b6d4;
         }
         .logout-btn {
-            background: #fee9e7;
-            color: #b13e2e;
-            border: none;
-            padding: 0.5rem 1.2rem;
+            background: #fce9e6;
+            border: 1px solid #f3cdc7;
+            color: #a14232;
+            padding: 0.5rem 1.3rem;
             border-radius: 40px;
             font-weight: 600;
             font-size: 0.85rem;
@@ -56,777 +85,573 @@
             transition: 0.15s;
         }
         .logout-btn:hover {
-            background: #fdd5d0;
-            transform: scale(0.97);
+            background: #fad6d0;
         }
-        
-        /* Stats Grid */
+
+        /* 3 stats boxes */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 1rem;
-            margin: 1.5rem 0 2rem;
+            margin: 1.8rem 0 2.2rem;
         }
         .stat-box {
-            background: #f8faff;
-            padding: 1.5rem 1rem;
-            border-radius: 1.5rem;
+            background: #f9fcff;
+            padding: 1.2rem 0.5rem;
+            border-radius: 1.8rem;
             text-align: center;
-            border: 1px solid #eef3f9;
-            transition: 0.15s;
-        }
-        .stat-box:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 18px -6px rgba(0,0,0,0.08);
-        }
-        .stat-box .icon {
-            font-size: 1.8rem;
-            color: #2a7de1;
-            margin-bottom: 0.3rem;
+            border: 1px solid #e8eff6;
+            transition: 0.1s;
         }
         .stat-box .num {
-            font-size: 2.5rem;
+            font-size: 2.4rem;
             font-weight: 700;
-            color: #0b2b4a;
+            color: #0a253f;
+            line-height: 1.2;
         }
         .stat-box .label {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 500;
-            color: #4a617c;
+            color: #4e6a8a;
+            letter-spacing: 0.3px;
             text-transform: uppercase;
-            letter-spacing: 0.4px;
             margin-top: 0.2rem;
         }
-        .stat-box.total .num { color: #1f509e; }
-        .stat-box.viewed .num { color: #b45b0e; }
-        .stat-box.balance .num { color: #0f7b3a; }
-        
-        /* Loading & Messages */
-        .loading {
-            text-align: center;
-            color: #36618b;
-            padding: 2rem 0;
+        .stat-box .icon {
+            font-size: 1.4rem;
+            color: #1f6fdf;
+            margin-bottom: 0.2rem;
         }
-        .hidden {
-            display: none !important;
-        }
-        .error {
-            background: #fee9e7;
-            color: #b13e2e;
-            padding: 1rem;
-            border-radius: 1rem;
-            margin: 1rem 0;
-            text-align: center;
-        }
-        .success-msg {
-            background: #d4edda;
-            color: #155724;
-            padding: 1rem;
-            border-radius: 1rem;
-            margin: 1rem 0;
-            text-align: center;
-            border-left: 4px solid #28a745;
-        }
-        
-        /* Secret Badge */
-        .badge {
-            background: #e9edf4;
-            padding: 0.3rem 1.2rem;
+        .stat-box.total .num { color: #1a4c7a; }
+        .stat-box.viewed .num { color: #b4690e; }
+        .stat-box.balance .num { color: #1a7a44; }
+
+        .badge-secret {
+            background: #e9f0f8;
+            display: inline-block;
+            padding: 0.25rem 1.5rem;
             border-radius: 60px;
             font-size: 0.8rem;
-            color: #1e3b5c;
-            display: inline-block;
+            color: #1b3d62;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
         }
-        
-        /* URL Cards - One by One */
+
+        /* url cards – one by one, clean */
         .urls-container {
-            margin-top: 2rem;
+            margin-top: 1.8rem;
         }
-        .url-card {
-            background: #f8faff;
-            border: 1px solid #eef3f9;
-            border-radius: 1.2rem;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
+        .section-title {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.5rem;
         }
-        /* BLOCKED/VIEWED STATE - Add this */
-        .url-card.blocked {
-            background: #f5f5f5;
-            opacity: 0.75;
-            border-color: #e0e0e0;
+        .section-title h2 {
+            font-size: 1.2rem;
+            color: #0b1f33;
+            font-weight: 600;
         }
-        .url-card.blocked .url-details .url-text {
-            color: #999;
+        .section-title span {
+            color: #58738f;
+            font-size: 0.9rem;
         }
-        .url-card.blocked .sl-no {
-            background: #999;
+
+        .url-card {
+            background: #fafdff;
+            border: 1px solid #e6edf6;
+            border-radius: 1.2rem;
+            padding: 1rem 1.4rem;
+            margin-bottom: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem 1rem;
+            transition: 0.1s ease;
         }
-        .url-card.blocked .click-count {
-            background: #e8e8e8;
-            color: #999;
-        }
-        .url-card.blocked .visit-btn {
-            background: #d1d1d1;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        .url-card.blocked .visit-btn:hover {
-            transform: none;
-        }
-        .url-card.blocked .visit-btn i {
-            color: #999;
-        }
-        
         .url-card:hover {
-            border-color: #2a7de1;
-            box-shadow: 0 4px 12px rgba(42, 125, 225, 0.1);
-            transform: translateX(5px);
+            border-color: #b8cee9;
+            background: #f8fcff;
         }
-        .url-card.blocked:hover {
-            transform: none;
-            border-color: #e0e0e0;
-            box-shadow: none;
-        }
-        
-        .url-card .url-info {
+        .url-left {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            flex: 1;
-            min-width: 200px;
+            gap: 0.8rem;
+            flex: 1 1 200px;
+            min-width: 180px;
         }
-        .url-card .sl-no {
-            background: #2a7de1;
+        .slno-badge {
+            background: #1f6fdf;
             color: white;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            border-radius: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             flex-shrink: 0;
         }
-        .url-card .url-details {
+        .url-meta {
             flex: 1;
         }
-        .url-card .url-details .id-label {
-            font-size: 0.75rem;
-            color: #6c757d;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .url-card .url-details .url-text {
-            color: #0b1e33;
+        .url-meta .id-label {
+            font-size: 0.7rem;
             font-weight: 500;
-            word-break: break-all;
+            color: #6f89a7;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
         }
-        .url-card .url-actions {
+        .url-meta .url-text {
+            font-weight: 500;
+            color: #0b1f33;
+            word-break: break-all;
+            font-size: 0.95rem;
+        }
+        .url-right {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.8rem;
+            flex-wrap: wrap;
         }
-        .url-card .click-count {
-            background: #e9edf4;
-            padding: 0.3rem 0.8rem;
-            border-radius: 40px;
+        .click-badge {
+            background: #eef4fa;
+            padding: 0.25rem 0.8rem;
+            border-radius: 50px;
             font-size: 0.8rem;
-            color: #1e3b5c;
             font-weight: 600;
+            color: #1d3f61;
             white-space: nowrap;
         }
-        .url-card .click-count i {
-            color: #2a7de1;
-            margin-right: 0.3rem;
+        .click-badge i {
+            color: #1f6fdf;
+            margin-right: 0.2rem;
         }
-        .url-card .visit-btn {
-            background: #2a7de1;
-            color: white;
+        .visit-btn {
+            background: #1f6fdf;
             border: none;
-            padding: 0.6rem 1.5rem;
+            color: white;
+            padding: 0.5rem 1.4rem;
             border-radius: 40px;
             font-weight: 600;
             font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
+            transition: 0.15s;
+            display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
+            gap: 0.4rem;
             white-space: nowrap;
+            text-decoration: none;
         }
-        .url-card .visit-btn:hover {
-            background: #1a5fa8;
+        .visit-btn:hover:not(:disabled) {
+            background: #1453b3;
             transform: scale(0.97);
         }
-        .url-card .visit-btn:active {
-            transform: scale(0.93);
+        .visit-btn:disabled {
+            opacity: 0.7;
+            cursor: default;
+            background: #8faccf;
+            transform: none;
         }
-        .url-card .visit-btn i {
-            font-size: 0.9rem;
-        }
-        .url-card .visit-btn.visited {
+        .visit-btn.visited {
             background: #28a745;
         }
-        .url-card .visit-btn.visited:hover {
-            background: #1e7e34;
+        .visit-btn.visited:disabled {
+            background: #8fc9a0;
+            opacity: 0.8;
         }
-        /* NEW: Disabled button style */
-        .url-card .visit-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        /* Click History / Details Modal */
-        .click-details {
-            margin-top: 0.5rem;
-            padding: 0.5rem 0.8rem;
-            background: #f8f9fa;
-            border-radius: 0.5rem;
-            font-size: 0.75rem;
-            color: #495057;
-            border-left: 3px solid #2a7de1;
+
+        .click-detail-mini {
+            font-size: 0.7rem;
+            color: #42607e;
+            margin-top: 0.2rem;
+            border-left: 3px solid #1f6fdf;
+            padding-left: 0.6rem;
+            background: #f3f8fe;
+            border-radius: 0 0.4rem 0.4rem 0;
             width: 100%;
         }
-        .click-details span {
-            margin-right: 1rem;
+        .click-detail-mini span {
+            margin-right: 0.8rem;
         }
-        .click-details .label {
-            font-weight: 600;
-            color: #6c757d;
-        }
-        
-        /* Empty state */
+
         .empty-state {
             text-align: center;
-            padding: 3rem 1rem;
-            color: #6c757d;
+            padding: 2.5rem 1rem;
+            color: #627b99;
         }
         .empty-state i {
-            font-size: 4rem;
-            color: #d1d9e6;
-            margin-bottom: 1rem;
+            font-size: 3rem;
+            color: #cddbe9;
+            margin-bottom: 0.8rem;
         }
         .empty-state h3 {
-            color: #0b1e33;
-            margin-bottom: 0.5rem;
+            color: #0b1f33;
+            font-weight: 500;
         }
-        
-        /* Notification toast */
+
         .toast {
             position: fixed;
             bottom: 2rem;
             right: 2rem;
-            background: #0b1e33;
+            background: #0b1f33;
             color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transform: translateY(100px);
+            padding: 1rem 1.6rem;
+            border-radius: 1.2rem;
+            max-width: 380px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+            transform: translateY(80px);
             opacity: 0;
-            transition: all 0.3s ease;
-            z-index: 1000;
-            max-width: 400px;
+            transition: all 0.25s ease;
+            z-index: 999;
         }
         .toast.show {
             transform: translateY(0);
             opacity: 1;
         }
-        .toast.success {
-            background: #28a745;
+        .toast.success { background: #1f7a3d; }
+        .toast.error { background: #b13e2e; }
+        .toast .toast-title { font-weight: 600; margin-bottom: 0.2rem; }
+        .toast .toast-detail { font-size: 0.8rem; opacity: 0.9; }
+
+        .hidden { display: none; }
+        .loading {
+            text-align: center;
+            padding: 2.5rem;
+            color: #3b5e82;
         }
-        .toast.error {
-            background: #dc3545;
+        .error-box {
+            background: #fce9e6;
+            color: #a14232;
+            padding: 0.9rem 1.2rem;
+            border-radius: 1.2rem;
+            margin: 1rem 0;
         }
-        .toast .toast-title {
-            font-weight: 600;
-            margin-bottom: 0.2rem;
+        .success-msg {
+            background: #d9f0e1;
+            color: #146c3a;
+            padding: 0.9rem 1.2rem;
+            border-radius: 1.2rem;
+            margin: 1rem 0;
         }
-        .toast .toast-detail {
-            font-size: 0.85rem;
-            opacity: 0.9;
-        }
-        
-        /* Refresh button */
-        .refresh-btn {
-            background: #e9edf4;
-            border: none;
-            padding: 0.4rem 1rem;
-            border-radius: 40px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            color: #1e3b5c;
-            transition: 0.15s;
-            margin-left: 0.5rem;
-        }
-        .refresh-btn:hover {
-            background: #d1dbe8;
-        }
-        
-        /* Filter buttons - NEW */
-        .filter-section {
-            display: flex;
-            gap: 0.5rem;
-            margin: 1rem 0 1.5rem;
-            flex-wrap: wrap;
-        }
-        .filter-btn {
-            padding: 0.4rem 1.2rem;
-            border: 2px solid #e9edf4;
-            border-radius: 40px;
-            background: white;
-            color: #4a617c;
-            font-weight: 500;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .filter-btn:hover {
-            border-color: #2a7de1;
-            color: #2a7de1;
-        }
-        .filter-btn.active {
-            border-color: #2a7de1;
-            background: #2a7de1;
-            color: white;
-        }
-        
-        /* Viewed badge - NEW */
-        .viewed-badge {
-            display: inline-block;
-            background: #ffe5e5;
-            color: #c62828;
-            padding: 0.2rem 0.8rem;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-            margin-left: 0.5rem;
-        }
-        
-        @media (max-width: 640px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            .container {
-                padding: 1.5rem;
-            }
-            .header {
-                flex-direction: column;
-                gap: 0.8rem;
-                align-items: flex-start;
-            }
-            .url-card {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .url-card .url-info {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .url-card .url-actions {
-                justify-content: space-between;
-                width: 100%;
-            }
-            .url-card .visit-btn {
-                flex: 1;
-                justify-content: center;
-            }
-            .click-details span {
-                display: block;
-                margin-bottom: 0.3rem;
-            }
-            .filter-section {
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                padding-bottom: 0.5rem;
-            }
-            .filter-btn {
-                flex-shrink: 0;
-            }
+
+        @media (max-width: 650px) {
+            .container { padding: 1.5rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .url-card { flex-direction: column; align-items: stretch; }
+            .url-left { flex-wrap: wrap; }
+            .url-right { justify-content: space-between; width: 100%; }
+            .visit-btn { flex: 1; justify-content: center; }
         }
     </style>
 </head>
 <body>
-    <div class="container" id="app">
-        <!-- Header -->
-        <div class="header">
-            <h1><i class="fas fa-shield-alt"></i> Work·track</h1>
-            <div>
-                <button class="refresh-btn" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button>
-                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-            </div>
-        </div>
-        
-        <!-- Loading -->
-        <div id="loading" class="loading">
-            <i class="fas fa-spinner fa-pulse"></i> Loading data...
-        </div>
-        
-        <!-- Stats -->
-        <div id="statsContainer" class="hidden">
-            <div class="stats-grid">
-                <div class="stat-box total">
-                    <div class="icon"><i class="fas fa-link"></i></div>
-                    <div class="num" id="totalUrls">0</div>
-                    <div class="label">Total URLs</div>
-                </div>
-                <div class="stat-box viewed">
-                    <div class="icon"><i class="fas fa-eye"></i></div>
-                    <div class="num" id="viewedUrls">0</div>
-                    <div class="label">Viewed</div>
-                </div>
-                <div class="stat-box balance">
-                    <div class="icon"><i class="fas fa-arrow-right"></i></div>
-                    <div class="num" id="balanceUrls">0</div>
-                    <div class="label">Balance</div>
-                </div>
-            </div>
-            <div style="text-align: center; margin-top: 0.5rem;">
-                <span class="badge">🔐 <span id="secretDisplay">---</span></span>
-            </div>
-        </div>
-        
-        <!-- Error -->
-        <div id="error" class="error hidden"></div>
-        
-        <!-- Success Message -->
-        <div id="successMsg" class="success-msg hidden"></div>
-        
-        <!-- URLs List -->
-        <div id="urlsContainer" class="hidden">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-                <h2 style="font-size: 1.2rem; color: #0b1e33;">
-                    <i class="fas fa-list"></i> URL List
-                </h2>
-                <span style="font-size: 0.85rem; color: #6c757d;" id="urlCount">0 items</span>
-            </div>
-            
-            <!-- NEW: Filter Section -->
-            <div class="filter-section">
-                <button class="filter-btn active" data-filter="all" onclick="filterUrls('all')">All</button>
-                <button class="filter-btn" data-filter="available" onclick="filterUrls('available')">Available</button>
-                <button class="filter-btn" data-filter="viewed" onclick="filterUrls('viewed')">Viewed</button>
-            </div>
-            
-            <div id="urlsList"></div>
+<div class="container" id="app">
+    <!-- header -->
+    <div class="header">
+        <h1><i class="fas fa-shield-alt"></i> work·track</h1>
+        <div class="header-actions">
+            <button class="btn-outline" onclick="refreshData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="toast"></div>
+    <!-- loading -->
+    <div id="loading" class="loading"><i class="fas fa-spinner fa-pulse"></i> Loading...</div>
 
-    <script>
-        (function() {
-            // Your Web App URL
-            const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzoHGVIEEmpOf2S8arfC7EaY-DLHo4IwebJHA-2OstNfD6ulQf0aj4DeHecN-B4xRmq/exec';
-            
-            const loadingEl = document.getElementById('loading');
-            const statsContainer = document.getElementById('statsContainer');
-            const urlsContainer = document.getElementById('urlsContainer');
-            const urlsList = document.getElementById('urlsList');
-            const errorEl = document.getElementById('error');
-            const successMsg = document.getElementById('successMsg');
-            const totalEl = document.getElementById('totalUrls');
-            const viewedEl = document.getElementById('viewedUrls');
-            const balanceEl = document.getElementById('balanceUrls');
-            const urlCount = document.getElementById('urlCount');
-            const secretDisplay = document.getElementById('secretDisplay');
-            const toast = document.getElementById('toast');
-            
-            let allItems = [];
-            let userData = null;
-            let toastTimeout = null;
-            let currentFilter = 'all';
-            let secret = '';
-            let viewedSlNos = new Set(); // Track which SL Nos are viewed
-            
-            function showToast(message, type = 'success', detail = '') {
-                if (toastTimeout) clearTimeout(toastTimeout);
-                
-                let html = `<div class="toast-title">${message}</div>`;
-                if (detail) {
-                    html += `<div class="toast-detail">${detail}</div>`;
-                }
-                toast.innerHTML = html;
-                toast.className = `toast ${type}`;
-                setTimeout(() => {
-                    toast.classList.add('show');
-                }, 100);
-                toastTimeout = setTimeout(() => {
-                    toast.classList.remove('show');
-                }, 4000);
-            }
-            
-            async function validateAndLoad() {
-                // Get secret from URL
-                const params = new URLSearchParams(window.location.search);
-                secret = params.get('secretcode');
-                
-                // If no secret, redirect to home
-                if (!secret) {
-                    window.location.href = 'https://workfrommobile.pages.dev/';
+    <!-- stats -->
+    <div id="statsContainer" class="hidden">
+        <div class="stats-grid">
+            <div class="stat-box total">
+                <div class="icon"><i class="fas fa-layer-group"></i></div>
+                <div class="num" id="totalUrls">0</div>
+                <div class="label">Total</div>
+            </div>
+            <div class="stat-box viewed">
+                <div class="icon"><i class="fas fa-eye"></i></div>
+                <div class="num" id="viewedUrls">0</div>
+                <div class="label">Viewed</div>
+            </div>
+            <div class="stat-box balance">
+                <div class="icon"><i class="fas fa-arrow-right"></i></div>
+                <div class="num" id="balanceUrls">0</div>
+                <div class="label">Balance</div>
+            </div>
+        </div>
+        <div style="text-align:center;"><span class="badge-secret">🔐 <span id="secretDisplay">---</span></span></div>
+    </div>
+
+    <!-- error / success -->
+    <div id="error" class="error-box hidden"></div>
+    <div id="successMsg" class="success-msg hidden"></div>
+
+    <!-- url list -->
+    <div id="urlsContainer" class="hidden">
+        <div class="section-title">
+            <h2><i class="fas fa-list-ul"></i> URLs</h2>
+            <span id="urlCount">0 items</span>
+        </div>
+        <div id="urlsList"></div>
+    </div>
+</div>
+
+<!-- toast -->
+<div id="toast" class="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+<script>
+    (function() {
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzoHGVIEEmpOf2S8arfC7EaY-DLHo4IwebJHA-2OstNfD6ulQf0aj4DeHecN-B4xRmq/exec';
+
+        // DOM refs
+        const loadingEl = document.getElementById('loading');
+        const statsContainer = document.getElementById('statsContainer');
+        const urlsContainer = document.getElementById('urlsContainer');
+        const urlsList = document.getElementById('urlsList');
+        const errorEl = document.getElementById('error');
+        const successMsg = document.getElementById('successMsg');
+        const totalEl = document.getElementById('totalUrls');
+        const viewedEl = document.getElementById('viewedUrls');
+        const balanceEl = document.getElementById('balanceUrls');
+        const urlCount = document.getElementById('urlCount');
+        const secretDisplay = document.getElementById('secretDisplay');
+        const toast = document.getElementById('toast');
+
+        let allItems = [];
+        let userData = null;
+        let viewedSet = new Set();        // slNo strings
+        let clickHistory = {};
+
+        // ---- toast ----
+        let toastTimer = null;
+        function showToast(message, type = 'success', detail = '') {
+            if (toastTimer) clearTimeout(toastTimer);
+            let html = `<div class="toast-title">${message}</div>`;
+            if (detail) html += `<div class="toast-detail">${detail}</div>`;
+            toast.innerHTML = html;
+            toast.className = `toast ${type}`;
+            setTimeout(() => toast.classList.add('show'), 20);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        // ---- fetch & render ----
+        async function fetchData(secret) {
+            try {
+                loadingEl.classList.remove('hidden');
+                const resp = await fetch(`${WEB_APP_URL}?secretcode=${encodeURIComponent(secret)}`);
+                const data = await resp.json();
+                loadingEl.classList.add('hidden');
+
+                if (!data.success) {
+                    showError('Invalid secret or error: ' + (data.error || 'unknown'));
+                    setTimeout(() => window.location.href = 'https://workfrommobile.pages.dev/', 2500);
                     return;
                 }
-                
-                try {
-                    loadingEl.classList.remove('hidden');
-                    statsContainer.classList.add('hidden');
-                    urlsContainer.classList.add('hidden');
-                    errorEl.classList.add('hidden');
-                    
-                    // Call the API
-                    const response = await fetch(`${WEB_APP_URL}?secretcode=${encodeURIComponent(secret)}`);
-                    const data = await response.json();
-                    
-                    loadingEl.classList.add('hidden');
-                    
-                    if (data.success) {
-                        // Store data
-                        userData = data.userData;
-                        allItems = data.items || [];
-                        
-                        // Build viewed set from data
-                        viewedSlNos = new Set();
-                        allItems.forEach(item => {
-                            if (item.isViewed || item.isBlocked) {
-                                viewedSlNos.add(item.slNo);
-                            }
-                        });
-                        
-                        // Update stats from data
-                        totalEl.textContent = data.totalItems || 0;
-                        viewedEl.textContent = data.viewedCount || viewedSlNos.size || 0;
-                        balanceEl.textContent = data.remainingUrls || (allItems.length - viewedSlNos.size) || 0;
-                        secretDisplay.textContent = secret.substring(0,6) + '...';
-                        
-                        // Show stats
-                        statsContainer.classList.remove('hidden');
-                        
-                        // Display URLs
-                        if (allItems.length > 0) {
-                            renderUrls(allItems);
-                            urlsContainer.classList.remove('hidden');
-                        } else {
-                            urlsList.innerHTML = `
-                                <div class="empty-state">
-                                    <i class="fas fa-inbox"></i>
-                                    <h3>No URLs Found</h3>
-                                    <p>There are no URLs available in Sheet2.</p>
-                                </div>
-                            `;
-                            urlsContainer.classList.remove('hidden');
-                        }
-                    } else {
-                        showError('Invalid secret code. Redirecting...');
-                        setTimeout(() => {
-                            window.location.href = 'https://workfrommobile.pages.dev/';
-                        }, 2000);
-                    }
-                } catch (error) {
-                    loadingEl.classList.add('hidden');
-                    showError('Error: ' + (error.message || 'Network error'));
-                    setTimeout(() => {
-                        window.location.href = 'https://workfrommobile.pages.dev/';
-                    }, 3000);
+
+                // update state
+                userData = data.userData;
+                allItems = data.items || [];
+
+                // viewedSet: from user sheet (isViewed flag)
+                viewedSet.clear();
+                if (data.items) {
+                    data.items.forEach(item => {
+                        if (item.isViewed === true) viewedSet.add(item.slNo);
+                    });
                 }
-            }
-            
-            function renderUrls(items) {
-                // Apply filter
-                let filteredItems = items;
-                if (currentFilter === 'available') {
-                    filteredItems = items.filter(item => !viewedSlNos.has(item.slNo));
-                } else if (currentFilter === 'viewed') {
-                    filteredItems = items.filter(item => viewedSlNos.has(item.slNo));
-                }
-                
-                urlCount.textContent = `${filteredItems.length} items`;
-                
-                if (filteredItems.length === 0) {
-                    urlsList.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-search"></i>
-                            <h3>No ${currentFilter === 'all' ? '' : currentFilter} URLs</h3>
-                            <p>${currentFilter === 'available' ? 'You have viewed all available URLs!' : 'No viewed URLs yet.'}</p>
-                        </div>
-                    `;
+
+                // stats from userData (or fallback)
+                totalEl.textContent = userData?.total ?? data.totalUrls ?? allItems.length;
+                viewedEl.textContent = userData?.viewed ?? viewedSet.size;
+                const total = parseInt(totalEl.textContent) || 0;
+                const viewed = parseInt(viewedEl.textContent) || 0;
+                balanceEl.textContent = total - viewed;
+                secretDisplay.textContent = secret.substring(0, 6) + '••••';
+
+                statsContainer.classList.remove('hidden');
+
+                if (allItems.length === 0) {
+                    urlsList.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><h3>No URLs</h3><p>Sheet2 is empty.</p></div>`;
+                    urlsContainer.classList.remove('hidden');
+                    urlCount.textContent = '0 items';
                     return;
                 }
-                
-                let html = '';
-                filteredItems.forEach((item) => {
-                    const isBlocked = viewedSlNos.has(item.slNo);
-                    const cardClass = isBlocked ? 'url-card blocked' : 'url-card';
-                    
-                    html += `
-                        <div class="${cardClass}" data-slno="${item.slNo}">
-                            <div class="url-info">
-                                <div class="sl-no">${item.slNo}</div>
-                                <div class="url-details">
-                                    <div class="id-label">
-                                        ID: ${item.id}
-                                        ${isBlocked ? '<span class="viewed-badge">✓ VIEWED</span>' : ''}
-                                    </div>
-                                    <div class="url-text">${item.url}</div>
-                                    ${item.lastClickDate ? `
-                                        <div class="click-details">
-                                            <span><span class="label">📅 Date:</span> ${item.lastClickDate}</span>
-                                            <span><span class="label">⏰ Time:</span> ${item.lastClickTime}</span>
-                                            <span><span class="label">🔄 Clicks:</span> ${item.clicks || 0}</span>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            </div>
-                            <div class="url-actions">
-                                <span class="click-count">
-                                    <i class="fas fa-mouse-pointer"></i> 
-                                    <span id="clickCount_${item.slNo}">${item.clicks || 0}</span>
-                                </span>
-                                ${isBlocked ? `
-                                    <button class="visit-btn" disabled style="background:#d1d1d1; cursor:not-allowed;">
-                                        <i class="fas fa-lock"></i> Blocked
-                                    </button>
-                                ` : `
-                                    <button class="visit-btn" 
-                                            onclick="handleUrlClick('${item.slNo}', '${item.id}', '${item.url}')">
-                                        <i class="fas fa-external-link-alt"></i> Visit
-                                    </button>
-                                `}
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                urlsList.innerHTML = html;
-            }
-            
-            // Handle URL click
-            window.handleUrlClick = async function(slNo, id, url) {
-                // Check if already viewed (double safety)
-                if (viewedSlNos.has(slNo)) {
-                    showToast('This URL has already been viewed!', 'error');
-                    return;
-                }
-                
-                // Disable button temporarily to prevent double clicks
-                const card = document.querySelector(`.url-card[data-slno="${slNo}"]`);
-                const btn = card?.querySelector('.visit-btn');
-                if (btn) {
-                    btn.disabled = true;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Loading...';
-                }
-                
-                try {
-                    // Track click
-                    const trackResponse = await fetch(`${WEB_APP_URL}?action=track&secretcode=${encodeURIComponent(secret)}&slno=${encodeURIComponent(slNo)}`);
-                    const trackData = await trackResponse.json();
-                    
-                    if (trackData.success) {
-                        // Mark as viewed
-                        viewedSlNos.add(slNo);
-                        
-                        // Update click count in UI
-                        const clickCountEl = document.getElementById(`clickCount_${slNo}`);
-                        if (clickCountEl) {
-                            clickCountEl.textContent = trackData.clicks || 1;
-                        }
-                        
-                        // Update stats
-                        const total = parseInt(totalEl.textContent) || 0;
-                        const viewed = viewedSlNos.size;
-                        viewedEl.textContent = viewed;
-                        balanceEl.textContent = total - viewed;
-                        
-                        // Show success toast with details
-                        const now = new Date();
-                        const timeStr = now.toLocaleTimeString('en-US', { 
-                            hour: '2-digit', 
-                            minute: '2-digit', 
-                            second: '2-digit' 
-                        });
-                        const detailMsg = `SL No: ${slNo} | ID: ${id} | Time: ${timeStr}`;
-                        showToast(`✓ URL Tracked Successfully!`, 'success', detailMsg);
-                        
-                        // Re-render with updated status
-                        renderUrls(allItems);
-                        
-                        // Open URL in new tab after a small delay
-                        setTimeout(() => {
-                            const fullUrl = url.startsWith('http') ? url : `https://${url}`;
-                            window.open(fullUrl, '_blank');
-                        }, 300);
-                        
-                    } else {
-                        showToast('Error tracking: ' + (trackData.error || 'Unknown error'), 'error');
-                        // Re-enable button
-                        if (btn) {
-                            btn.disabled = false;
-                            btn.innerHTML = '<i class="fas fa-external-link-alt"></i> Visit';
-                        }
-                    }
-                } catch (error) {
-                    showToast('Network error: ' + error.message, 'error');
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="fas fa-external-link-alt"></i> Visit';
-                    }
-                }
-            };
-            
-            // Filter URLs
-            window.filterUrls = function(filter) {
-                currentFilter = filter;
-                
-                // Update active button
-                document.querySelectorAll('.filter-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                document.querySelector(`.filter-btn[data-filter="${filter}"]`)?.classList.add('active');
-                
+
                 renderUrls(allItems);
-            };
-            
-            // Refresh data
-            window.refreshData = function() {
-                validateAndLoad();
-                showToast('Refreshing data...', 'success');
-            };
-            
-            function showError(message) {
-                errorEl.textContent = '❌ ' + message;
-                errorEl.classList.remove('hidden');
-                setTimeout(() => {
-                    errorEl.classList.add('hidden');
-                }, 5000);
+                urlsContainer.classList.remove('hidden');
+            } catch (err) {
+                loadingEl.classList.add('hidden');
+                showError('Network error: ' + err.message);
             }
-            
-            function showSuccess(message) {
-                successMsg.textContent = '✅ ' + message;
-                successMsg.classList.remove('hidden');
-                setTimeout(() => {
-                    successMsg.classList.add('hidden');
-                }, 5000);
+        }
+
+        function renderUrls(items) {
+            urlCount.textContent = `${items.length} items`;
+            let html = '';
+            // sort: viewed items go to bottom
+            const sorted = [...items].sort((a, b) => {
+                const aView = viewedSet.has(a.slNo) ? 1 : 0;
+                const bView = viewedSet.has(b.slNo) ? 1 : 0;
+                return aView - bView;   // unviewed first, viewed last
+            });
+
+            sorted.forEach(item => {
+                const slNo = item.slNo;
+                const isViewed = viewedSet.has(slNo);
+                const url = item.url.startsWith('http') ? item.url : `https://${item.url}`;
+                const history = clickHistory[slNo] || null;
+
+                let detailHtml = '';
+                if (history) {
+                    detailHtml = `
+                        <div class="click-detail-mini">
+                            <span>📅 ${history.date}</span>
+                            <span>⏱ ${history.time}</span>
+                            <span>🔄 ${history.clicks} clicks</span>
+                        </div>
+                    `;
+                }
+
+                // button: if viewed => disabled with "Viewed" label, else "Visit"
+                let btnHtml = '';
+                if (isViewed) {
+                    btnHtml = `
+                        <button class="visit-btn visited" disabled>
+                            <i class="fas fa-check-circle"></i> Viewed
+                        </button>
+                    `;
+                } else {
+                    btnHtml = `
+                        <button class="visit-btn" onclick="handleClick('${slNo}', '${item.id}', '${item.url}')">
+                            <i class="fas fa-external-link-alt"></i> Click
+                        </button>
+                    `;
+                }
+
+                html += `
+                    <div class="url-card" data-slno="${slNo}">
+                        <div class="url-left">
+                            <div class="slno-badge">${slNo}</div>
+                            <div class="url-meta">
+                                <div class="id-label">ID: ${item.id}</div>
+                                <div class="url-text">${item.url}</div>
+                                ${detailHtml}
+                            </div>
+                        </div>
+                        <div class="url-right">
+                            <span class="click-badge"><i class="fas fa-mouse-pointer"></i> <span id="clickCount_${slNo}">${item.clicks || 0}</span></span>
+                            ${btnHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            urlsList.innerHTML = html;
+        }
+
+        // ---- handle click ----
+        window.handleClick = async function(slNo, id, url) {
+            const params = new URLSearchParams(window.location.search);
+            const secret = params.get('secretcode');
+            if (!secret) return;
+
+            // disable button to avoid double
+            const card = document.querySelector(`.url-card[data-slno="${slNo}"]`);
+            const btn = card?.querySelector('.visit-btn');
+            if (btn) { btn.disabled = true; btn.style.opacity = '0.6'; }
+
+            try {
+                // 1) track click
+                const trackResp = await fetch(`${WEB_APP_URL}?action=track&secretcode=${encodeURIComponent(secret)}&slno=${encodeURIComponent(slNo)}`);
+                const trackData = await trackResp.json();
+
+                if (!trackData.success) {
+                    showToast('Track error: ' + (trackData.error || 'unknown'), 'error');
+                    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+                    return;
+                }
+
+                // 2) update view count in Sheet1 (action=view)
+                const viewResp = await fetch(`${WEB_APP_URL}?action=view&secretcode=${encodeURIComponent(secret)}`);
+                const viewData = await viewResp.json();
+
+                // 3) update UI
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+                // update click count on card
+                const clickSpan = document.getElementById(`clickCount_${slNo}`);
+                const newCount = trackData.clicks || 1;
+                if (clickSpan) clickSpan.textContent = newCount;
+
+                // store history
+                clickHistory[slNo] = { date: dateStr, time: timeStr, clicks: newCount };
+
+                // mark as viewed locally
+                viewedSet.add(slNo);
+
+                // update stats
+                const total = parseInt(totalEl.textContent) || 0;
+                const viewed = parseInt(viewedEl.textContent) || 0;
+                viewedEl.textContent = viewed + 1;
+                balanceEl.textContent = total - (viewed + 1);
+
+                // re-render (to move card to bottom, update button)
+                renderUrls(allItems);
+
+                // show toast with details
+                const detailMsg = `SL ${slNo} · ${timeStr}`;
+                showToast(`✓ Click recorded`, 'success', detailMsg);
+
+                // open url in new tab
+                const fullUrl = url.startsWith('http') ? url : `https://${url}`;
+                setTimeout(() => window.open(fullUrl, '_blank'), 350);
+
+            } catch (err) {
+                showToast('Error: ' + err.message, 'error');
+                if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
             }
-            
-            // Logout function
-            window.logout = function() {
+        };
+
+        // ---- refresh ----
+        window.refreshData = function() {
+            const params = new URLSearchParams(window.location.search);
+            const secret = params.get('secretcode');
+            if (secret) {
+                fetchData(secret);
+                showToast('Refreshed', 'success');
+            }
+        };
+
+        // ---- helpers ----
+        function showError(msg) {
+            errorEl.textContent = '❌ ' + msg;
+            errorEl.classList.remove('hidden');
+        }
+        function hideError() { errorEl.classList.add('hidden'); }
+
+        window.logout = function() {
+            window.location.href = 'https://workfrommobile.pages.dev/';
+        };
+
+        // ---- init ----
+        function init() {
+            const params = new URLSearchParams(window.location.search);
+            const secret = params.get('secretcode');
+            if (!secret) {
                 window.location.href = 'https://workfrommobile.pages.dev/';
-            };
-            
-            // Start
-            validateAndLoad();
-        })();
-    </script>
-    
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                return;
+            }
+            fetchData(secret);
+        }
+
+        init();
+    })();
+</script>
 </body>
 </html>
