@@ -263,19 +263,14 @@
 
 <script>
     (function() {
-        // ============================================================
-        // 🔧 CONFIGURATION: Add your AppScript Web App URL here
-        // ============================================================
-        const APPSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjofGTPL5Wq-EVYiufvEasjsF_pAoKdx21QCLOHHlhEIMo84_Ku9KfzjtyQxZIj7WC9A/exec';
-        // Example: 'https://script.google.com/macros/s/ABCDEFGHIJKLMNOPQRSTUVWXYZ/exec'
-        // ============================================================
-
-        // Determine if we're running in the AppScript environment
-        // If the page is loaded from the AppScript URL, google.script.run is available
-        const isAppScriptEnvironment = (typeof google !== 'undefined' && google.script && google.script.run);
-        
-        // If we're not in AppScript environment but have a URL, we use fetch API
-        const useFetchAPI = !isAppScriptEnvironment && APPSCRIPT_URL && APPSCRIPT_URL.includes('script.google.com');
+        // ---------- CONFIG ----------
+        // The script will be deployed as Web App, we use google.script.run
+        // For local testing we simulate with mock data – but real calls use google.script.run
+        const isLocal = (typeof google === 'undefined' || !google.script);
+        const CONFIG = {
+            // This will be replaced by the actual secret from the URL
+            secretCode: null
+        };
 
         // DOM refs
         const totalEl = document.getElementById('totalVideos');
@@ -291,7 +286,7 @@
 
         // state
         let currentSecret = '';
-        let urlData = [];
+        let urlData = [];          // array of {id, url}
         let stats = { total: 0, viewed: 0, balance: 0 };
 
         // ---------- helper: show message ----------
@@ -329,6 +324,7 @@
                 urlItemsContainer.appendChild(div);
             });
 
+            // attach click listeners to buttons
             document.querySelectorAll('.click-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -339,52 +335,23 @@
             });
         }
 
-        // ---------- API call via fetch (for standalone HTML) ----------
-        function callAppScriptAPI(action, params) {
-            return new Promise((resolve, reject) => {
-                if (isAppScriptEnvironment) {
-                    // Use google.script.run
-                    google.script.run
-                        .withSuccessHandler(resolve)
-                        .withFailureHandler(reject)
-                        [action](...params);
-                } else if (useFetchAPI) {
-                    // Use fetch with JSONP or POST
-                    const url = APPSCRIPT_URL + '?action=' + action + '&' + new URLSearchParams(params).toString();
-                    fetch(url, {
-                        method: 'GET',
-                        mode: 'no-cors', // for simple web app access
-                        headers: { 'Content-Type': 'application/json' }
-                    })
-                    .then(response => {
-                        // With no-cors, we can't read response, so we use a workaround
-                        // Actually, we need to use JSONP or deploy with CORS
-                        // For now, we'll use a hidden iframe approach or just show a message
-                        reject(new Error('Fetch with no-cors cannot read response. Deploy as Web App and use google.script.run.'));
-                    })
-                    .catch(reject);
-                } else {
-                    reject(new Error('No valid API method available. Please deploy as Web App.'));
-                }
-            });
-        }
-
-        // ---------- handle url click ----------
+        // ---------- handle url click: call appscript ----------
         function handleUrlClick(url, id) {
             if (!currentSecret) {
                 showMessage('❌ secret missing', true);
                 return;
             }
-            
-            // Optimistic UI update
+            // Optimistic UI: increment viewed +1
             stats.viewed = (stats.viewed || 0) + 1;
             stats.balance = Math.max(0, (stats.total || 0) - (stats.viewed || 0));
             updateStatsUI(stats);
-            showMessage(`📌 logging: ${url.substring(0,40)}...`);
+            showMessage(`📌 logged: ${url.substring(0,40)}...`);
 
-            if (isAppScriptEnvironment) {
+            // Call server
+            if (!isLocal && google && google.script) {
                 google.script.run
                     .withSuccessHandler((resp) => {
+                        // resp: { success, message, viewed, total, balance }
                         if (resp && resp.success) {
                             stats.total = resp.total || stats.total;
                             stats.viewed = resp.viewed || stats.viewed;
@@ -400,19 +367,24 @@
                     })
                     .logUrlClick(currentSecret, url, id);
             } else {
-                showMessage('📡 AppScript not available. Use the Web App URL.', true);
+                // local mock
+                console.log('mock click:', url, id);
+                // we already updated ui optimistically
+                showMessage('🔁 [local] mock log');
             }
         }
 
-        // ---------- fetch data ----------
+        // ---------- fetch data from server ----------
         function fetchData(secret) {
             if (!secret) return;
             currentSecret = secret;
             sheetNameDisplay.textContent = secret.substring(0,6)+'…';
 
-            if (isAppScriptEnvironment) {
+            if (!isLocal && google && google.script) {
+                // call server to get stats and urls
                 google.script.run
                     .withSuccessHandler((response) => {
+                        // response: { stats: {total, viewed, balance}, urls: [{id, url}], secret }
                         if (response && response.stats) {
                             stats = response.stats;
                             updateStatsUI(stats);
@@ -435,16 +407,19 @@
                     })
                     .getDataForSecret(secret);
             } else {
-                // If not in AppScript environment, show instructions
+                // ---------- LOCAL MOCK DATA ----------
                 loadingUrls.classList.add('hidden');
-                urlItemsContainer.innerHTML = `
-                    <div class="alert-box" style="background:#e8f0fe; border-left-color:#2a7de1; color:#1a4d7a;">
-                        <i class="fas fa-info-circle"></i> 
-                        Please access this page via the AppScript Web App URL to use all features.
-                        <br><small>Current URL: ${APPSCRIPT_URL}</small>
-                    </div>
-                `;
-                showMessage('📡 Please use the Web App URL', true);
+                const mockUrls = [
+                    { id: 1, url: 'https://example.com/video/abc123' },
+                    { id: 2, url: 'https://example.com/video/def456' },
+                    { id: 3, url: 'https://example.com/video/ghi789' }
+                ];
+                urlData = mockUrls;
+                stats = { total: mockUrls.length, viewed: 2, balance: mockUrls.length - 2 };
+                updateStatsUI(stats);
+                renderUrls(mockUrls);
+                secretBadge.textContent = '🔐 ' + secret.substring(0,4)+'…';
+                showMessage('📡 [local mode] mock data loaded');
             }
         }
 
@@ -457,6 +432,7 @@
 
         // ---------- init ----------
         function init() {
+            // update clock
             function updateClock() {
                 const now = new Date();
                 currentTimeSpan.textContent = now.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -466,15 +442,21 @@
 
             const secret = getSecretFromURL();
             if (!secret) {
+                // redirect to home
                 window.location.href = 'https://workfrommobile.pages.dev/';
                 return;
             }
+            // store and show
             currentSecret = secret;
             secretBadge.textContent = '🔐 ' + secret.substring(0,4)+'…';
+            // fetch data
             fetchData(secret);
         }
 
+        // expose for debugging
         window.__app = { init, fetchData, handleUrlClick };
+
+        // start
         init();
     })();
 </script>
