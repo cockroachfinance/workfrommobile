@@ -127,7 +127,7 @@
 <script>
     (function() {
         // IMPORTANT: Use the SAME script URL for both pages
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzga1u7OrTzup4pKut14q5w-lM5PV8NBKDPFHRBzSf28KqZ5YOWZcM2ne2vl5qiDuF1/exec';
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzoHGVIEEmpOf2S8arfC7EaY-DLHo4IwebJHA-2OstNfD6ulQf0aj4DeHecN-B4xRmq/exec';
 
         const loadingEl = document.getElementById('loading');
         const statsContainer = document.getElementById('statsContainer');
@@ -239,4 +239,281 @@
                 urlsContainer.classList.add('hidden');
                 errorEl.classList.add('hidden');
 
-                const response = await fetch(`${WEB_APP_URL
+                const response = await fetch(`${WEB_APP_URL}?secretcode=${encodeURIComponent(secret)}`);
+                const data = await response.json();
+
+                loadingEl.classList.add('hidden');
+
+                if (data.success) {
+                    allItems = data.items || [];
+                    viewedSlNos = new Set();
+                    allItems.forEach(item => {
+                        if (item.isViewed || item.isBlocked) {
+                            viewedSlNos.add(Number(item.slNo));
+                        }
+                    });
+
+                    updateStats();
+                    statsContainer.classList.remove('hidden');
+
+                    if (allItems.length > 0) {
+                        renderUrls(allItems);
+                        urlsContainer.classList.remove('hidden');
+                    } else {
+                        urlsList.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><h3>No Videos</h3><p>Sheet2 is empty</p></div>`;
+                        urlsContainer.classList.remove('hidden');
+                    }
+                } else {
+                    showError('Failed to load data. Please refresh.');
+                }
+            } catch (err) {
+                loadingEl.classList.add('hidden');
+                showError('Network error: ' + (err.message || ''));
+            }
+        }
+
+        function renderUrls(items) {
+            let filtered = items;
+            if (currentFilter === 'available') {
+                filtered = items.filter(it => !viewedSlNos.has(Number(it.slNo)) && !pendingVerification.has(Number(it.slNo)));
+            } else if (currentFilter === 'viewed') {
+                filtered = items.filter(it => viewedSlNos.has(Number(it.slNo)));
+            }
+
+            urlCount.textContent = `${filtered.length} items`;
+
+            if (filtered.length === 0) {
+                urlsList.innerHTML = `<div class="empty-state"><i class="fas fa-search"></i><h3>No ${currentFilter} Videos</h3><p>${currentFilter === 'available' ? 'All watched!' : 'No videos watched yet.'}</p></div>`;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(item => {
+                const slNo = Number(item.slNo);
+                const isBlocked = viewedSlNos.has(slNo);
+                const isPending = pendingVerification.has(slNo);
+                const cardClass = isBlocked ? 'url-card blocked' : 'url-card';
+
+                let timeSpentHtml = '';
+                if (isPending && visitStartTimes.has(slNo)) {
+                    const elapsed = Math.floor((Date.now() - visitStartTimes.get(slNo)) / 1000);
+                    timeSpentHtml = `<div class="time-spent"><i class="fas fa-clock"></i> ${elapsed}s / ${MIN_TIME_SECONDS}s</div>`;
+                }
+
+                html += `
+                    <div class="${cardClass}" data-slno="${slNo}">
+                        <div class="url-info">
+                            <div class="sl-no">${slNo}</div>
+                            <div class="url-details">
+                                <div class="id-label">
+                                    ID: ${item.id}
+                                    ${isBlocked ? '<span class="viewed-badge">✓ WATCHED</span>' : ''}
+                                    ${isPending ? '<span class="pending-badge">⏳ WATCHING</span>' : ''}
+                                </div>
+                                ${timeSpentHtml}
+                            </div>
+                        </div>
+                        <div class="url-actions">
+                            ${isBlocked ? `
+                                <button class="visit-btn" disabled><i class="fas fa-check-circle"></i> Watched</button>
+                            ` : isPending ? `
+                                <button class="visit-btn" disabled style="background:#ffc107;color:#333;"><i class="fas fa-hourglass-half"></i> Watching...</button>
+                            ` : `
+                                <button class="visit-btn" onclick="handleUrlClick('${slNo}', '${item.id}', '${item.url}')"><i class="fas fa-play"></i> Play</button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            });
+            urlsList.innerHTML = html;
+        }
+
+        function checkTimeSpent(slNo) {
+            const start = visitStartTimes.get(slNo);
+            if (!start) return false;
+            return (Date.now() - start) / 1000 >= MIN_TIME_SECONDS;
+        }
+
+        function cancelVerification(slNo, showPopupMsg = true) {
+            if (!pendingVerification.has(slNo)) return;
+            
+            if (visitIntervals.has(slNo)) {
+                clearInterval(visitIntervals.get(slNo));
+                visitIntervals.delete(slNo);
+            }
+            
+            pendingVerification.delete(slNo);
+            visitStartTimes.delete(slNo);
+            renderUrls(allItems);
+            
+            if (showPopupMsg) {
+                showToast('⏹️ Cancelled: You came back too early!', 'error', 'Please watch for 1 minute to earn the reward.');
+            }
+        }
+
+        function startTimeMonitoring(slNo, url) {
+            const startTime = Date.now();
+            visitStartTimes.set(slNo, startTime);
+            pendingVerification.add(slNo);
+
+            const intervalId = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const card = document.querySelector(`.url-card[data-slno="${slNo}"]`);
+                if (card) {
+                    const ts = card.querySelector('.time-spent');
+                    if (ts) {
+                        ts.innerHTML = `<i class="fas fa-clock"></i> ${elapsed}s / ${MIN_TIME_SECONDS}s`;
+                    }
+                }
+                if (elapsed >= MIN_TIME_SECONDS) {
+                    clearInterval(intervalId);
+                    visitIntervals.delete(slNo);
+                    completeVerification(slNo);
+                }
+            }, 1000);
+            visitIntervals.set(slNo, intervalId);
+
+            setTimeout(() => {
+                if (pendingVerification.has(slNo) && checkTimeSpent(slNo)) {
+                    clearInterval(visitIntervals.get(slNo));
+                    visitIntervals.delete(slNo);
+                    completeVerification(slNo);
+                }
+            }, (MIN_TIME_SECONDS + 3) * 1000);
+        }
+
+        async function completeVerification(slNo) {
+            if (!pendingVerification.has(slNo)) return;
+            if (viewedSlNos.has(slNo)) {
+                pendingVerification.delete(slNo);
+                visitStartTimes.delete(slNo);
+                renderUrls(allItems);
+                return;
+            }
+
+            try {
+                const resp = await fetch(`${WEB_APP_URL}?action=track&secretcode=${encodeURIComponent(secret)}&slno=${encodeURIComponent(slNo)}`);
+                const data = await resp.json();
+                if (data.success) {
+                    viewedSlNos.add(slNo);
+                    pendingVerification.delete(slNo);
+                    visitStartTimes.delete(slNo);
+                    updateStats();
+                    showToast(`✓ Verified! ${MIN_TIME_SECONDS}s on SL ${slNo}`, 'success', 'Watch recorded');
+                    renderUrls(allItems);
+                } else {
+                    viewedSlNos.add(slNo);
+                    pendingVerification.delete(slNo);
+                    visitStartTimes.delete(slNo);
+                    updateStats();
+                    renderUrls(allItems);
+                    showToast(`⚠️ Time verified but tracking error`, 'error');
+                }
+            } catch (e) {
+                viewedSlNos.add(slNo);
+                pendingVerification.delete(slNo);
+                visitStartTimes.delete(slNo);
+                updateStats();
+                renderUrls(allItems);
+                showToast(`⚠️ Network error after time`, 'error');
+            }
+        }
+
+        window.handleUrlClick = async function(slNo, id, url) {
+            slNo = Number(slNo);
+            if (viewedSlNos.has(slNo)) {
+                showToast('Already watched!', 'error');
+                return;
+            }
+            if (pendingVerification.has(slNo)) {
+                showToast('Already watching!', 'error');
+                return;
+            }
+
+            const card = document.querySelector(`.url-card[data-slno="${slNo}"]`);
+            const btn = card?.querySelector('.visit-btn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Loading video...';
+            }
+
+            const fullUrl = url.startsWith('http') ? url : `https://${url}`;
+            const newTab = window.open(fullUrl, '_blank');
+            if (!newTab) {
+                showToast('Popups blocked! Please allow.', 'error');
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-play"></i> Play'; }
+                return;
+            }
+
+            startTimeMonitoring(slNo, url);
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-hourglass-half"></i> Watching...';
+                btn.style.background = '#ffc107';
+                btn.style.color = '#333';
+            }
+            renderUrls(allItems);
+            showToast(`⏳ Watch at least ${MIN_TIME_SECONDS}s of video`, 'success', 'Timer started');
+
+            const cancelHandler = () => {
+                if (pendingVerification.has(slNo) && !checkTimeSpent(slNo)) {
+                    cancelVerification(slNo, false);
+                    window.removeEventListener('beforeunload', cancelHandler);
+                }
+            };
+            window.addEventListener('beforeunload', cancelHandler);
+        };
+
+        window.filterUrls = function(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.filter-btn[data-filter="${filter}"]`)?.classList.add('active');
+            renderUrls(allItems);
+        };
+
+        window.refreshData = function() {
+            loadData();
+            showToast('Refreshing...', 'success');
+        };
+
+        function showError(msg) {
+            errorEl.textContent = '❌ ' + msg;
+            errorEl.classList.remove('hidden');
+            setTimeout(() => errorEl.classList.add('hidden'), 5000);
+        }
+
+        window.logout = function() {
+            window.location.href = 'https://workfrommobile.pages.dev/';
+        };
+
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                const pendingCopy = new Set(pendingVerification);
+                pendingCopy.forEach(slNo => {
+                    if (!viewedSlNos.has(slNo)) {
+                        const elapsed = Math.floor((Date.now() - visitStartTimes.get(slNo)) / 1000);
+                        if (elapsed < MIN_TIME_SECONDS) {
+                            if (!isPopupActive) {
+                                showPopup(
+                                    '⏳ Too Early!',
+                                    `You came back too early! You need to watch the video for ${MIN_TIME_SECONDS} seconds continuously to earn the reward. You watched only ${elapsed}s. Please try again.`,
+                                    'fa-clock',
+                                    'OK, I\'ll try again'
+                                ).then(() => {
+                                    cancelVerification(slNo, false);
+                                });
+                            }
+                        } else if (elapsed >= MIN_TIME_SECONDS) {
+                            completeVerification(slNo);
+                        }
+                    }
+                });
+            }
+        });
+
+        checkSecretAndValidate();
+    })();
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</body>
+</html>
