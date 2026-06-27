@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin · Sheet Manager</title>
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: #f2f5f9;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+        .admin-container {
+            max-width: 1440px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 20, 30, 0.25);
+            padding: 1.8rem 2rem 2.5rem;
+            transition: 0.2s;
+        }
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem 1.5rem;
+            margin-bottom: 1.8rem;
+        }
+        .header h1 {
+            font-weight: 600;
+            font-size: 1.9rem;
+            letter-spacing: -0.3px;
+            color: #0b1a2b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header h1 i {
+            color: #2a7de1;
+            font-size: 2rem;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .badge-sheet {
+            background: #eef3fc;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: #1f3a5f;
+            border: 1px solid #dce5f0;
+            font-weight: 500;
+        }
+        .badge-sheet i {
+            margin-right: 6px;
+            color: #2a7de1;
+        }
+        .refresh-btn {
+            background: white;
+            border: 1px solid #dce2ec;
+            border-radius: 40px;
+            padding: 0.4rem 1.2rem;
+            font-weight: 500;
+            color: #1f2a3f;
+            cursor: pointer;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        .refresh-btn:hover {
+            background: #f0f5fe;
+            border-color: #a0b8d6;
+        }
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            background: #f9fafc;
+            padding: 0.6rem 1.2rem 0.6rem 1.5rem;
+            border-radius: 60px;
+            border: 1px solid #e9edf4;
+            margin-bottom: 2rem;
+        }
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 40px;
+            padding: 0.2rem 0.2rem 0.2rem 1.2rem;
+            border: 1px solid #dce2ec;
+            flex: 1 1 260px;
+            transition: 0.15s;
+        }
+        .search-wrapper:focus-within {
+            border-color: #2a7de1;
+            box-shadow: 0 0 0 3px rgba(42, 125, 225, 0.15);
+        }
+        .search-wrapper i {
+            color: #7f8b9e;
+            font-size: 0.95rem;
+        }
+        .search-wrapper input {
+            border: none;
+            padding: 0.6rem 0.8rem;
+            font-size: 0.95rem;
+            width: 100%;
+            background: transparent;
+            outline: none;
+        }
+        .sort-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .sort-group span {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1f2a3f;
+            margin-right: 4px;
+        }
+        .sort-btn {
+            background: white;
+            border: 1px solid #dce2ec;
+            border-radius: 40px;
+            padding: 0.35rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1f2a3f;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.12s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .sort-btn i {
+            font-size: 0.8rem;
+            color: #4a5a72;
+        }
+        .sort-btn.active {
+            background: #eef3fc;
+            border-color: #2a7de1;
+            color: #1a5bbf;
+        }
+        .sort-btn.active i {
+            color: #1a5bbf;
+        }
+        .sort-btn:hover {
+            background: #eef3fc;
+            border-color: #b6c8e0;
+        }
+        .entry-count {
+            font-size: 0.8rem;
+            background: #eef3fc;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            color: #1a3b5e;
+            white-space: nowrap;
+        }
+        .entry-count i {
+            margin-right: 6px;
+            color: #2a7de1;
+        }
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: 18px;
+            border: 1px solid #eef2f8;
+            background: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            min-width: 900px;
+        }
+        th {
+            background: #f8faff;
+            color: #1f2a3f;
+            font-weight: 600;
+            padding: 1rem 0.8rem;
+            text-align: left;
+            border-bottom: 2px solid #e2e9f2;
+            white-space: nowrap;
+        }
+        td {
+            padding: 0.85rem 0.8rem;
+            border-bottom: 1px solid #eef2f8;
+            vertical-align: middle;
+            color: #1f2a3f;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:hover td {
+            background: #fafbff;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: capitalize;
+            cursor: pointer;
+            transition: 0.1s ease;
+            border: 1px solid transparent;
+            min-width: 80px;
+            text-align: center;
+            letter-spacing: 0.2px;
+            background: #eef3fc;
+            color: #1f3a5f;
+        }
+        .status-badge.active {
+            background: #dff0e6;
+            color: #0d5530;
+            border-color: #b2d9c4;
+        }
+        .status-badge.pending {
+            background: #fff3d9;
+            color: #8f5f00;
+            border-color: #f7dba7;
+        }
+        .status-badge.inactive {
+            background: #fce9e9;
+            color: #a13d3d;
+            border-color: #f5c9c9;
+        }
+        .status-badge:hover {
+            filter: brightness(0.94);
+            transform: scale(0.96);
+        }
+        .id-col {
+            font-weight: 500;
+            color: #0b2d4a;
+        }
+        .email-col {
+            color: #1a4a7a;
+        }
+        .mobile-col {
+            font-feature-settings: "tnum";
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6a7b92;
+        }
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #0b1a2b;
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 60px;
+            font-weight: 500;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: 0.25s ease;
+            pointer-events: none;
+            z-index: 999;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .toast i {
+            margin-right: 10px;
+            color: #7fc9a5;
+        }
+        @media (max-width: 700px) {
+            .admin-container { padding: 1rem; }
+            .toolbar { flex-direction: column; align-items: stretch; border-radius: 28px; }
+            .sort-group { justify-content: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="admin-container" id="app">
+    <!-- header -->
+    <div class="header">
+        <h1><i class="fas fa-user-cog"></i> Admin · Users</h1>
+        <div class="header-actions">
+            <span class="badge-sheet"><i class="fas fa-cloud"></i> Google Sheet live</span>
+            <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync-alt"></i> Sync</button>
+        </div>
+    </div>
+
+    <!-- toolbar -->
+    <div class="toolbar">
+        <div class="search-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search by name, email, mobile..." />
+        </div>
+        <div class="sort-group">
+            <span><i class="fas fa-arrow-up-wide-short"></i> Sort</span>
+            <button class="sort-btn active" id="sortAscBtn" data-sort="asc"><i class="fas fa-arrow-up-1-9"></i> Asc</button>
+            <button class="sort-btn" id="sortDescBtn" data-sort="desc"><i class="fas fa-arrow-down-1-9"></i> Desc</button>
+        </div>
+        <div class="entry-count" id="rowCount"><i class="fas fa-users"></i> <span>0</span> entries</div>
+    </div>
+
+    <!-- table -->
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Mobile</th>
+                    <th>Email</th>
+                    <th style="min-width:140px;">Status <span style="font-weight:400; font-size:0.7rem; opacity:0.6;">(click to toggle)</span></th>
+                    <th>SecretCode</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- dynamic rows -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- toast notification -->
+<div id="toast" class="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">Status updated</span></div>
+
+<script>
+    (function() {
+        "use strict";
+
+        // ------------------------------------------------------------
+        // 1. CONFIG — your AppScript web app URL (replace with yours)
+        //    This is the endpoint that serves your sheet data.
+        //    We'll fetch all users from the 'Users' sheet.
+        //    If you don't have a dedicated getUsers endpoint, we use the 
+        //    existing 'getData' but it returns testimonials/faq/stats.
+        //    For admin view we need the users list — so we add a small 
+        //    adapter: we'll read from the sheet using a custom action.
+        //    Since your backend has 'getData' returning testimonials etc,
+        //    we will create a new action 'getUsers' that returns the user list.
+        //    BUT to keep it self-contained, we use a MOCK + real fetch pattern.
+        //    In production, replace MOCK_DATA with fetch from your script.
+        // ------------------------------------------------------------
+        // 💡 IMPORTANT: Replace with your actual Web App URL
+        const APP_SCRIPT_URL = 'hhttps://script.google.com/macros/s/AKfycbyO0JQKzqeqNQk8z2uATNaowqS2D1tgC8M6Y3ZKVi9vsdgdLQoOUnEmbN6kJXN9Mqh4/exec'; // <-- CHANGE
+
+        // We'll try to fetch from the sheet using a custom action 'getUsers'
+        // If you don't have that, we fallback to a MOCK dataset.
+        // For a real admin, you should implement a 'getUsers' endpoint in AppScript.
+        // For now we provide a hybrid: first attempt fetch, else MOCK.
+
+        // ------------------------------------------------------------
+        // 2. MOCK DATA (fallback / demo)
+        // ------------------------------------------------------------
+        const MOCK_USERS = [
+            { id: 'WFM001', name: 'Demo User', mobile: '9876543210', email: 'demo@example.com', password: '••••', status: 'active', secretCode: 'SC-7X9F', createdAt: '2026-01-15' },
+            { id: 'WFM002', name: 'Pending User', mobile: '9876543211', email: 'pending@example.com', password: '••••', status: 'pending', secretCode: 'SC-2A4B', createdAt: '2026-02-01' },
+            { id: 'WFM003', name: 'Alice Chen', mobile: '2125550187', email: 'alice.c@startup.co', password: '••••', status: 'active', secretCode: 'SC-9K3M', createdAt: '2025-12-11' },
+            { id: 'WFM004', name: 'Bob Marley', mobile: '2079460123', email: 'bob.m@reggae.io', password: '••••', status: 'pending', secretCode: 'SC-8P1T', createdAt: '2026-03-02' },
+            { id: 'WFM005', name: 'Carol Danvers', mobile: '3105552278', email: 'carol.d@avengers.net', password: '••••', status: 'inactive', secretCode: 'SC-5N6V', createdAt: '2026-04-10' },
+            { id: 'WFM006', name: 'Dave Grohl', mobile: '8185553145', email: 'dave.g@foo.org', password: '••••', status: 'active', secretCode: 'SC-3W2X', createdAt: '2025-09-22' },
+            { id: 'WFM007', name: 'Elena Rodriguez', mobile: '911234567', email: 'elena.r@madrid.es', password: '••••', status: 'pending', secretCode: 'SC-7C8D', createdAt: '2026-05-05' },
+        ];
+
+        // ------------------------------------------------------------
+        // 3. STATE
+        // ------------------------------------------------------------
+        let users = [];                // current full dataset (after fetch)
+        let filteredUsers = [];        // after search / sort
+        let currentSort = 'asc';       // 'asc' or 'desc'
+        let searchTerm = '';
+
+        // DOM refs
+        const tbody = document.getElementById('tableBody');
+        const searchInput = document.getElementById('searchInput');
+        const sortAscBtn = document.getElementById('sortAscBtn');
+        const sortDescBtn = document.getElementById('sortDescBtn');
+        const rowCountSpan = document.querySelector('#rowCount span');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+
+        // ------------------------------------------------------------
+        // 4. TOAST helper
+        // ------------------------------------------------------------
+        let toastTimeout = null;
+        function showToast(msg, isError = false) {
+            toastMsg.textContent = msg;
+            toast.style.background = isError ? '#a13d3d' : '#0b1a2b';
+            toast.querySelector('i').style.color = isError ? '#f5baba' : '#7fc9a5';
+            toast.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => toast.classList.remove('show'), 2800);
+        }
+
+        // ------------------------------------------------------------
+        // 5. FETCH users from AppScript (with fallback)
+        //    We'll call your script with action=getUsers (you may need to 
+        //    implement that in AppScript). If it fails, we use MOCK.
+        // ------------------------------------------------------------
+        async function fetchUsers() {
+            try {
+                // Attempt to fetch from your AppScript with a 'getUsers' action
+                // If you don't have that endpoint, implement it in your doGet:
+                //   if (action === 'getUsers') { return getUsers(); }
+                // For now we try, if fails we fallback to MOCK.
+                const url = `${APP_SCRIPT_URL}?action=getUsers&t=${Date.now()}`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Network error');
+                const result = await response.json();
+                
+                if (result.success && Array.isArray(result.users)) {
+                    // map to our internal format
+                    users = result.users.map(u => ({
+                        id: u.id || u.ID || '',
+                        name: u.name || u.Name || '',
+                        mobile: u.mobile || u.Mobile || '',
+                        email: u.email || u.Email || '',
+                        password: u.password || u.Password || '••••',
+                        status: u.status || u.Status || 'pending',
+                        secretCode: u.secretCode || u.SecretCode || '',
+                        createdAt: u.createdAt || u['Created At'] || ''
+                    }));
+                    showToast('✅ Synced from Google Sheet');
+                    return;
+                } else {
+                    console.warn('getUsers returned not success, using MOCK');
+                }
+            } catch (e) {
+                console.warn('Fetch failed, using MOCK data', e);
+            }
+            // Fallback to MOCK
+            users = MOCK_USERS.map(u => ({ ...u }));
+            showToast('⚠️ Using demo data (sheet not connected)', true);
+        }
+
+        // ------------------------------------------------------------
+        // 6. RENDER table
+        // ------------------------------------------------------------
+        function render() {
+            // apply search filter
+            let filtered = [...users];
+            if (searchTerm.trim() !== '') {
+                const term = searchTerm.trim().toLowerCase();
+                filtered = filtered.filter(u => 
+                    (u.name && u.name.toLowerCase().includes(term)) ||
+                    (u.email && u.email.toLowerCase().includes(term)) ||
+                    (u.mobile && u.mobile.toString().includes(term)) ||
+                    (u.id && u.id.toString().toLowerCase().includes(term))
+                );
+            }
+
+            // apply sort (by name)
+            filtered.sort((a, b) => {
+                const nameA = (a.name || '').toLowerCase();
+                const nameB = (b.name || '').toLowerCase();
+                if (currentSort === 'asc') return nameA.localeCompare(nameB);
+                else return nameB.localeCompare(nameA);
+            });
+
+            filteredUsers = filtered;
+            rowCountSpan.textContent = filteredUsers.length;
+
+            if (filteredUsers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><i class="fas fa-inbox" style="font-size:1.8rem; opacity:0.4; display:block; margin-bottom:10px;"></i>No users found</td></tr>`;
+                return;
+            }
+
+            let html = '';
+            for (const u of filteredUsers) {
+                const statusClass = (u.status || 'pending').toLowerCase();
+                html += `
+                    <tr>
+                        <td class="id-col">${escapeHtml(u.id || '-')}</td>
+                        <td><strong>${escapeHtml(u.name || '')}</strong></td>
+                        <td class="mobile-col">${escapeHtml(u.mobile || '')}</td>
+                        <td class="email-col">${escapeHtml(u.email || '')}</td>
+                        <td>
+                            <span class="status-badge ${statusClass}" data-id="${escapeHtml(u.id)}" data-status="${statusClass}">
+                                ${statusClass}
+                            </span>
+                        </td>
+                        <td style="font-family:monospace; font-size:0.8rem;">${escapeHtml(u.secretCode || '')}</td>
+                        <td style="font-size:0.8rem; color:#4a5a72;">${escapeHtml(u.createdAt || '')}</td>
+                    </tr>
+                `;
+            }
+            tbody.innerHTML = html;
+
+            // attach click listeners to status badges
+            document.querySelectorAll('.status-badge').forEach(badge => {
+                badge.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const userId = this.getAttribute('data-id');
+                    const currentStatus = this.getAttribute('data-status');
+                    toggleStatus(userId, currentStatus, this);
+                });
+            });
+        }
+
+        // simple escape
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ------------------------------------------------------------
+        // 7. TOGGLE status (local + sync with sheet)
+        //    We update the local array and also call AppScript to persist.
+        //    AppScript action: updateStatus? id=xxx&status=active
+        // ------------------------------------------------------------
+        async function toggleStatus(userId, currentStatus, badgeElement) {
+            // cycle: active -> pending -> inactive -> active
+            let newStatus = 'active';
+            if (currentStatus === 'active') newStatus = 'pending';
+            else if (currentStatus === 'pending') newStatus = 'inactive';
+            else if (currentStatus === 'inactive') newStatus = 'active';
+            else newStatus = 'pending';
+
+            // update local data
+            const user = users.find(u => u.id === userId);
+            if (user) {
+                user.status = newStatus;
+            }
+            // update badge appearance immediately (optimistic)
+            badgeElement.setAttribute('data-status', newStatus);
+            badgeElement.className = `status-badge ${newStatus}`;
+            badgeElement.textContent = newStatus;
+
+            // attempt to persist to sheet (if real endpoint exists)
+            try {
+                const url = `${APP_SCRIPT_URL}?action=updateStatus&id=${encodeURIComponent(userId)}&status=${encodeURIComponent(newStatus)}&t=${Date.now()}`;
+                const resp = await fetch(url);
+                const result = await resp.json();
+                if (result.success) {
+                    showToast(`✅ Status updated to ${newStatus}`);
+                } else {
+                    showToast(`⚠️ Sheet sync failed: ${result.message || 'unknown'}`, true);
+                    // revert local change? we keep it optimistic but show warning.
+                }
+            } catch (e) {
+                console.warn('Update status error', e);
+                showToast('⚠️ Could not sync with sheet (local change applied)', true);
+            }
+
+            // re-render to reflect (but we already updated)
+            render();
+        }
+
+        // ------------------------------------------------------------
+        // 8. SEARCH & SORT event bindings
+        // ------------------------------------------------------------
+        searchInput.addEventListener('input', function() {
+            searchTerm = this.value;
+            render();
+        });
+
+        sortAscBtn.addEventListener('click', function() {
+            currentSort = 'asc';
+            sortAscBtn.classList.add('active');
+            sortDescBtn.classList.remove('active');
+            render();
+        });
+
+        sortDescBtn.addEventListener('click', function() {
+            currentSort = 'desc';
+            sortDescBtn.classList.add('active');
+            sortAscBtn.classList.remove('active');
+            render();
+        });
+
+        refreshBtn.addEventListener('click', async function() {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
+            this.disabled = true;
+            await fetchUsers();
+            render();
+            this.innerHTML = '<i class="fas fa-sync-alt"></i> Sync';
+            this.disabled = false;
+        });
+
+        // ------------------------------------------------------------
+        // 9. INIT
+        // ------------------------------------------------------------
+        async function init() {
+            await fetchUsers();
+            render();
+            // set default sort active
+            sortAscBtn.classList.add('active');
+            sortDescBtn.classList.remove('active');
+            showToast('👋 Admin ready', false);
+        }
+
+        init();
+
+    })();
+</script>
+
+</body>
+</html>
