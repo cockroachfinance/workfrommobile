@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
+    <title>WorkFromMobile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f4f7fc;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            margin: 0;
+        }
+        .dashboard-card {
+            max-width: 820px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15), 0 8px 20px -8px rgba(0,20,40,0.08);
+            padding: 2rem 2.2rem;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(2px);
+        }
+        @media (max-width: 480px) {
+            .dashboard-card { padding: 1.5rem 1.2rem; border-radius: 28px; }
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.2rem;
+            border-bottom: 1px solid #eef2f6;
+            padding-bottom: 1rem;
+        }
+        .brand { display: flex; align-items: center; gap: 10px; }
+        .brand i {
+            font-size: 1.8rem;
+            color: #2563eb;
+            background: #e8edfb;
+            padding: 10px;
+            border-radius: 16px;
+        }
+        .brand h2 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: -0.3px;
+            color: #0b1a33;
+        }
+        .badge-secret {
+            background: #eef2ff;
+            color: #2563eb;
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #d9e3f5;
+        }
+        .badge-secret .logout-badge {
+            background: transparent;
+            border: none;
+            color: #4f6a8a;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 0 0 0 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.15s;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            border-left: 1px solid #cbd8ea;
+            padding-left: 10px;
+            margin-left: 4px;
+        }
+        .badge-secret .logout-badge:hover { color: #a43747; }
+
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            justify-content: flex-end;
+        }
+        .btn-workpage {
+            background: #1d4ed8;
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.6rem 1.8rem;
+            border-radius: 60px;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 8px 14px -8px rgba(29,78,216,0.3);
+            transition: all 0.15s;
+            font-family: 'Inter', sans-serif;
+            border: 1px solid #1d4ed8;
+        }
+        .btn-workpage:hover { background: #1a40b0; border-color: #1a40b0; transform: scale(1.01); }
+        .btn-withdraw {
+            background: #eef4ff;
+            border: 1px solid #cdddfa;
+            padding: 0.6rem 1.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            color: #1d4ed8;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.1s;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-withdraw:hover { background: #dce8fe; border-color: #a5bff0; }
+
+        .user-identity-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            background: #f8fafd;
+            padding: 1.2rem 1.4rem;
+            border-radius: 28px;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e9edf4;
+        }
+        .user-name { font-weight: 700; font-size: 1.6rem; color: #0b1a33; letter-spacing: -0.2px; }
+        .user-mobile {
+            font-weight: 500;
+            color: #1f3a5f;
+            font-size: 1rem;
+            background: #eef2f8;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            display: inline-block;
+            width: fit-content;
+        }
+        .user-email {
+            color: #4a5c77;
+            font-size: 0.95rem;
+            background: white;
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            border: 1px solid #dce3ec;
+            display: inline-block;
+            width: fit-content;
+        }
+        .last-login-compact {
+            background: #f2f6fd;
+            border-radius: 40px;
+            padding: 0.7rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #1f3a5f;
+            border: 1px solid #dce7f5;
+            margin-bottom: 1.5rem;
+            width: fit-content;
+        }
+        .last-login-compact i { color: #3b6bc4; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1.8rem 0 2rem;
+        }
+        .stat-item {
+            background: #fafcff;
+            border-radius: 24px;
+            padding: 1rem 0.6rem;
+            text-align: center;
+            border: 1px solid #eaf0f6;
+            transition: 0.1s ease;
+        }
+        .stat-item .label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #6a7e9c;
+            font-weight: 600;
+        }
+        .stat-item .value {
+            font-weight: 700;
+            font-size: 1.7rem;
+            color: #0b1a33;
+            margin-top: 0.2rem;
+            letter-spacing: -0.3px;
+        }
+        .stat-item .value small {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #4d6a8f;
+            margin-left: 2px;
+        }
+        .stat-item.highlight { background: #eef4ff; border-color: #cdddfa; }
+        .stat-item.highlight .value { color: #1d4ed8; }
+
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.8rem;
+            border-top: 1px solid #e9eff6;
+            padding-top: 1.8rem;
+        }
+        .btn {
+            border: none;
+            font-weight: 600;
+            padding: 0.8rem 2rem;
+            border-radius: 60px;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            color: #1a2c4a;
+            border: 1px solid #d2ddee;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-primary {
+            background: #1d4ed8;
+            border: 1px solid #1d4ed8;
+            color: white;
+            box-shadow: 0 8px 14px -8px rgba(29,78,216,0.3);
+        }
+        .btn-primary i { color: white; }
+        .btn-primary:hover { background: #1a40b0; border-color: #1a40b0; transform: scale(1.01); }
+        .btn-outline { background: transparent; border: 1px solid #d0ddea; }
+        .btn-outline:hover { background: #f0f4fe; border-color: #b0c4e0; }
+        .btn i { font-size: 1rem; color: #3f5b81; }
+        .btn-primary i { color: white; }
+
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+            .stat-item .value { font-size: 1.4rem; }
+            .action-row { flex-direction: column; align-items: stretch; }
+            .action-bar { justify-content: stretch; }
+            .action-bar .btn-withdraw, .action-bar .btn-workpage { flex: 1; justify-content: center; }
+            .btn { justify-content: center; padding: 0.7rem 1.2rem; flex: 1; }
+            .user-name { font-size: 1.3rem; }
+            .dashboard-header { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+            .badge-secret { align-self: flex-start; }
+        }
+        @media (max-width: 420px) {
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+
+        .footnote {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #7a8aa3;
+            border-top: 1px solid #eef3f9;
+            padding-top: 1.2rem;
+        }
+        .footnote i { margin-right: 6px; }
+        .hidden { display: none !important; }
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 1.2rem;
+            color: #1d4ed8;
+            font-weight: 500;
+        }
+        .spinner {
+            width: 28px;
+            height: 28px;
+            border: 4px solid #e0e7ff;
+            border-top: 4px solid #1d4ed8;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .error-message {
+            background: #fee9ec;
+            color: #a43747;
+            padding: 1rem 1.5rem;
+            border-radius: 30px;
+            border: 1px solid #f5d0d6;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* popup overlay */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10,20,40,0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 1.5rem;
+        }
+        .popup-card {
+            background: white;
+            max-width: 440px;
+            width: 100%;
+            border-radius: 40px;
+            padding: 2rem 1.8rem;
+            box-shadow: 0 40px 60px -20px rgba(0,0,0,0.3);
+            animation: popIn 0.2s ease;
+            position: relative;
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.96) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .popup-close {
+            position: absolute;
+            top: 16px;
+            right: 18px;
+            background: #f0f4fc;
+            border: none;
+            border-radius: 40px;
+            width: 36px;
+            height: 36px;
+            font-size: 1.2rem;
+            color: #1f3a5f;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.15s;
+            border: 1px solid #dce3ec;
+        }
+        .popup-close:hover { background: #fee9ec; color: #a43747; border-color: #e6b6be; }
+        .popup-card h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #0b1a33;
+            margin-bottom: 0.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .popup-card .sub {
+            color: #4f6a8a;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+        .popup-card label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1f3a5f;
+            display: block;
+            margin-top: 1rem;
+            margin-bottom: 0.3rem;
+        }
+        /* input with hidden arrows & custom rupee icon */
+        .input-group {
+            position: relative;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 0.8rem 1.2rem 0.8rem 2.6rem; /* left space for rupee icon */
+            border-radius: 40px;
+            border: 1px solid #d3dfed;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: 0.15s;
+            background: #fafcff;
+            appearance: textfield; /* hide arrows in Firefox */
+            -moz-appearance: textfield;
+        }
+        .input-group input::-webkit-outer-spin-button,
+        .input-group input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #1d4ed8;
+            box-shadow: 0 0 0 3px rgba(29,78,216,0.15);
+        }
+        .input-group .rupee-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7a8fa8;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+        .popup-actions {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        .popup-actions .btn { flex: 1; justify-content: center; }
+        .popup-actions .btn-secondary { background: #eef2f8; border-color: #d3ddee; }
+        .popup-actions .btn-secondary:hover { background: #e2e9f3; }
+        .inline-error {
+            color: #b13a4a;
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .popup-step { display: block; }
+        .popup-step.hidden { display: none; }
+        .tab-bar {
+            display: flex;
+            gap: 4px;
+            background: #f0f4fc;
+            border-radius: 60px;
+            padding: 4px;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e9f2;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 0.5rem 0.8rem;
+            border: none;
+            border-radius: 40px;
+            background: transparent;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #4f6a8a;
+            cursor: pointer;
+            transition: 0.15s;
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-btn.active {
+            background: white;
+            color: #1d4ed8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #d3dfed;
+        }
+        .tab-btn:hover:not(.active) { background: #e6edf8; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+        .tab-panel label { margin-top: 0.2rem; }
+        .tab-panel input { margin-bottom: 0.2rem; }
+
+        /* redirect popup (invalid secret) */
+        .redirect-popup .popup-card {
+            max-width: 400px;
+            text-align: center;
+        }
+        .redirect-popup .popup-card h3 { justify-content: center; }
+        .redirect-popup .popup-card .sub { margin-bottom: 0.5rem; }
+        .btn-danger {
+            background: #dc2626;
+            border: 1px solid #dc2626;
+            color: white;
+        }
+        .btn-danger:hover { background: #b91c1c; border-color: #b91c1c; }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-card" id="dashboardMain">
+    <div class="dashboard-header">
+        <div class="brand">
+            <i class="fas fa-layer-group"></i>
+            <h2>WorkFromMobile</h2>
+        </div>
+        <div class="badge-secret">
+            <button class="logout-badge" id="logoutBadgeBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+
+    <div class="action-bar">
+        <button class="btn-withdraw" id="withdrawBtn"><i class="fas fa-university"></i> Withdraw</button>
+        <button class="btn-workpage" id="workPageBtn"><i class="fas fa-arrow-right"></i> Work page</button>
+    </div>
+
+    <div id="loadingIndicator" class="loading-spinner hidden">
+        <div class="spinner"></div>
+        <span>Fetching secure data...</span>
+    </div>
+
+    <div id="errorContainer" class="error-message hidden"></div>
+
+    <div id="dashboardContent">
+        <div class="user-identity-compact">
+            <div class="user-name" id="userNameDisplay">—</div>
+            <div class="user-mobile" id="userMobileDisplay"><i class="fas fa-phone-alt" style="margin-right: 6px;"></i>—</div>
+            <div class="user-email" id="userEmailDisplay"><i class="far fa-envelope"></i> —</div>
+        </div>
+
+        <div class="last-login-compact">
+            <i class="fas fa-clock"></i>
+            <span>Last login: </span>
+            <strong id="lastLoginDisplay">—</strong>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-item highlight">
+                <div class="label"><i class="fas fa-wallet"></i> Total earning</div>
+                <div class="value" id="totalEarningDisplay">₹0</div>
+            </div>
+            <div class="stat-item">
+                <div class="label"><i class="fas fa-hand-holding-usd"></i> Withdrawed</div>
+                <div class="value" id="withdrawedDisplay">₹0</div>
+            </div>
+            <div class="stat-item">
+                <div class="label"><i class="fas fa-piggy-bank"></i> Balance</div>
+                <div class="value" id="balanceDisplay">₹0</div>
+            </div>
+        </div>
+        <div class="action-row"></div>
+    </div>
+
+    <div class="footnote">
+        <i class="fas fa-shield-alt"></i> secured · dashboard v2.0
+    </div>
+</div>
+
+<!-- WITHDRAW POPUP -->
+<div id="withdrawPopup" class="popup-overlay hidden">
+    <div class="popup-card">
+        <button class="popup-close" id="popupCloseBtn"><i class="fas fa-times"></i></button>
+        <div id="stepAmount" class="popup-step">
+            <h3><i class="fas fa-hand-holding-usd" style="color:#1d4ed8;"></i> Withdraw</h3>
+            <div class="sub">Enter amount (max balance <span id="popupBalanceHint">₹0</span>)</div>
+            <label for="withdrawAmount">Amount (₹)</label>
+            <div class="input-group">
+                <span class="rupee-icon">₹</span>
+                <input type="number" id="withdrawAmount" placeholder="0.00" min="0.01" step="0.01" />
+            </div>
+            <div id="amountError" class="inline-error hidden"><i class="fas fa-exclamation-circle"></i> <span></span></div>
+            <div class="popup-actions">
+                <button class="btn btn-secondary" id="popupCancelBtn">Cancel</button>
+                <button class="btn btn-primary" id="popupNextBtn">Next <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+        <div id="stepDetails" class="popup-step hidden">
+            <h3><i class="fas fa-university" style="color:#1d4ed8;"></i> Payment details</h3>
+            <div class="sub">Choose payment method</div>
+            <div class="tab-bar" id="tabBar">
+                <button class="tab-btn active" data-tab="tabUPI">UPI</button>
+                <button class="tab-btn" data-tab="tabBank">Bank</button>
+            </div>
+            <div id="tabUPI" class="tab-panel active">
+                <label for="upiInput">UPI ID</label>
+                <input type="text" id="upiInput" placeholder="example@upi" />
+            </div>
+            <div id="tabBank" class="tab-panel">
+                <label for="accountInput">Account number</label>
+                <input type="text" id="accountInput" placeholder="1234567890" />
+                <label for="ifscInput">IFSC code</label>
+                <input type="text" id="ifscInput" placeholder="SBIN0001234" />
+            </div>
+            <div id="detailsError" class="inline-error hidden"><i class="fas fa-exclamation-circle"></i> <span></span></div>
+            <div class="popup-actions">
+                <button class="btn btn-secondary" id="popupBackBtn"><i class="fas fa-arrow-left"></i> Back</button>
+                <button class="btn btn-primary" id="popupSubmitBtn"><i class="fas fa-check"></i> Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- REDIRECT POPUP (invalid secret) -->
+<div id="redirectPopup" class="popup-overlay hidden redirect-popup">
+    <div class="popup-card">
+        <h3><i class="fas fa-exclamation-triangle" style="color:#dc2626;"></i> Invalid Secret</h3>
+        <div class="sub">The secret code is missing or invalid. You will be redirected to the home page.</div>
+        <div class="popup-actions" style="margin-top:1.5rem;">
+            <button class="btn btn-danger" id="redirectOkBtn"><i class="fas fa-arrow-right"></i> Go to Home</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCP7i_BmRycTLuvlO8oVTYfolbcfH1C8eHbxjH1CyQh1WEloDGffQXQTQa9GlAnXl8/exec';
+
+        // DOM refs
+        const userName = document.getElementById('userNameDisplay');
+        const userMobile = document.getElementById('userMobileDisplay');
+        const userEmail = document.getElementById('userEmailDisplay');
+        const lastLogin = document.getElementById('lastLoginDisplay');
+        const totalEarning = document.getElementById('totalEarningDisplay');
+        const withdrawed = document.getElementById('withdrawedDisplay');
+        const balance = document.getElementById('balanceDisplay');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const errorContainer = document.getElementById('errorContainer');
+        const dashboardContent = document.getElementById('dashboardContent');
+        const withdrawBtn = document.getElementById('withdrawBtn');
+        const logoutBadgeBtn = document.getElementById('logoutBadgeBtn');
+        const workPageBtn = document.getElementById('workPageBtn');
+        const redirectPopup = document.getElementById('redirectPopup');
+        const redirectOkBtn = document.getElementById('redirectOkBtn');
+
+        // popup
+        const popupOverlay = document.getElementById('withdrawPopup');
+        const stepAmount = document.getElementById('stepAmount');
+        const stepDetails = document.getElementById('stepDetails');
+        const popupBalanceHint = document.getElementById('popupBalanceHint');
+        const withdrawAmount = document.getElementById('withdrawAmount');
+        const amountError = document.getElementById('amountError');
+        const popupNextBtn = document.getElementById('popupNextBtn');
+        const popupCancelBtn = document.getElementById('popupCancelBtn');
+        const popupBackBtn = document.getElementById('popupBackBtn');
+        const popupSubmitBtn = document.getElementById('popupSubmitBtn');
+        const upiInput = document.getElementById('upiInput');
+        const accountInput = document.getElementById('accountInput');
+        const ifscInput = document.getElementById('ifscInput');
+        const detailsError = document.getElementById('detailsError');
+        const popupCloseBtn = document.getElementById('popupCloseBtn');
+
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabPanels = {
+            upi: document.getElementById('tabUPI'),
+            bank: document.getElementById('tabBank')
+        };
+
+        let currentUser = null;
+        let currentSecret = '';
+        let withdrawalAmount = 0;
+
+        function redirectToHome() {
+            window.location.href = 'https://workfrommobile.pages.dev/';
+        }
+
+        function getSecretFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return (params.get('secretcode') || params.get('secretCode') || '').trim();
+        }
+
+        function showError(message) {
+            errorContainer.textContent = message;
+            errorContainer.classList.remove('hidden');
+            dashboardContent.style.display = 'none';
+            loadingIndicator.classList.add('hidden');
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr || dateStr === '—') return '—';
+            try {
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return dateStr;
+                return d.toLocaleString('en-IN', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+            } catch (_) { return dateStr; }
+        }
+
+        function renderDashboard(row) {
+            if (!row) {
+                showError('❌ Invalid secret or user not found.');
+                return;
+            }
+            currentUser = row;
+            currentSecret = row.secret || '';
+
+            userName.textContent = row.name || '—';
+            userMobile.textContent = row.mobile || '—';
+            userEmail.textContent = row.email || '—';
+            lastLogin.textContent = formatDate(row.lastLogin);
+            totalEarning.textContent = row.totalEarning ? `₹${Number(row.totalEarning).toLocaleString()}` : '₹0';
+            withdrawed.textContent = row.withdrawed ? `₹${Number(row.withdrawed).toLocaleString()}` : '₹0';
+            balance.textContent = row.balance ? `₹${Number(row.balance).toLocaleString()}` : '₹0';
+
+            dashboardContent.style.display = 'block';
+            errorContainer.classList.add('hidden');
+            loadingIndicator.classList.add('hidden');
+        }
+
+        function fetchUserData(secret) {
+            if (!secret) {
+                // show redirect popup
+                redirectPopup.classList.remove('hidden');
+                return;
+            }
+            loadingIndicator.classList.remove('hidden');
+            dashboardContent.style.display = 'none';
+            errorContainer.classList.add('hidden');
+
+            const url = `${APPS_SCRIPT_URL}?secretcode=${encodeURIComponent(secret)}`;
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success' && data.user) {
+                        renderDashboard(data.user);
+                    } else {
+                        // invalid secret -> show redirect popup
+                        redirectPopup.classList.remove('hidden');
+                        loadingIndicator.classList.add('hidden');
+                    }
+                })
+                .catch(err => {
+                    console.error('Fetch error:', err);
+                    showError('⚠️ Could not reach server. Please try again later.');
+                });
+        }
+
+        function getBalance() {
+            if (!currentUser) return 0;
+            return Number(currentUser.balance) || 0;
+        }
+
+        function openPopup() {
+            const bal = getBalance();
+            popupBalanceHint.textContent = `₹${bal.toLocaleString()}`;
+            withdrawAmount.value = '';
+            amountError.classList.add('hidden');
+            detailsError.classList.add('hidden');
+            upiInput.value = '';
+            accountInput.value = '';
+            ifscInput.value = '';
+            tabBtns.forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-tab="tabUPI"]').classList.add('active');
+            tabPanels.upi.classList.add('active');
+            tabPanels.bank.classList.remove('active');
+
+            stepAmount.classList.remove('hidden');
+            stepDetails.classList.add('hidden');
+            popupOverlay.classList.remove('hidden');
+            setTimeout(() => withdrawAmount.focus(), 100);
+        }
+
+        function closePopup() {
+            popupOverlay.classList.add('hidden');
+        }
+
+        function validateAmount() {
+            const val = parseFloat(withdrawAmount.value);
+            const bal = getBalance();
+            if (isNaN(val) || val <= 0) {
+                amountError.classList.remove('hidden');
+                amountError.querySelector('span').textContent = 'Enter a valid positive amount.';
+                return false;
+            }
+            if (val > bal) {
+                amountError.classList.remove('hidden');
+                amountError.querySelector('span').textContent = `Amount exceeds balance (₹${bal.toFixed(2)}).`;
+                return false;
+            }
+            amountError.classList.add('hidden');
+            withdrawalAmount = val;
+            return true;
+        }
+
+        function goToStep2() {
+            if (!validateAmount()) return;
+            stepAmount.classList.add('hidden');
+            stepDetails.classList.remove('hidden');
+            detailsError.classList.add('hidden');
+            setTimeout(() => {
+                const activePanel = document.querySelector('.tab-panel.active');
+                if (activePanel) {
+                    const inp = activePanel.querySelector('input');
+                    if (inp) inp.focus();
+                }
+            }, 100);
+        }
+
+        function goToStep1() {
+            stepDetails.classList.add('hidden');
+            stepAmount.classList.remove('hidden');
+            detailsError.classList.add('hidden');
+            setTimeout(() => withdrawAmount.focus(), 100);
+        }
+
+        function submitWithdrawal() {
+            const isUpi = tabPanels.upi.classList.contains('active');
+            let upi = '', acc = '', ifsc = '';
+
+            if (isUpi) {
+                upi = upiInput.value.trim();
+                if (!upi) {
+                    detailsError.classList.remove('hidden');
+                    detailsError.querySelector('span').textContent = 'Please enter a UPI ID.';
+                    return;
+                }
+            } else {
+                acc = accountInput.value.trim();
+                ifsc = ifscInput.value.trim();
+                if (!acc || !ifsc) {
+                    detailsError.classList.remove('hidden');
+                    detailsError.querySelector('span').textContent = 'Please enter both Account number and IFSC.';
+                    return;
+                }
+            }
+            detailsError.classList.add('hidden');
+
+            const payload = {
+                action: 'withdraw',
+                secret: currentSecret,
+                amount: withdrawalAmount,
+                upi: upi || '',
+                account: acc || '',
+                ifsc: ifsc || '',
+                timestamp: new Date().toISOString()
+            };
+
+            popupSubmitBtn.disabled = true;
+            popupSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+            fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                .then(() => {
+                    alert('✅ Withdrawal request submitted!');
+                    closePopup();
+                    fetchUserData(currentSecret);
+                })
+                .catch(err => {
+                    console.error('Submit error:', err);
+                    alert('⚠️ Could not submit. Please try again.');
+                })
+                .finally(() => {
+                    popupSubmitBtn.disabled = false;
+                    popupSubmitBtn.innerHTML = '<i class="fas fa-check"></i> Submit';
+                });
+        }
+
+        // Tab switching
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const target = this.dataset.tab;
+                Object.keys(tabPanels).forEach(key => {
+                    const panel = tabPanels[key];
+                    if (panel.id === target) {
+                        panel.classList.add('active');
+                    } else {
+                        panel.classList.remove('active');
+                    }
+                });
+                detailsError.classList.add('hidden');
+                upiInput.value = '';
+                accountInput.value = '';
+                ifscInput.value = '';
+            });
+        });
+
+        // Event listeners
+        withdrawBtn.addEventListener('click', openPopup);
+        popupCancelBtn.addEventListener('click', closePopup);
+        popupCloseBtn.addEventListener('click', closePopup);
+        popupOverlay.addEventListener('click', function(e) {
+            if (e.target === popupOverlay) closePopup();
+        });
+        popupNextBtn.addEventListener('click', goToStep2);
+        withdrawAmount.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                goToStep2();
+            }
+        });
+        popupBackBtn.addEventListener('click', goToStep1);
+        popupSubmitBtn.addEventListener('click', submitWithdrawal);
+
+        [upiInput, accountInput, ifscInput].forEach(field => {
+            field.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    submitWithdrawal();
+                }
+            });
+        });
+
+        function handleLogout() {
+            if (confirm('Logout and redirect to workfrommobile.pages.dev?')) {
+                redirectToHome();
+            }
+        }
+        logoutBadgeBtn.addEventListener('click', handleLogout);
+
+        workPageBtn.addEventListener('click', function() {
+            const secret = getSecretFromUrl();
+            if (secret) {
+                window.location.href = `https://workfrommobile.pages.dev/workpage?secretcode=${encodeURIComponent(secret)}`;
+            } else if (currentSecret) {
+                window.location.href = `https://workfrommobile.pages.dev/workpage?secretcode=${encodeURIComponent(currentSecret)}`;
+            } else {
+                alert('No secret code found. Please login again.');
+                redirectToHome();
+            }
+        });
+
+        redirectOkBtn.addEventListener('click', redirectToHome);
+
+        function init() {
+            const secret = getSecretFromUrl();
+            const host = window.location.hostname;
+            // if on pages.dev and no secret, redirect immediately
+            if ((host === 'workfrommobile.pages.dev' || host === 'www.workfrommobile.pages.dev') && !secret) {
+                redirectToHome();
+                return;
+            }
+            if (secret) {
+                fetchUserData(secret);
+            } else {
+                // show redirect popup
+                redirectPopup.classList.remove('hidden');
+            }
+        }
+        init();
+    })();
+</script>
+</body>
+</html>
