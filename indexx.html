@@ -510,13 +510,15 @@
     <p>© 2026 Work From Mobile. All Rights Reserved.</p>
   </footer>
 
+ 
+
   <script>
     (function() {
       "use strict";
 
       // ========== CONFIG ==========
       // REPLACE WITH YOUR DEPLOYED APPSCRIPT URL
-      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9V6M5glcboGqSWvGtnPi23iYcrPDEOiCwZ5OrfXa46SRf0LR9ZOZ86asr2n1otiwT/exec';
+      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzQaadSbMwThISY-p5xLzZ3vmlBrUIDHPkYiOMRAnAHDgtpXXNXL8hZ3mb0DxmjhyC8/exec';
 
       // ========== DOM REFS ==========
       const overlay = document.getElementById('popupOverlay');
@@ -608,9 +610,6 @@
       // ========== TASK CARDS CLICK => show login or signup ==========
       document.querySelectorAll('.card').forEach(card => {
         card.addEventListener('click', function() {
-          // if user is logged in (we don't have session, so show login popup)
-          // but we offer both: if logged in → go to task, else ask login/signup
-          // Simple: show login popup; user can switch to signup
           openLoginPopup();
         });
       });
@@ -663,6 +662,11 @@
       function openSuccessPopup() {
         successPopup.classList.add('active');
         document.body.style.overflow = 'hidden';
+        // Update success message based on status
+        const successMsg = document.querySelector('#successPopup .sub');
+        if (successMsg) {
+          successMsg.textContent = 'Your account is pending admin approval. You will be notified once approved.';
+        }
       }
       function closeSuccessPopup() {
         successPopup.classList.remove('active');
@@ -752,6 +756,11 @@
           .then(data => {
             if (data.success) {
               closeConfirmPopup();
+              // Update success message for pending status
+              const successMsg = document.querySelector('#successPopup p');
+              if (successMsg) {
+                successMsg.innerHTML = 'Welcome to the Work From Mobile family!<br>Your account is pending admin approval.<br>You will be notified once approved.';
+              }
               openSuccessPopup();
               userData = {};
               tempPassword = '';
@@ -806,7 +815,8 @@
           })
           .then(data => {
             if (data.success === true) {
-              const redirectUrl = data.redirectUrl || 'https://example.com/dashboard';
+              // Redirect to the URL with secret code
+              const redirectUrl = data.redirectUrl || 'https://workfrommobile.pages.dev/dashboard/?secretcode=' + data.user.secretCode;
               window.location.href = redirectUrl;
             } else {
               loginAttempts--;
@@ -814,7 +824,7 @@
               loginError.classList.remove('hidden');
               
               let msg = 'Invalid credentials.';
-              if (data.status === 'pending') msg = 'Account pending approval.';
+              if (data.status === 'pending') msg = 'Account pending approval. Please wait for admin approval.';
               else if (data.status === 'blocked') msg = 'Account blocked. Contact support.';
               else if (data.message) msg = data.message;
               
