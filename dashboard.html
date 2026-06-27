@@ -382,14 +382,14 @@
         }
         .input-group input {
             width: 100%;
-            padding: 0.8rem 1.2rem 0.8rem 2.6rem; /* left space for rupee icon */
+            padding: 0.8rem 1.2rem 0.8rem 2.6rem;
             border-radius: 40px;
             border: 1px solid #d3dfed;
             font-size: 1rem;
             font-family: 'Inter', sans-serif;
             transition: 0.15s;
             background: #fafcff;
-            appearance: textfield; /* hide arrows in Firefox */
+            appearance: textfield;
             -moz-appearance: textfield;
         }
         .input-group input::-webkit-outer-spin-button,
@@ -465,10 +465,7 @@
         .tab-panel input { margin-bottom: 0.2rem; }
 
         /* redirect popup (invalid secret) */
-        .redirect-popup .popup-card {
-            max-width: 400px;
-            text-align: center;
-        }
+        .redirect-popup .popup-card { max-width: 400px; text-align: center; }
         .redirect-popup .popup-card h3 { justify-content: center; }
         .redirect-popup .popup-card .sub { margin-bottom: 0.5rem; }
         .btn-danger {
@@ -477,6 +474,20 @@
             color: white;
         }
         .btn-danger:hover { background: #b91c1c; border-color: #b91c1c; }
+
+        /* welcome popup special */
+        .welcome-popup .popup-card { max-width: 400px; text-align: center; }
+        .welcome-popup .popup-card h3 { justify-content: center; }
+        .welcome-popup .popup-card .sub { font-size: 1rem; color: #1f3a5f; margin-bottom: 0.5rem; }
+        .welcome-popup .popup-card .highlight-text {
+            background: #eef4ff;
+            padding: 0.8rem 1rem;
+            border-radius: 30px;
+            color: #1d4ed8;
+            font-weight: 600;
+            margin: 0.5rem 0 1rem;
+            border: 1px solid #cdddfa;
+        }
     </style>
 </head>
 <body>
@@ -594,6 +605,18 @@
     </div>
 </div>
 
+<!-- WELCOME POPUP (shown once on first load) -->
+<div id="welcomePopup" class="popup-overlay welcome-popup">
+    <div class="popup-card">
+        <h3><i class="fas fa-coins" style="color:#f59e0b;"></i> Daily Credit</h3>
+        <div class="highlight-text">🕛 Balance will be credited every day at 12:00 AM</div>
+        <div class="sub">Please be patient. Thank you for using WorkFromMobile!</div>
+        <div class="popup-actions" style="margin-top:1.5rem;">
+            <button class="btn btn-primary" id="welcomeOkBtn" style="flex:1;">Okay</button>
+        </div>
+    </div>
+</div>
+
 <script>
     (function() {
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCP7i_BmRycTLuvlO8oVTYfolbcfH1C8eHbxjH1CyQh1WEloDGffQXQTQa9GlAnXl8/exec';
@@ -614,6 +637,8 @@
         const workPageBtn = document.getElementById('workPageBtn');
         const redirectPopup = document.getElementById('redirectPopup');
         const redirectOkBtn = document.getElementById('redirectOkBtn');
+        const welcomePopup = document.getElementById('welcomePopup');
+        const welcomeOkBtn = document.getElementById('welcomeOkBtn');
 
         // popup
         const popupOverlay = document.getElementById('withdrawPopup');
@@ -698,7 +723,6 @@
 
         function fetchUserData(secret) {
             if (!secret) {
-                // show redirect popup
                 redirectPopup.classList.remove('hidden');
                 return;
             }
@@ -715,8 +739,12 @@
                 .then(data => {
                     if (data.status === 'success' && data.user) {
                         renderDashboard(data.user);
+                        // show welcome popup only if user data loaded and not shown before
+                        if (!sessionStorage.getItem('welcomeShown')) {
+                            welcomePopup.classList.remove('hidden');
+                            sessionStorage.setItem('welcomeShown', 'true');
+                        }
                     } else {
-                        // invalid secret -> show redirect popup
                         redirectPopup.classList.remove('hidden');
                         loadingIndicator.classList.add('hidden');
                     }
@@ -919,10 +947,14 @@
 
         redirectOkBtn.addEventListener('click', redirectToHome);
 
+        // Welcome popup OK button
+        welcomeOkBtn.addEventListener('click', function() {
+            welcomePopup.classList.add('hidden');
+        });
+
         function init() {
             const secret = getSecretFromUrl();
             const host = window.location.hostname;
-            // if on pages.dev and no secret, redirect immediately
             if ((host === 'workfrommobile.pages.dev' || host === 'www.workfrommobile.pages.dev') && !secret) {
                 redirectToHome();
                 return;
@@ -930,7 +962,6 @@
             if (secret) {
                 fetchUserData(secret);
             } else {
-                // show redirect popup
                 redirectPopup.classList.remove('hidden');
             }
         }
