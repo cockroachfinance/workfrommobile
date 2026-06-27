@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header with tabs */
+        .header {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid #e8ecf1;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 500;
+            color: #5f6b7a;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            background: #f0f2f5;
+        }
+
+        .tab-btn.active {
+            background: #0066ff;
+            color: white;
+        }
+
+        .auth-section {
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .auth-section label {
+            font-weight: 500;
+            color: #1a2332;
+        }
+
+        .auth-section input {
+            padding: 10px 15px;
+            border: 2px solid #dce0e6;
+            border-radius: 8px;
+            font-size: 14px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .auth-section input:focus {
+            outline: none;
+            border-color: #0066ff;
+        }
+
+        .auth-status {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .auth-status.authenticated {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .auth-status.unauthenticated {
+            background: #fbe9e7;
+            color: #c62828;
+        }
+
+        /* Tab content */
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Upload section */
+        .upload-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 12px 18px;
+            border: 2px solid #dce0e6;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 300px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #0066ff;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #0066ff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0052cc;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,102,255,0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #b0b8c4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        /* URL list */
+        .url-list {
+            margin-top: 20px;
+        }
+
+        .url-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e8ecf1;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .url-item:last-child {
+            border-bottom: none;
+        }
+
+        .url-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .url-slno {
+            background: #f0f2f5;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #1a2332;
+            font-size: 13px;
+        }
+
+        .url-text {
+            word-break: break-all;
+            color: #1a2332;
+        }
+
+        .url-text a {
+            color: #0066ff;
+            text-decoration: none;
+        }
+
+        .url-text a:hover {
+            text-decoration: underline;
+        }
+
+        .url-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 12px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #dce0e6;
+            color: #5f6b7a;
+        }
+
+        .btn-outline:hover {
+            background: #f0f2f5;
+        }
+
+        /* Messages */
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .message.error {
+            background: #fbe9e7;
+            color: #c62828;
+            border-left: 4px solid #c62828;
+        }
+
+        .message.info {
+            background: #e3f2fd;
+            color: #0d47a1;
+            border-left: 4px solid #0d47a1;
+        }
+
+        /* Stats */
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 12px 20px;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .stat-card label {
+            display: block;
+            font-size: 12px;
+            color: #5f6b7a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a2332;
+            margin-top: 5px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(0,102,255,0.2);
+            border-top-color: #0066ff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #5f6b7a;
+        }
+
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab-btn {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .input-group input {
+                min-width: auto;
+                width: 100%;
+            }
+            
+            .url-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .url-actions {
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header with Tabs -->
+        <div class="header">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="upload" onclick="switchTab('upload')">
+                    📤 Upload URL
+                </button>
+                <button class="tab-btn" data-tab="view" onclick="switchTab('view')">
+                    📋 View URLs
+                </button>
+            </div>
+            
+            <!-- Authentication -->
+            <div class="auth-section">
+                <label for="secretCode">Secret Code:</label>
+                <input type="text" id="secretCode" placeholder="Enter your secret code..." 
+                       onchange="authenticate()" onkeyup="if(event.key==='Enter') authenticate()">
+                <button class="btn btn-primary" onclick="authenticate()">Authenticate</button>
+                <span id="authStatus" class="auth-status unauthenticated">Not authenticated</span>
+            </div>
+        </div>
+
+        <!-- Upload Tab -->
+        <div id="uploadTab" class="tab-content active">
+            <div class="upload-area">
+                <h2>📤 Upload New URL</h2>
+                <p style="color: #5f6b7a; margin-bottom: 15px;">
+                    Paste a URL below and click upload. It will be added to Sheet2 with automatic SL No and ID.
+                </p>
+                
+                <div class="input-group">
+                    <input type="url" id="urlInput" placeholder="https://example.com/page" 
+                           onkeyup="if(event.key==='Enter') uploadUrl()">
+                    <button class="btn btn-primary" id="uploadBtn" onclick="uploadUrl()">
+                        Upload URL
+                    </button>
+                </div>
+                
+                <div id="uploadMessage"></div>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <label>Total URLs in Sheet2</label>
+                        <div class="value" id="totalUrls">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <label>Last Uploaded</label>
+                        <div class="value" id="lastUploaded">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View Tab -->
+        <div id="viewTab" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+                <h2>📋 All URLs in Sheet2</h2>
+                <button class="btn btn-primary" onclick="loadUrls()">🔄 Refresh</button>
+            </div>
+            
+            <div id="urlListContainer">
+                <div class="empty-state">
+                    <div class="icon">📭</div>
+                    <p>Loading URLs... Please authenticate first.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const SCRIPT_URL = 'YOUR_SCRIPT_URL_HERE'; // Replace with your Apps Script URL
+        
+        let isAuthenticated = false;
+        let secretCode = '';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved secret if exists
+            const savedSecret = localStorage.getItem('secretCode');
+            if (savedSecret) {
+                document.getElementById('secretCode').value = savedSecret;
+                authenticate();
+            }
+        });
+
+        // Switch tabs
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            // Load URLs if viewing tab
+            if (tabName === 'view' && isAuthenticated) {
+                loadUrls();
+            }
+        }
+
+        // Authenticate
+        async function authenticate() {
+            const input = document.getElementById('secretCode');
+            secretCode = input.value.trim();
+            
+            if (!secretCode) {
+                showStatus('Please enter a secret code', 'error');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('secretCode', secretCode);
+            
+            try {
+                const response = await fetch(`${SCRIPT_URL}?secretcode=${secretCode}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    isAuthenticated = true;
+                    showStatus(`Authenticated as ${data.userData.id}`, 'authenticated');
+                    document.getElementById('totalUrls').textContent = data.totalItems || 0;
+                    
+                    // Enable upload button
+                    document.getElementById('uploadBtn').disabled = false;
+                    
+                    // Load URLs if view tab is active
+                    if (document.getElementById('viewTab').classList.contains('active')) {
+                        loadUrls();
+                    }
+                } else {
+                    isAuthenticated = false;
+                    showStatus('Authentication failed: ' + (data.error || 'Invalid secret code'), 'unauthenticated');
+                    document.getElementById('uploadBtn').disabled = true;
+                }
+            } catch (error) {
+                isAuthenticated = false;
+                showStatus('Error: ' + error.message, 'unauthenticated');
+                document.getElementById('uploadBtn').disabled = true;
+            }
+        }
+
+        // Show status
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('authStatus');
+            statusEl.textContent = message;
+            statusEl.className = 'auth-status ' + type;
+            
+            // Also show in messages if it's an error
+            if (type === 'error' || type === 'unauthenticated') {
+                showMessage(message, 'error');
+            }
+        }
+
+        // Show message
+        function showMessage(message, type = 'info', containerId = 'uploadMessage') {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<div class="message ${type}">${message}</div>`;
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        // Upload URL
+        async function uploadUrl() {
+            if (!isAuthenticated) {
+                showMessage('Please authenticate first!', 'error');
+                return;
+            }
+            
+            const urlInput = document.getElementById('urlInput');
+            const url = urlInput.value.trim();
+            
+            if (!url) {
+                showMessage('Please enter a valid URL', 'error');
+                return;
+            }
+            
+            // Basic URL validation
+            try {
+                new URL(url);
+            } catch (e) {
+                showMessage('Please enter a valid URL (include http:// or https://)', 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('uploadBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="loading-text"><span class="spinner"></span> Uploading...</span>';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch(
+                    `${SCRIPT_URL}?secretcode=${secretCode}&action=uploadUrl&url=${encodeURIComponent(url)}`
+                );
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage(`✅ URL uploaded successfully! SL No: ${data.slNo}`, 'success');
+                    document.getElementById('totalUrls').textContent = data.totalUrls || 0;
+                    document.getElementById('lastUploaded').textContent = data.slNo || '-';
+                    urlInput.value = '';
+                    
+                    // Refresh URLs in view tab
+                    if (document.getElementById('viewTab').classList.contains('active')) {
+                        loadUrls();
+                    }
+                } else {
+                    showMessage('❌ Upload failed: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                showMessage('❌ Error: ' + error.message, 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Load all URLs
+        async function loadUrls() {
+            if (!isAuthenticated) {
+                const container = document.getElementById('urlListContainer');
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🔒</div>
+                        <p>Please authenticate first to view URLs.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const container = document.getElementById('urlListContainer');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">⏳</div>
+                    <p>Loading URLs...</p>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch(`${SCRIPT_URL}?secretcode=${secretCode}&action=getAllUrls`);
+                const data = await response.json();
+                
+                if (data.success && data.urls && data.urls.length > 0) {
+                    let html = '<div class="url-list">';
+                    
+                    data.urls.forEach(item => {
+                        html += `
+                            <div class="url-item">
+                                <div class="url-info">
+                                    <span class="url-slno">#${item.slNo}</span>
+                                    <span class="url-text">
+                                        <a href="${item.url}" target="_blank" rel="noopener noreferrer">
+                                            ${item.url}
+                                        </a>
+                                    </span>
+                                    ${item.id ? `<span style="color:#5f6b7a;font-size:12px;">ID: ${item.id}</span>` : ''}
+                                </div>
+                                <div class="url-actions">
+                                    <button class="btn btn-sm btn-outline" onclick="copyUrl('${item.url}')">📋 Copy</button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteUrl('${item.slNo}')">🗑️ Delete</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div>';
+                    html += `<div style="margin-top:15px;color:#5f6b7a;font-size:14px;">
+                                Total: ${data.total} URLs
+                            </div>`;
+                    
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">📭</div>
+                            <p>No URLs found in Sheet2.</p>
+                            <p style="font-size:14px;margin-top:10px;color:#8a9aa8;">
+                                Go to the Upload tab to add some URLs.
+                            </p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">❌</div>
+                        <p>Error loading URLs: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Delete URL
+        async function deleteUrl(slNo) {
+            if (!confirm(`Are you sure you want to delete URL #${slNo}?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(
+                    `${SCRIPT_URL}?secretcode=${secretCode}&action=deleteUrl&slno=${slNo}`
+                );
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage(`✅ URL #${slNo} deleted successfully!`, 'success', 'uploadMessage');
+                    loadUrls(); // Refresh the list
+                    
+                    // Update total count
+                    const totalEl = document.getElementById('totalUrls');
+                    totalEl.textContent = parseInt(totalEl.textContent) - 1;
+                } else {
+                    showMessage('❌ Delete failed: ' + (data.error || 'Unknown error'), 'error', 'uploadMessage');
+                }
+            } catch (error) {
+                showMessage('❌ Error: ' + error.message, 'error', 'uploadMessage');
+            }
+        }
+
+        // Copy URL to clipboard
+        function copyUrl(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                showMessage('✅ URL copied to clipboard!', 'success', 'uploadMessage');
+            }).catch(() => {
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = url;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showMessage('✅ URL copied to clipboard!', 'success', 'uploadMessage');
+            });
+        }
+
+        // Auto-authenticate on page load if secret exists
+        window.addEventListener('load', function() {
+            const savedSecret = localStorage.getItem('secretCode');
+            if (savedSecret) {
+                document.getElementById('secretCode').value = savedSecret;
+                authenticate();
+            }
+        });
+    </script>
+</body>
+</html>
