@@ -708,6 +708,28 @@
             return (Date.now() - start) / 1000 >= MIN_TIME_SECONDS;
         }
 
+        // ---- CANCEL verification ----
+        function cancelVerification(slNo, showPopupMsg = true) {
+            if (!pendingVerification.has(slNo)) return;
+            
+            // Clear interval
+            if (visitIntervals.has(slNo)) {
+                clearInterval(visitIntervals.get(slNo));
+                visitIntervals.delete(slNo);
+            }
+            
+            // Remove from pending
+            pendingVerification.delete(slNo);
+            visitStartTimes.delete(slNo);
+            
+            // Re-render to show the "Visit" button again
+            renderUrls(allItems);
+            
+            if (showPopupMsg) {
+                showToast('⏹️ Cancelled: You came back too early!', 'error', 'Please watch for 1 minute to earn the reward.');
+            }
+        }
+
         function startTimeMonitoring(slNo, url) {
             const startTime = Date.now();
             visitStartTimes.set(slNo, startTime);
@@ -730,6 +752,7 @@
             }, 1000);
             visitIntervals.set(slNo, intervalId);
 
+            // Fallback: if user somehow stays on page but timer doesn't fire
             setTimeout(() => {
                 if (pendingVerification.has(slNo) && checkTimeSpent(slNo)) {
                     clearInterval(visitIntervals.get(slNo));
@@ -777,6 +800,7 @@
             }
         }
 
+        // ---- cancel if user leaves before time ----
         window.handleUrlClick = async function(slNo, id, url) {
             slNo = Number(slNo);
             if (viewedSlNos.has(slNo)) {
@@ -788,13 +812,7 @@
                 return;
             }
 
-            // Show reminder popup before opening
-            await showPopup(
-                '⏳ Minimum 1 Minute Required',
-                'You must watch the video for at least 1 minute to earn the reward.',
-                'fa-clock',
-                'OK, start now!'
-            );
+            // No popup — just open the link and start timer
 
             const card = document.querySelector(`.url-card[data-slno="${slNo}"]`);
             const btn = card?.querySelector('.visit-btn');
@@ -821,14 +839,10 @@
             renderUrls(allItems);
             showToast(`⏳ Spend at least ${MIN_TIME_SECONDS}s on page`, 'success', 'Timer started');
 
+            // cancel if user closes tab before time
             const cancelHandler = () => {
                 if (pendingVerification.has(slNo) && !checkTimeSpent(slNo)) {
-                    clearInterval(visitIntervals.get(slNo));
-                    visitIntervals.delete(slNo);
-                    pendingVerification.delete(slNo);
-                    visitStartTimes.delete(slNo);
-                    renderUrls(allItems);
-                    showToast(`⏹️ Cancelled: time not completed`, 'error');
+                    cancelVerification(slNo, false);
                     window.removeEventListener('beforeunload', cancelHandler);
                 }
             };
@@ -857,11 +871,31 @@
             window.location.href = 'https://workfrommobile.pages.dev/';
         };
 
+        // ---- Check when user returns to the site ----
         document.addEventListener('visibilitychange', function() {
             if (document.visibilityState === 'visible') {
-                pendingVerification.forEach(slNo => {
-                    if (checkTimeSpent(slNo) && !viewedSlNos.has(slNo)) {
-                        completeVerification(slNo);
+                // Check all pending verifications
+                const pendingCopy = new Set(pendingVerification);
+                pendingCopy.forEach(slNo => {
+                    if (!viewedSlNos.has(slNo)) {
+                        const elapsed = Math.floor((Date.now() - visitStartTimes.get(slNo)) / 1000);
+                        if (elapsed < MIN_TIME_SECONDS) {
+                            // User came back before 1 minute — CANCEL the verification
+                            if (!isPopupActive) {
+                                // Show popup explaining cancellation
+                                showPopup(
+                                    '⏳ Too Early!',
+                                    `You came back too early! You need to spend ${MIN_TIME_SECONDS} seconds continuously on the page to earn the reward. You spent only ${elapsed}s. Please try again.`,
+                                    'fa-clock',
+                                    'OK, I\'ll try again'
+                                ).then(() => {
+                                    cancelVerification(slNo, false);
+                                });
+                            }
+                        } else if (elapsed >= MIN_TIME_SECONDS) {
+                            // Time completed, complete verification
+                            completeVerification(slNo);
+                        }
                     }
                 });
             }
