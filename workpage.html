@@ -5,77 +5,437 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Work·track</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
-        body { background: #f4f7fc; min-height: 100vh; padding: 1rem; display: flex; align-items: flex-start; justify-content: center; }
-        .container { max-width: 600px; width: 100%; background: white; border-radius: 1.8rem; padding: 1.5rem 1.2rem; box-shadow: 0 16px 40px -8px rgba(0,0,0,0.08); }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid #eef3f9; flex-wrap: wrap; gap: 0.5rem; }
-        .header h1 { font-size: 1.3rem; color: #0b1e33; font-weight: 600; display: flex; align-items: center; gap: 0.4rem; }
-        .header h1 i { color: #2a7de1; font-size: 1.2rem; }
-        .header-actions { display: flex; gap: 0.5rem; align-items: center; }
-        .refresh-btn, .logout-btn { border: none; padding: 0.4rem 1rem; border-radius: 40px; font-weight: 600; font-size: 0.75rem; cursor: pointer; transition: 0.15s; background: #e9edf4; color: #1e3b5c; }
-        .logout-btn { background: #fee9e7; color: #b13e2e; }
-        .logout-btn:hover { background: #fdd5d0; transform: scale(0.96); }
-        .refresh-btn:hover { background: #d1dbe8; }
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; margin: 1rem 0 1.5rem; }
-        .stat-box { background: #f8faff; padding: 0.9rem 0.3rem; border-radius: 1.2rem; text-align: center; border: 1px solid #eef3f9; }
-        .stat-box .icon { font-size: 1.2rem; color: #2a7de1; margin-bottom: 0.1rem; }
-        .stat-box .num { font-size: 1.8rem; font-weight: 700; color: #0b2b4a; line-height: 1.2; }
-        .stat-box .label { font-size: 0.6rem; font-weight: 500; color: #4a617c; text-transform: uppercase; letter-spacing: 0.3px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: #f4f7fc;
+            min-height: 100vh;
+            padding: 1rem;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 1.8rem;
+            padding: 1.5rem 1.2rem;
+            box-shadow: 0 16px 40px -8px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid #eef3f9;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .header h1 {
+            font-size: 1.3rem;
+            color: #0b1e33;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .header h1 i {
+            color: #2a7de1;
+            font-size: 1.2rem;
+        }
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .refresh-btn, .logout-btn {
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.15s;
+            background: #e9edf4;
+            color: #1e3b5c;
+        }
+        .logout-btn {
+            background: #fee9e7;
+            color: #b13e2e;
+        }
+        .logout-btn:hover {
+            background: #fdd5d0;
+            transform: scale(0.96);
+        }
+        .refresh-btn:hover {
+            background: #d1dbe8;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.7rem;
+            margin: 1rem 0 1.5rem;
+        }
+        .stat-box {
+            background: #f8faff;
+            padding: 0.9rem 0.3rem;
+            border-radius: 1.2rem;
+            text-align: center;
+            border: 1px solid #eef3f9;
+            transition: 0.1s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .stat-box .icon {
+            font-size: 1.2rem;
+            color: #2a7de1;
+            margin-bottom: 0.1rem;
+        }
+        .stat-box .num {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0b2b4a;
+            line-height: 1.2;
+        }
+        .stat-box .label {
+            font-size: 0.6rem;
+            font-weight: 500;
+            color: #4a617c;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
         .stat-box.pending .num { color: #b45b0e; }
         .stat-box.today-views .num { color: #1f509e; }
         .stat-box.earning .num { color: #0f7b3a; }
-        .loading { text-align: center; color: #36618b; padding: 1.5rem 0; font-size: 0.95rem; }
-        .hidden { display: none !important; }
-        .error { background: #fee9e7; color: #b13e2e; padding: 0.8rem; border-radius: 1rem; margin: 0.5rem 0; text-align: center; font-size: 0.9rem; }
-        .success-msg { background: #d4edda; color: #155724; padding: 0.8rem; border-radius: 1rem; margin: 0.5rem 0; text-align: center; font-size: 0.9rem; border-left: 4px solid #28a745; }
-        .urls-container { margin-top: 1.5rem; }
-        .url-card { background: #f8faff; border: 1px solid #eef3f9; border-radius: 1.2rem; padding: 1rem 1rem; margin-bottom: 0.8rem; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 0.7rem; transition: 0.2s; flex-wrap: wrap; }
-        .url-card.blocked { background: #f5f5f5; opacity: 0.8; border-color: #e0e0e0; }
-        .url-card.blocked .url-text { color: #888; }
-        .url-card .url-info { display: flex; align-items: center; gap: 0.7rem; flex: 1 1 auto; min-width: 120px; }
-        .url-card .sl-no { background: #2a7de1; color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
-        .url-card .url-details { flex: 1; min-width: 80px; }
-        .url-card .url-details .id-label { font-size: 0.65rem; color: #6c757d; text-transform: uppercase; letter-spacing: 0.3px; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; }
-        .url-card .url-actions { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
-        .url-card .visit-btn { background: #2a7de1; color: white; border: none; padding: 0.5rem 1.2rem; border-radius: 40px; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: 0.15s; display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
-        .url-card .visit-btn:active { transform: scale(0.94); }
-        .url-card .visit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-        .url-card .visit-btn.visited { background: #28a745; }
-        .url-card.blocked .visit-btn { background: #d1d1d1; color: #666; cursor: not-allowed; }
-        .time-spent { font-size: 0.65rem; color: #2c5a7a; background: #e9edf4; padding: 0.2rem 0.6rem; border-radius: 30px; display: inline-block; margin-top: 0.2rem; }
-        .viewed-badge, .pending-badge { display: inline-block; padding: 0.1rem 0.6rem; border-radius: 40px; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.2px; }
-        .viewed-badge { background: #d4edda; color: #155724; }
-        .pending-badge { background: #fff3cd; color: #856404; }
-        .empty-state { text-align: center; padding: 2rem 0.5rem; color: #6c757d; }
-        .filter-section { display: flex; gap: 0.4rem; margin: 0.8rem 0 1rem; flex-wrap: wrap; }
-        .filter-btn { padding: 0.3rem 1rem; border: 2px solid #e9edf4; border-radius: 40px; background: white; color: #4a617c; font-weight: 500; font-size: 0.7rem; cursor: pointer; transition: 0.15s; }
-        .filter-btn.active { border-color: #2a7de1; background: #2a7de1; color: white; }
-        .toast { position: fixed; bottom: 1.2rem; left: 1.2rem; right: 1.2rem; max-width: 380px; margin: 0 auto; background: #0b1e33; color: white; padding: 0.9rem 1.2rem; border-radius: 1.2rem; box-shadow: 0 8px 24px rgba(0,0,0,0.15); transform: translateY(80px); opacity: 0; transition: 0.25s ease; z-index: 999; font-size: 0.9rem; }
-        .toast.show { transform: translateY(0); opacity: 1; }
+        .loading {
+            text-align: center;
+            color: #36618b;
+            padding: 1.5rem 0;
+            font-size: 0.95rem;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .error {
+            background: #fee9e7;
+            color: #b13e2e;
+            padding: 0.8rem;
+            border-radius: 1rem;
+            margin: 0.5rem 0;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .success-msg {
+            background: #d4edda;
+            color: #155724;
+            padding: 0.8rem;
+            border-radius: 1rem;
+            margin: 0.5rem 0;
+            text-align: center;
+            font-size: 0.9rem;
+            border-left: 4px solid #28a745;
+        }
+        .urls-container {
+            margin-top: 1.5rem;
+        }
+        .url-card {
+            background: #f8faff;
+            border: 1px solid #eef3f9;
+            border-radius: 1.2rem;
+            padding: 1rem 1rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.7rem;
+            transition: 0.2s;
+            flex-wrap: wrap;
+        }
+        .url-card.blocked {
+            background: #f5f5f5;
+            opacity: 0.8;
+            border-color: #e0e0e0;
+        }
+        .url-card.blocked .url-text {
+            color: #888;
+        }
+        .url-card .url-info {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            flex: 1 1 auto;
+            min-width: 120px;
+        }
+        .url-card .sl-no {
+            background: #2a7de1;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .url-card .url-details {
+            flex: 1;
+            min-width: 80px;
+        }
+        .url-card .url-details .id-label {
+            font-size: 0.65rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .url-card .url-details .url-text {
+            display: none;
+        }
+        .url-card .url-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-shrink: 0;
+        }
+        .url-card .visit-btn {
+            background: #2a7de1;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            white-space: nowrap;
+        }
+        .url-card .visit-btn:active {
+            transform: scale(0.94);
+        }
+        .url-card .visit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .url-card .visit-btn.visited {
+            background: #28a745;
+        }
+        .url-card.blocked .visit-btn {
+            background: #d1d1d1;
+            color: #666;
+            cursor: not-allowed;
+        }
+        .time-spent {
+            font-size: 0.65rem;
+            color: #2c5a7a;
+            background: #e9edf4;
+            padding: 0.2rem 0.6rem;
+            border-radius: 30px;
+            display: inline-block;
+            margin-top: 0.2rem;
+        }
+        .click-details {
+            margin-top: 0.3rem;
+            padding: 0.3rem 0.5rem;
+            background: #f0f3f8;
+            border-radius: 0.6rem;
+            font-size: 0.65rem;
+            color: #1e3b5c;
+            border-left: 3px solid #2a7de1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem 0.8rem;
+        }
+        .click-details .label {
+            font-weight: 600;
+            color: #4a617c;
+        }
+        .viewed-badge, .pending-badge {
+            display: inline-block;
+            padding: 0.1rem 0.6rem;
+            border-radius: 40px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+        .viewed-badge {
+            background: #d4edda;
+            color: #155724;
+        }
+        .pending-badge {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 2rem 0.5rem;
+            color: #6c757d;
+        }
+        .empty-state i {
+            font-size: 2.8rem;
+            color: #d1d9e6;
+            margin-bottom: 0.5rem;
+        }
+        .empty-state h3 {
+            color: #0b1e33;
+            font-size: 1.1rem;
+        }
+        .filter-section {
+            display: flex;
+            gap: 0.4rem;
+            margin: 0.8rem 0 1rem;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 0.3rem 1rem;
+            border: 2px solid #e9edf4;
+            border-radius: 40px;
+            background: white;
+            color: #4a617c;
+            font-weight: 500;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .filter-btn.active {
+            border-color: #2a7de1;
+            background: #2a7de1;
+            color: white;
+        }
+        .filter-btn:hover {
+            border-color: #2a7de1;
+        }
+        .toast {
+            position: fixed;
+            bottom: 1.2rem;
+            left: 1.2rem;
+            right: 1.2rem;
+            max-width: 380px;
+            margin: 0 auto;
+            background: #0b1e33;
+            color: white;
+            padding: 0.9rem 1.2rem;
+            border-radius: 1.2rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            transform: translateY(80px);
+            opacity: 0;
+            transition: 0.25s ease;
+            z-index: 999;
+            font-size: 0.9rem;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
         .toast.success { background: #1e7e34; }
         .toast.error { background: #b13e2e; }
-        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; animation: fadeIn 0.25s ease; }
-        .popup-box { background: white; max-width: 400px; width: 90%; padding: 2rem 1.5rem; border-radius: 2rem; box-shadow: 0 24px 48px rgba(0,0,0,0.2); text-align: center; animation: slideUp 0.3s ease; }
-        .popup-box h2 { color: #0b1e33; font-size: 1.4rem; margin-bottom: 0.5rem; }
-        .popup-box p { color: #2c4a6a; font-size: 1rem; margin: 0.8rem 0 1.8rem; line-height: 1.5; }
-        .popup-box .popup-icon { font-size: 3rem; color: #2a7de1; margin-bottom: 0.3rem; }
-        .popup-box .btn-ok { background: #2a7de1; color: white; border: none; padding: 0.8rem 2.8rem; border-radius: 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.15s; box-shadow: 0 6px 14px rgba(42,125,225,0.25); }
-        .popup-box .btn-ok:active { transform: scale(0.94); }
-        .popup-box .btn-ok.danger { background: #d32f2f; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .toast .toast-title { font-weight: 600; margin-bottom: 0.1rem; }
+        .toast .toast-detail { font-size: 0.8rem; opacity: 0.9; }
         @media (max-width: 480px) {
             .container { padding: 1rem 0.8rem; }
-            .stats-grid { grid-template-columns: 1fr; gap: 0.5rem; }
-            .stat-box { display: flex; align-items: center; justify-content: space-between; padding: 0.7rem 1rem; border-radius: 1.2rem; }
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            .stat-box {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.7rem 1rem;
+                border-radius: 1.2rem;
+            }
             .stat-box .icon { font-size: 1.2rem; margin: 0; }
             .stat-box .num { font-size: 1.6rem; }
             .stat-box .label { font-size: 0.6rem; }
             .stat-box > div { display: flex; align-items: center; gap: 0.5rem; }
             .url-card { padding: 0.9rem; flex-direction: row; flex-wrap: wrap; }
+            .url-card .url-info { gap: 0.5rem; }
+            .url-card .sl-no { width: 32px; height: 32px; font-size: 0.8rem; }
             .header h1 { font-size: 1.1rem; }
+            .refresh-btn, .logout-btn { font-size: 0.65rem; padding: 0.3rem 0.8rem; }
+            .filter-btn { font-size: 0.65rem; padding: 0.2rem 0.8rem; }
             .url-card .url-actions { width: 100%; justify-content: flex-end; }
         }
+
+        /* Popup overlay */
+        .popup-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.25s ease;
+        }
+        .popup-box {
+            background: white;
+            max-width: 400px;
+            width: 90%;
+            padding: 2rem 1.5rem;
+            border-radius: 2rem;
+            box-shadow: 0 24px 48px rgba(0,0,0,0.2);
+            text-align: center;
+            animation: slideUp 0.3s ease;
+        }
+        .popup-box h2 {
+            color: #0b1e33;
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+        }
+        .popup-box p {
+            color: #2c4a6a;
+            font-size: 1rem;
+            margin: 0.8rem 0 1.8rem;
+            line-height: 1.5;
+        }
+        .popup-box .popup-icon {
+            font-size: 3rem;
+            color: #2a7de1;
+            margin-bottom: 0.3rem;
+        }
+        .popup-box .btn-ok {
+            background: #2a7de1;
+            color: white;
+            border: none;
+            padding: 0.8rem 2.8rem;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 6px 14px rgba(42,125,225,0.25);
+        }
+        .popup-box .btn-ok:active {
+            transform: scale(0.94);
+        }
+        .popup-box .btn-ok:hover {
+            background: #1a5bb5;
+        }
+        .popup-box .btn-ok.danger {
+            background: #d32f2f;
+        }
+        .popup-box .btn-ok.danger:hover {
+            background: #b71c1c;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -115,6 +475,8 @@
 </div>
 
 <div id="toast" class="toast"></div>
+
+<!-- Popup overlay (hidden by default) -->
 <div id="popupOverlay" class="popup-overlay hidden">
     <div class="popup-box">
         <div class="popup-icon" id="popupIcon"><i class="fas fa-info-circle"></i></div>
@@ -126,7 +488,6 @@
 
 <script>
     (function() {
-        // IMPORTANT: Use the SAME script URL for both pages
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzoHGVIEEmpOf2S8arfC7EaY-DLHo4IwebJHA-2OstNfD6ulQf0aj4DeHecN-B4xRmq/exec';
 
         const loadingEl = document.getElementById('loading');
@@ -152,6 +513,7 @@
         let secret = '';
         let viewedSlNos = new Set();
         let pendingVerification = new Set();
+
         const visitStartTimes = new Map();
         const visitIntervals = new Map();
         const MIN_TIME_SECONDS = 60;
@@ -190,6 +552,7 @@
             });
         }
 
+        // ---- auth check and validate secret with sheet ----
         async function checkSecretAndValidate() {
             const params = new URLSearchParams(window.location.search);
             secret = params.get('secretcode');
@@ -199,6 +562,7 @@
                 return false;
             }
 
+            // Validate secret with sheet
             try {
                 loadingEl.classList.remove('hidden');
                 const response = await fetch(`${WEB_APP_URL}?secretcode=${encodeURIComponent(secret)}&checkonly=true`);
@@ -206,10 +570,18 @@
                 loadingEl.classList.add('hidden');
 
                 if (data.success) {
-                    await showPopup('⏳ Watch & Earn', 'Please watch the video for a minimum of 1 minute to earn the reward.', 'fa-play-circle', 'OK, got it!');
+                    // Secret exists — show the "watch 1 minute" popup
+                    await showPopup(
+                        '⏳ Watch & Earn',
+                        'Please watch the video for a minimum of 1 minute to earn the reward.',
+                        'fa-play-circle',
+                        'OK, got it!'
+                    );
+                    // Now load the actual data
                     await loadData();
                     return true;
                 } else {
+                    // Secret not found
                     await showPopup('User Not Found', 'Invalid secret code. Please check and try again.', 'fa-user-slash', 'OK', true);
                     window.location.href = 'https://workfrommobile.pages.dev/';
                     return false;
@@ -227,8 +599,12 @@
             const viewed = viewedSlNos.size;
             const pending = total - viewed;
             pendingEl.textContent = pending;
-            todayViewsEl.textContent = viewed;
-            const earning = (viewed * 0.70).toFixed(2);
+
+            // For demo, todayViews = viewed (assuming all views are today)
+            const todayViews = viewed;
+            todayViewsEl.textContent = todayViews;
+            // Earning = views * 0.70 paisa = 0.70 INR
+            const earning = (todayViews * 0.70).toFixed(2);
             todayEarningEl.textContent = `₹${earning}`;
         }
 
@@ -311,6 +687,13 @@
                                     ${isPending ? '<span class="pending-badge">⏳ WATCHING</span>' : ''}
                                 </div>
                                 ${timeSpentHtml}
+                                ${item.lastClickDate ? `
+                                    <div class="click-details">
+                                        <span><span class="label">📅</span> ${item.lastClickDate}</span>
+                                        <span><span class="label">⏰</span> ${item.lastClickTime}</span>
+                                        <span><span class="label">🔄</span> ${item.clicks || 0}</span>
+                                    </div>
+                                ` : ''}
                             </div>
                         </div>
                         <div class="url-actions">
@@ -334,16 +717,21 @@
             return (Date.now() - start) / 1000 >= MIN_TIME_SECONDS;
         }
 
+        // ---- CANCEL verification ----
         function cancelVerification(slNo, showPopupMsg = true) {
             if (!pendingVerification.has(slNo)) return;
             
+            // Clear interval
             if (visitIntervals.has(slNo)) {
                 clearInterval(visitIntervals.get(slNo));
                 visitIntervals.delete(slNo);
             }
             
+            // Remove from pending
             pendingVerification.delete(slNo);
             visitStartTimes.delete(slNo);
+            
+            // Re-render to show the "Play" button again
             renderUrls(allItems);
             
             if (showPopupMsg) {
@@ -373,6 +761,7 @@
             }, 1000);
             visitIntervals.set(slNo, intervalId);
 
+            // Fallback: if user somehow stays on page but timer doesn't fire
             setTimeout(() => {
                 if (pendingVerification.has(slNo) && checkTimeSpent(slNo)) {
                     clearInterval(visitIntervals.get(slNo));
@@ -419,6 +808,7 @@
             }
         }
 
+        // ---- cancel if user leaves before time ----
         window.handleUrlClick = async function(slNo, id, url) {
             slNo = Number(slNo);
             if (viewedSlNos.has(slNo)) {
@@ -455,6 +845,7 @@
             renderUrls(allItems);
             showToast(`⏳ Watch at least ${MIN_TIME_SECONDS}s of video`, 'success', 'Timer started');
 
+            // cancel if user closes tab before time
             const cancelHandler = () => {
                 if (pendingVerification.has(slNo) && !checkTimeSpent(slNo)) {
                     cancelVerification(slNo, false);
@@ -486,14 +877,18 @@
             window.location.href = 'https://workfrommobile.pages.dev/';
         };
 
+        // ---- Check when user returns to the site ----
         document.addEventListener('visibilitychange', function() {
             if (document.visibilityState === 'visible') {
+                // Check all pending verifications
                 const pendingCopy = new Set(pendingVerification);
                 pendingCopy.forEach(slNo => {
                     if (!viewedSlNos.has(slNo)) {
                         const elapsed = Math.floor((Date.now() - visitStartTimes.get(slNo)) / 1000);
                         if (elapsed < MIN_TIME_SECONDS) {
+                            // User came back before 1 minute — CANCEL the verification
                             if (!isPopupActive) {
+                                // Show popup explaining cancellation
                                 showPopup(
                                     '⏳ Too Early!',
                                     `You came back too early! You need to watch the video for ${MIN_TIME_SECONDS} seconds continuously to earn the reward. You watched only ${elapsed}s. Please try again.`,
@@ -504,6 +899,7 @@
                                 });
                             }
                         } else if (elapsed >= MIN_TIME_SECONDS) {
+                            // Time completed, complete verification
                             completeVerification(slNo);
                         }
                     }
@@ -511,7 +907,9 @@
             }
         });
 
+        // ---- ENTRY: check secret with sheet, show popups accordingly ----
         checkSecretAndValidate();
+
     })();
 </script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
