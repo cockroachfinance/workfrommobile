@@ -159,9 +159,12 @@
             padding: 1rem 1rem;
             margin-bottom: 0.8rem;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
             gap: 0.7rem;
             transition: 0.2s;
+            flex-wrap: wrap;
         }
         .url-card.blocked {
             background: #f5f5f5;
@@ -175,24 +178,25 @@
             display: flex;
             align-items: center;
             gap: 0.7rem;
-            flex-wrap: wrap;
+            flex: 1 1 auto;
+            min-width: 120px;
         }
         .url-card .sl-no {
             background: #2a7de1;
             color: white;
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             flex-shrink: 0;
         }
         .url-card .url-details {
             flex: 1;
-            min-width: 140px;
+            min-width: 80px;
         }
         .url-card .url-details .id-label {
             font-size: 0.65rem;
@@ -204,17 +208,15 @@
             align-items: center;
             gap: 0.3rem;
         }
+        /* hide the actual URL text */
         .url-card .url-details .url-text {
-            color: #0b1e33;
-            font-weight: 500;
-            word-break: break-all;
-            font-size: 0.9rem;
+            display: none;
         }
         .url-card .url-actions {
             display: flex;
             align-items: center;
             gap: 0.6rem;
-            flex-wrap: wrap;
+            flex-shrink: 0;
         }
         .url-card .visit-btn {
             background: #2a7de1;
@@ -375,12 +377,13 @@
             .stat-box .num { font-size: 1.6rem; }
             .stat-box .label { font-size: 0.6rem; }
             .stat-box > div { display: flex; align-items: center; gap: 0.5rem; }
-            .url-card { padding: 0.9rem; }
+            .url-card { padding: 0.9rem; flex-direction: row; flex-wrap: wrap; }
             .url-card .url-info { gap: 0.5rem; }
-            .url-card .sl-no { width: 28px; height: 28px; font-size: 0.7rem; }
+            .url-card .sl-no { width: 32px; height: 32px; font-size: 0.8rem; }
             .header h1 { font-size: 1.1rem; }
             .refresh-btn, .logout-btn { font-size: 0.65rem; padding: 0.3rem 0.8rem; }
             .filter-btn { font-size: 0.65rem; padding: 0.2rem 0.8rem; }
+            .url-card .url-actions { width: 100%; justify-content: flex-end; }
         }
     </style>
 </head>
@@ -464,7 +467,6 @@
             const params = new URLSearchParams(window.location.search);
             secret = params.get('secretcode');
             if (!secret) {
-                // show popup alert then redirect
                 alert('No secret code found. Please provide a valid secret.');
                 window.location.href = 'https://workfrommobile.pages.dev/';
                 return false;
@@ -546,10 +548,10 @@
                 let timeSpentHtml = '';
                 if (isPending && visitStartTimes.has(slNo)) {
                     const elapsed = Math.floor((Date.now() - visitStartTimes.get(slNo)) / 1000);
-                    const remaining = Math.max(0, MIN_TIME_SECONDS - elapsed);
                     timeSpentHtml = `<div class="time-spent"><i class="fas fa-clock"></i> ${elapsed}s / ${MIN_TIME_SECONDS}s</div>`;
                 }
 
+                // only show SL no, ID, and visit button (no URL text)
                 html += `
                     <div class="${cardClass}" data-slno="${slNo}">
                         <div class="url-info">
@@ -560,7 +562,6 @@
                                     ${isBlocked ? '<span class="viewed-badge">✓ VIEWED</span>' : ''}
                                     ${isPending ? '<span class="pending-badge">⏳ VERIFYING</span>' : ''}
                                 </div>
-                                <div class="url-text">${item.url}</div>
                                 ${timeSpentHtml}
                                 ${item.lastClickDate ? `
                                     <div class="click-details">
@@ -603,7 +604,6 @@
                 if (card) {
                     const ts = card.querySelector('.time-spent');
                     if (ts) {
-                        const rem = Math.max(0, MIN_TIME_SECONDS - elapsed);
                         ts.innerHTML = `<i class="fas fa-clock"></i> ${elapsed}s / ${MIN_TIME_SECONDS}s`;
                     }
                 }
@@ -663,12 +663,7 @@
             }
         }
 
-        // ---- if user closes tab before time, cancel and mark not viewed ----
-        function cancelPendingIfClosed() {
-            // if page is hidden (tab switch) we do not cancel; only on unload
-            // but we also check visibility: if user returns after time, we verify
-        }
-
+        // ---- cancel if user leaves before time ----
         window.handleUrlClick = async function(slNo, id, url) {
             slNo = Number(slNo);
             if (viewedSlNos.has(slNo)) {
@@ -705,12 +700,9 @@
             renderUrls(allItems);
             showToast(`⏳ Spend at least ${MIN_TIME_SECONDS}s on page`, 'success', 'Timer started');
 
-            // ---- if user closes tab before time, we cancel ----
-            // We handle this via page visibility and unload: if user navigates away before time,
-            // we cancel the verification (mark as not viewed).
+            // cancel if user closes tab before time
             const cancelHandler = () => {
                 if (pendingVerification.has(slNo) && !checkTimeSpent(slNo)) {
-                    // cancel: remove from pending, clear timers, mark not viewed
                     clearInterval(visitIntervals.get(slNo));
                     visitIntervals.delete(slNo);
                     pendingVerification.delete(slNo);
@@ -721,7 +713,6 @@
                 }
             };
             window.addEventListener('beforeunload', cancelHandler);
-            // also if tab becomes hidden for long? we use visibility change to check if user returns
         };
 
         window.filterUrls = function(filter) {
@@ -746,7 +737,6 @@
             window.location.href = 'https://workfrommobile.pages.dev/';
         };
 
-        // on visibility change: if user returns and time passed, complete
         document.addEventListener('visibilitychange', function() {
             if (document.visibilityState === 'visible') {
                 pendingVerification.forEach(slNo => {
@@ -757,7 +747,6 @@
             }
         });
 
-        // start
         validateAndLoad();
     })();
 </script>
