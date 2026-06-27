@@ -274,8 +274,8 @@
             letter-spacing: 0.2px;
         }
         .viewed-badge {
-            background: #ffe5e5;
-            color: #c62828;
+            background: #d4edda;
+            color: #155724;
         }
         .pending-badge {
             background: #fff3cd;
@@ -451,7 +451,7 @@
     <div id="loading" class="loading"><i class="fas fa-spinner fa-pulse"></i> Loading...</div>
     <div id="statsContainer" class="hidden">
         <div class="stats-grid">
-            <div class="stat-box pending"><div><span class="num" id="pendingCount">0</span></div><span class="label">Pending Videos</span></div>
+            <div class="stat-box pending"><div><span class="num" id="pendingCount">0</span></div><span class="label">Unwatched Videos</span></div>
             <div class="stat-box today-views"><div><span class="num" id="todayViews">0</span></div><span class="label">Today Views</span></div>
             <div class="stat-box earning"><div><span class="num" id="todayEarning">0</span></div><span class="label">Today Earning</span></div>
         </div>
@@ -462,13 +462,13 @@
 
     <div id="urlsContainer" class="hidden">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; flex-wrap: wrap;">
-            <h2 style="font-size: 1rem; color: #0b1e33;"><i class="fas fa-list"></i> URLs</h2>
+            <h2 style="font-size: 1rem; color: #0b1e33;"><i class="fas fa-video"></i> Videos</h2>
             <span style="font-size: 0.75rem; color: #6c757d;" id="urlCount">0</span>
         </div>
         <div class="filter-section">
             <button class="filter-btn" data-filter="all" onclick="filterUrls('all')">All</button>
             <button class="filter-btn active" data-filter="available" onclick="filterUrls('available')">Available</button>
-            <button class="filter-btn" data-filter="viewed" onclick="filterUrls('viewed')">Viewed</button>
+            <button class="filter-btn" data-filter="viewed" onclick="filterUrls('viewed')">Watched</button>
         </div>
         <div id="urlsList"></div>
     </div>
@@ -573,7 +573,7 @@
                     // Secret exists — show the "watch 1 minute" popup
                     await showPopup(
                         '⏳ Watch & Earn',
-                        'You should watch the video for minimum 1 minute to earn the reward.',
+                        'Please watch the video for a minimum of 1 minute to earn the reward.',
                         'fa-play-circle',
                         'OK, got it!'
                     );
@@ -601,7 +601,6 @@
             pendingEl.textContent = pending;
 
             // For demo, todayViews = viewed (assuming all views are today)
-            // In a real scenario you'd filter by date, but we use viewed count as today views.
             const todayViews = viewed;
             todayViewsEl.textContent = todayViews;
             // Earning = views * 0.70 paisa = 0.70 INR
@@ -637,7 +636,7 @@
                         renderUrls(allItems);
                         urlsContainer.classList.remove('hidden');
                     } else {
-                        urlsList.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><h3>No URLs</h3><p>Sheet2 is empty</p></div>`;
+                        urlsList.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><h3>No Videos</h3><p>Sheet2 is empty</p></div>`;
                         urlsContainer.classList.remove('hidden');
                     }
                 } else {
@@ -660,7 +659,7 @@
             urlCount.textContent = `${filtered.length} items`;
 
             if (filtered.length === 0) {
-                urlsList.innerHTML = `<div class="empty-state"><i class="fas fa-search"></i><h3>No ${currentFilter} URLs</h3><p>${currentFilter === 'available' ? 'All viewed!' : 'No viewed yet.'}</p></div>`;
+                urlsList.innerHTML = `<div class="empty-state"><i class="fas fa-search"></i><h3>No ${currentFilter} Videos</h3><p>${currentFilter === 'available' ? 'All watched!' : 'No videos watched yet.'}</p></div>`;
                 return;
             }
 
@@ -684,8 +683,8 @@
                             <div class="url-details">
                                 <div class="id-label">
                                     ID: ${item.id}
-                                    ${isBlocked ? '<span class="viewed-badge">✓ VIEWED</span>' : ''}
-                                    ${isPending ? '<span class="pending-badge">⏳ VERIFYING</span>' : ''}
+                                    ${isBlocked ? '<span class="viewed-badge">✓ WATCHED</span>' : ''}
+                                    ${isPending ? '<span class="pending-badge">⏳ WATCHING</span>' : ''}
                                 </div>
                                 ${timeSpentHtml}
                                 ${item.lastClickDate ? `
@@ -699,11 +698,11 @@
                         </div>
                         <div class="url-actions">
                             ${isBlocked ? `
-                                <button class="visit-btn" disabled><i class="fas fa-lock"></i> Blocked</button>
+                                <button class="visit-btn" disabled><i class="fas fa-check-circle"></i> Watched</button>
                             ` : isPending ? `
-                                <button class="visit-btn" disabled style="background:#ffc107;color:#333;"><i class="fas fa-hourglass-half"></i> Verifying...</button>
+                                <button class="visit-btn" disabled style="background:#ffc107;color:#333;"><i class="fas fa-hourglass-half"></i> Watching...</button>
                             ` : `
-                                <button class="visit-btn" onclick="handleUrlClick('${slNo}', '${item.id}', '${item.url}')"><i class="fas fa-external-link-alt"></i> Visit</button>
+                                <button class="visit-btn" onclick="handleUrlClick('${slNo}', '${item.id}', '${item.url}')"><i class="fas fa-play"></i> Play</button>
                             `}
                         </div>
                     </div>
@@ -732,7 +731,7 @@
             pendingVerification.delete(slNo);
             visitStartTimes.delete(slNo);
             
-            // Re-render to show the "Visit" button again
+            // Re-render to show the "Play" button again
             renderUrls(allItems);
             
             if (showPopupMsg) {
@@ -789,7 +788,7 @@
                     pendingVerification.delete(slNo);
                     visitStartTimes.delete(slNo);
                     updateStats();
-                    showToast(`✓ Verified! ${MIN_TIME_SECONDS}s on SL ${slNo}`, 'success', 'Click recorded');
+                    showToast(`✓ Verified! ${MIN_TIME_SECONDS}s on SL ${slNo}`, 'success', 'Watch recorded');
                     renderUrls(allItems);
                 } else {
                     viewedSlNos.add(slNo);
@@ -813,11 +812,11 @@
         window.handleUrlClick = async function(slNo, id, url) {
             slNo = Number(slNo);
             if (viewedSlNos.has(slNo)) {
-                showToast('Already viewed!', 'error');
+                showToast('Already watched!', 'error');
                 return;
             }
             if (pendingVerification.has(slNo)) {
-                showToast('Already verifying!', 'error');
+                showToast('Already watching!', 'error');
                 return;
             }
 
@@ -825,26 +824,26 @@
             const btn = card?.querySelector('.visit-btn');
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Opening...';
+                btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Loading video...';
             }
 
             const fullUrl = url.startsWith('http') ? url : `https://${url}`;
             const newTab = window.open(fullUrl, '_blank');
             if (!newTab) {
                 showToast('Popups blocked! Please allow.', 'error');
-                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-external-link-alt"></i> Visit'; }
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-play"></i> Play'; }
                 return;
             }
 
             startTimeMonitoring(slNo, url);
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-hourglass-half"></i> Verifying...';
+                btn.innerHTML = '<i class="fas fa-hourglass-half"></i> Watching...';
                 btn.style.background = '#ffc107';
                 btn.style.color = '#333';
             }
             renderUrls(allItems);
-            showToast(`⏳ Spend at least ${MIN_TIME_SECONDS}s on page`, 'success', 'Timer started');
+            showToast(`⏳ Watch at least ${MIN_TIME_SECONDS}s of video`, 'success', 'Timer started');
 
             // cancel if user closes tab before time
             const cancelHandler = () => {
@@ -892,7 +891,7 @@
                                 // Show popup explaining cancellation
                                 showPopup(
                                     '⏳ Too Early!',
-                                    `You came back too early! You need to spend ${MIN_TIME_SECONDS} seconds continuously on the page to earn the reward. You spent only ${elapsed}s. Please try again.`,
+                                    `You came back too early! You need to watch the video for ${MIN_TIME_SECONDS} seconds continuously to earn the reward. You watched only ${elapsed}s. Please try again.`,
                                     'fa-clock',
                                     'OK, I\'ll try again'
                                 ).then(() => {
