@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL Manager</title>
+    <title>URL Manager - Admin</title>
     <style>
         * {
             margin: 0;
@@ -58,50 +58,6 @@
         .tab-btn.active {
             background: #0066ff;
             color: white;
-        }
-
-        .auth-section {
-            margin-top: 15px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .auth-section label {
-            font-weight: 500;
-            color: #1a2332;
-        }
-
-        .auth-section input {
-            padding: 10px 15px;
-            border: 2px solid #dce0e6;
-            border-radius: 8px;
-            font-size: 14px;
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .auth-section input:focus {
-            outline: none;
-            border-color: #0066ff;
-        }
-
-        .auth-status {
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .auth-status.authenticated {
-            background: #e8f5e9;
-            color: #2e7d32;
-        }
-
-        .auth-status.unauthenticated {
-            background: #fbe9e7;
-            color: #c62828;
         }
 
         /* Tab content */
@@ -181,6 +137,15 @@
             background: #c82333;
         }
 
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
         /* URL list */
         .url-list {
             margin-top: 20px;
@@ -215,6 +180,8 @@
             font-weight: 600;
             color: #1a2332;
             font-size: 13px;
+            min-width: 50px;
+            text-align: center;
         }
 
         .url-text {
@@ -229,6 +196,14 @@
 
         .url-text a:hover {
             text-decoration: underline;
+        }
+
+        .url-id {
+            color: #5f6b7a;
+            font-size: 12px;
+            background: #f0f2f5;
+            padding: 2px 8px;
+            border-radius: 4px;
         }
 
         .url-actions {
@@ -340,6 +315,34 @@
             margin-bottom: 10px;
         }
 
+        .batch-input {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px dashed #e8ecf1;
+        }
+
+        .batch-input textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            border: 2px solid #dce0e6;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .batch-input textarea:focus {
+            outline: none;
+            border-color: #0066ff;
+        }
+
+        .batch-input .helper-text {
+            color: #5f6b7a;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
         @media (max-width: 600px) {
             .tabs {
                 flex-direction: column;
@@ -382,15 +385,6 @@
                     📋 View URLs
                 </button>
             </div>
-            
-            <!-- Authentication -->
-            <div class="auth-section">
-                <label for="secretCode">Secret Code:</label>
-                <input type="text" id="secretCode" placeholder="Enter your secret code..." 
-                       onchange="authenticate()" onkeyup="if(event.key==='Enter') authenticate()">
-                <button class="btn btn-primary" onclick="authenticate()">Authenticate</button>
-                <span id="authStatus" class="auth-status unauthenticated">Not authenticated</span>
-            </div>
         </div>
 
         <!-- Upload Tab -->
@@ -398,7 +392,7 @@
             <div class="upload-area">
                 <h2>📤 Upload New URL</h2>
                 <p style="color: #5f6b7a; margin-bottom: 15px;">
-                    Paste a URL below and click upload. It will be added to Sheet2 with automatic SL No and ID.
+                    Paste a URL below and click upload. It will be added to Sheet2 with automatic SL No.
                 </p>
                 
                 <div class="input-group">
@@ -410,6 +404,18 @@
                 </div>
                 
                 <div id="uploadMessage"></div>
+                
+                <div class="batch-input">
+                    <h3>📦 Bulk Upload</h3>
+                    <p style="color: #5f6b7a; margin-bottom: 10px;">
+                        Paste multiple URLs (one per line) for batch upload:
+                    </p>
+                    <textarea id="batchUrls" placeholder="https://example.com/1&#10;https://example.com/2&#10;https://example.com/3"></textarea>
+                    <div class="helper-text">💡 Each URL will be added with automatic SL No</div>
+                    <button class="btn btn-success" style="margin-top:10px;" onclick="bulkUpload()">
+                        Upload All URLs
+                    </button>
+                </div>
                 
                 <div class="stats">
                     <div class="stat-card">
@@ -434,27 +440,30 @@
             <div id="urlListContainer">
                 <div class="empty-state">
                     <div class="icon">📭</div>
-                    <p>Loading URLs... Please authenticate first.</p>
+                    <p>Loading URLs...</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Configuration
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZkxna_9c6QHMDREWikOuM7a2q0v6KxOkQhwazB6EmPUibS0DdyN6QjTvokAWlubm_/exec'; // Replace with your Apps Script URL
+        // ============================================
+        // CONFIGURATION - EDIT THIS
+        // ============================================
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZkxna_9c6QHMDREWikOuM7a2q0v6KxOkQhwazB6EmPUibS0DdyN6QjTvokAWlubm_/exec';
+        const ADMIN_SECRET = 'YOUR_ADMIN_SECRET_CODE'; // 👈 SET YOUR ADMIN SECRET CODE HERE
+        
+        // ============================================
+        // NO NEED TO CHANGE ANYTHING BELOW
+        // ============================================
         
         let isAuthenticated = false;
-        let secretCode = '';
+        let secretCode = ADMIN_SECRET;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            // Load saved secret if exists
-            const savedSecret = localStorage.getItem('secretCode');
-            if (savedSecret) {
-                document.getElementById('secretCode').value = savedSecret;
-                authenticate();
-            }
+            // Auto-authenticate with admin secret
+            authenticate();
         });
 
         // Switch tabs
@@ -472,34 +481,20 @@
             document.getElementById(tabName + 'Tab').classList.add('active');
             
             // Load URLs if viewing tab
-            if (tabName === 'view' && isAuthenticated) {
+            if (tabName === 'view') {
                 loadUrls();
             }
         }
 
         // Authenticate
         async function authenticate() {
-            const input = document.getElementById('secretCode');
-            secretCode = input.value.trim();
-            
-            if (!secretCode) {
-                showStatus('Please enter a secret code', 'error');
-                return;
-            }
-            
-            // Save to localStorage
-            localStorage.setItem('secretCode', secretCode);
-            
             try {
                 const response = await fetch(`${SCRIPT_URL}?secretcode=${secretCode}`);
                 const data = await response.json();
                 
                 if (data.success) {
                     isAuthenticated = true;
-                    showStatus(`Authenticated as ${data.userData.id}`, 'authenticated');
                     document.getElementById('totalUrls').textContent = data.totalItems || 0;
-                    
-                    // Enable upload button
                     document.getElementById('uploadBtn').disabled = false;
                     
                     // Load URLs if view tab is active
@@ -508,25 +503,13 @@
                     }
                 } else {
                     isAuthenticated = false;
-                    showStatus('Authentication failed: ' + (data.error || 'Invalid secret code'), 'unauthenticated');
+                    showMessage('Authentication failed: ' + (data.error || 'Invalid secret code'), 'error');
                     document.getElementById('uploadBtn').disabled = true;
                 }
             } catch (error) {
                 isAuthenticated = false;
-                showStatus('Error: ' + error.message, 'unauthenticated');
+                showMessage('Error: ' + error.message, 'error');
                 document.getElementById('uploadBtn').disabled = true;
-            }
-        }
-
-        // Show status
-        function showStatus(message, type) {
-            const statusEl = document.getElementById('authStatus');
-            statusEl.textContent = message;
-            statusEl.className = 'auth-status ' + type;
-            
-            // Also show in messages if it's an error
-            if (type === 'error' || type === 'unauthenticated') {
-                showMessage(message, 'error');
             }
         }
 
@@ -541,10 +524,10 @@
             }, 5000);
         }
 
-        // Upload URL
+        // Upload single URL
         async function uploadUrl() {
             if (!isAuthenticated) {
-                showMessage('Please authenticate first!', 'error');
+                showMessage('Authentication failed. Please check admin secret.', 'error');
                 return;
             }
             
@@ -596,6 +579,94 @@
             }
         }
 
+        // Bulk upload
+        async function bulkUpload() {
+            if (!isAuthenticated) {
+                showMessage('Authentication failed. Please check admin secret.', 'error');
+                return;
+            }
+            
+            const textarea = document.getElementById('batchUrls');
+            const urls = textarea.value.split('\n')
+                .map(u => u.trim())
+                .filter(u => u.length > 0);
+            
+            if (urls.length === 0) {
+                showMessage('Please enter at least one URL', 'error');
+                return;
+            }
+            
+            // Validate URLs
+            const validUrls = [];
+            const invalidUrls = [];
+            urls.forEach(url => {
+                try {
+                    new URL(url);
+                    validUrls.push(url);
+                } catch (e) {
+                    invalidUrls.push(url);
+                }
+            });
+            
+            if (invalidUrls.length > 0) {
+                showMessage(`⚠️ ${invalidUrls.length} invalid URLs found. Only valid URLs will be uploaded.`, 'info');
+            }
+            
+            if (validUrls.length === 0) {
+                showMessage('No valid URLs to upload', 'error');
+                return;
+            }
+            
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="loading-text"><span class="spinner"></span> Uploading ${validUrls.length} URLs...</span>`;
+            btn.disabled = true;
+            
+            let successCount = 0;
+            let failCount = 0;
+            let lastSlNo = 0;
+            
+            for (const url of validUrls) {
+                try {
+                    const response = await fetch(
+                        `${SCRIPT_URL}?secretcode=${secretCode}&action=uploadUrl&url=${encodeURIComponent(url)}`
+                    );
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        successCount++;
+                        lastSlNo = data.slNo;
+                    } else {
+                        failCount++;
+                    }
+                } catch (error) {
+                    failCount++;
+                }
+            }
+            
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            
+            showMessage(
+                `✅ Upload complete! ${successCount} uploaded successfully, ${failCount} failed.`,
+                successCount > 0 ? 'success' : 'error'
+            );
+            
+            // Update total count
+            const totalEl = document.getElementById('totalUrls');
+            totalEl.textContent = parseInt(totalEl.textContent) + successCount;
+            
+            if (lastSlNo) {
+                document.getElementById('lastUploaded').textContent = lastSlNo;
+            }
+            
+            textarea.value = '';
+            
+            if (document.getElementById('viewTab').classList.contains('active')) {
+                loadUrls();
+            }
+        }
+
         // Load all URLs
         async function loadUrls() {
             if (!isAuthenticated) {
@@ -603,7 +674,7 @@
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="icon">🔒</div>
-                        <p>Please authenticate first to view URLs.</p>
+                        <p>Authentication failed. Please check admin secret.</p>
                     </div>
                 `;
                 return;
@@ -634,7 +705,7 @@
                                             ${item.url}
                                         </a>
                                     </span>
-                                    ${item.id ? `<span style="color:#5f6b7a;font-size:12px;">ID: ${item.id}</span>` : ''}
+                                    ${item.id ? `<span class="url-id">ID: ${item.id}</span>` : ''}
                                 </div>
                                 <div class="url-actions">
                                     <button class="btn btn-sm btn-outline" onclick="copyUrl('${item.url}')">📋 Copy</button>
@@ -645,8 +716,9 @@
                     });
                     
                     html += '</div>';
-                    html += `<div style="margin-top:15px;color:#5f6b7a;font-size:14px;">
-                                Total: ${data.total} URLs
+                    html += `<div style="margin-top:15px;color:#5f6b7a;font-size:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                                <span>Total: <strong>${data.total}</strong> URLs</span>
+                                <span>Last SL No: <strong>${data.urls[data.urls.length - 1].slNo}</strong></span>
                             </div>`;
                     
                     container.innerHTML = html;
@@ -713,15 +785,6 @@
                 showMessage('✅ URL copied to clipboard!', 'success', 'uploadMessage');
             });
         }
-
-        // Auto-authenticate on page load if secret exists
-        window.addEventListener('load', function() {
-            const savedSecret = localStorage.getItem('secretCode');
-            if (savedSecret) {
-                document.getElementById('secretCode').value = savedSecret;
-                authenticate();
-            }
-        });
     </script>
 </body>
 </html>
