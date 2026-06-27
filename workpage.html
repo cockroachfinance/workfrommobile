@@ -28,8 +28,6 @@
             box-shadow: 0 16px 40px -8px rgba(0,0,0,0.08);
             transition: all 0.2s;
         }
-
-        /* header */
         .header {
             display: flex;
             justify-content: space-between;
@@ -79,8 +77,6 @@
         .refresh-btn:hover {
             background: #d1dbe8;
         }
-
-        /* stats — compact & one by one on mobile */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -117,8 +113,6 @@
         .stat-box.total .num { color: #1f509e; }
         .stat-box.viewed .num { color: #b45b0e; }
         .stat-box.balance .num { color: #0f7b3a; }
-
-        /* loading, error, messages */
         .loading {
             text-align: center;
             color: #36618b;
@@ -147,8 +141,6 @@
             font-size: 0.9rem;
             border-left: 4px solid #28a745;
         }
-
-        /* URL cards — stack nicely on mobile */
         .urls-container {
             margin-top: 1.5rem;
         }
@@ -208,7 +200,6 @@
             align-items: center;
             gap: 0.3rem;
         }
-        /* hide the actual URL text */
         .url-card .url-details .url-text {
             display: none;
         }
@@ -290,7 +281,6 @@
             background: #fff3cd;
             color: #856404;
         }
-
         .empty-state {
             text-align: center;
             padding: 2rem 0.5rem;
@@ -305,7 +295,6 @@
             color: #0b1e33;
             font-size: 1.1rem;
         }
-
         .filter-section {
             display: flex;
             gap: 0.4rem;
@@ -331,7 +320,6 @@
         .filter-btn:hover {
             border-color: #2a7de1;
         }
-
         .toast {
             position: fixed;
             bottom: 1.2rem;
@@ -358,8 +346,6 @@
         .toast.error { background: #b13e2e; }
         .toast .toast-title { font-weight: 600; margin-bottom: 0.1rem; }
         .toast .toast-detail { font-size: 0.8rem; opacity: 0.9; }
-
-        /* mobile first: boxes one by one */
         @media (max-width: 480px) {
             .container { padding: 1rem 0.8rem; }
             .stats-grid {
@@ -386,7 +372,7 @@
             .url-card .url-actions { width: 100%; justify-content: flex-end; }
         }
 
-        /* Popup overlay (starting popup) */
+        /* Popup overlay */
         .popup-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -410,7 +396,7 @@
         }
         .popup-box h2 {
             color: #0b1e33;
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             margin-bottom: 0.5rem;
         }
         .popup-box p {
@@ -420,7 +406,7 @@
             line-height: 1.5;
         }
         .popup-box .popup-icon {
-            font-size: 3.2rem;
+            font-size: 3rem;
             color: #2a7de1;
             margin-bottom: 0.3rem;
         }
@@ -442,7 +428,12 @@
         .popup-box .btn-ok:hover {
             background: #1a5bb5;
         }
-
+        .popup-box .btn-ok.danger {
+            background: #d32f2f;
+        }
+        .popup-box .btn-ok.danger:hover {
+            background: #b71c1c;
+        }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
@@ -485,13 +476,13 @@
 
 <div id="toast" class="toast"></div>
 
-<!-- Starting Popup (hidden by default) -->
-<div id="startingPopup" class="popup-overlay hidden">
+<!-- Popup overlay (hidden by default) -->
+<div id="popupOverlay" class="popup-overlay hidden">
     <div class="popup-box">
-        <div class="popup-icon"><i class="fas fa-play-circle"></i></div>
-        <h2>⏳ Watch & Earn</h2>
-        <p>You must watch the video for at least <strong>1 minute</strong> to earn the reward.<br>Click <strong>OK</strong> to start.</p>
-        <button class="btn-ok" id="popupOkBtn">OK, got it!</button>
+        <div class="popup-icon" id="popupIcon"><i class="fas fa-info-circle"></i></div>
+        <h2 id="popupTitle">Notice</h2>
+        <p id="popupMessage">Message</p>
+        <button class="btn-ok" id="popupOkBtn">OK</button>
     </div>
 </div>
 
@@ -510,7 +501,11 @@
         const balanceEl = document.getElementById('balanceUrls');
         const urlCount = document.getElementById('urlCount');
         const toast = document.getElementById('toast');
-        const popupOverlay = document.getElementById('startingPopup');
+        const popupOverlay = document.getElementById('popupOverlay');
+        const popupTitle = document.getElementById('popupTitle');
+        const popupMessage = document.getElementById('popupMessage');
+        const popupIcon = document.getElementById('popupIcon');
+        const popupOkBtn = document.getElementById('popupOkBtn');
 
         let allItems = [];
         let toastTimeout = null;
@@ -522,6 +517,7 @@
         const visitStartTimes = new Map();
         const visitIntervals = new Map();
         const MIN_TIME_SECONDS = 60;
+        let isPopupActive = false;
 
         function showToast(message, type = 'success', detail = '') {
             if (toastTimeout) clearTimeout(toastTimeout);
@@ -533,39 +529,72 @@
             toastTimeout = setTimeout(() => toast.classList.remove('show'), 4200);
         }
 
-        // ---- auth check: if no secret => popup + redirect ----
-        function checkAuthAndShowPopup() {
+        function showPopup(title, message, icon = 'fa-info-circle', btnText = 'OK', isDanger = false) {
+            return new Promise((resolve) => {
+                popupTitle.textContent = title;
+                popupMessage.textContent = message;
+                popupIcon.innerHTML = `<i class="fas ${icon}"></i>`;
+                popupOkBtn.textContent = btnText;
+                if (isDanger) {
+                    popupOkBtn.classList.add('danger');
+                } else {
+                    popupOkBtn.classList.remove('danger');
+                }
+                popupOverlay.classList.remove('hidden');
+                isPopupActive = true;
+                const handler = function() {
+                    popupOverlay.classList.add('hidden');
+                    isPopupActive = false;
+                    popupOkBtn.removeEventListener('click', handler);
+                    resolve();
+                };
+                popupOkBtn.addEventListener('click', handler);
+            });
+        }
+
+        // ---- auth check and validate secret with sheet ----
+        async function checkSecretAndValidate() {
             const params = new URLSearchParams(window.location.search);
             secret = params.get('secretcode');
             if (!secret) {
-                // show popup with redirect
-                alert('No secret code found. Please provide a valid secret.');
+                await showPopup('Access Denied', 'No secret code found. Please provide a valid secret.', 'fa-times-circle', 'OK', true);
                 window.location.href = 'https://workfrommobile.pages.dev/';
                 return false;
             }
-            // secret exists: show starting popup
-            showStartingPopup();
-            return true;
-        }
 
-        function showStartingPopup() {
-            if (popupOverlay) {
-                popupOverlay.classList.remove('hidden');
-                document.getElementById('popupOkBtn').addEventListener('click', function() {
-                    popupOverlay.classList.add('hidden');
-                    // after OK, load data
-                    validateAndLoad();
-                }, { once: true });
-            }
-        }
+            // Validate secret with sheet
+            try {
+                loadingEl.classList.remove('hidden');
+                const response = await fetch(`${WEB_APP_URL}?secretcode=${encodeURIComponent(secret)}&checkonly=true`);
+                const data = await response.json();
+                loadingEl.classList.add('hidden');
 
-        async function validateAndLoad() {
-            if (!secret) {
-                // fallback: if secret somehow empty, redirect
+                if (data.success) {
+                    // Secret exists — show the "watch 1 minute" popup
+                    await showPopup(
+                        '⏳ Watch & Earn',
+                        'You should watch the video for minimum 1 minute to earn the reward.',
+                        'fa-play-circle',
+                        'OK, got it!'
+                    );
+                    // Now load the actual data
+                    await loadData();
+                    return true;
+                } else {
+                    // Secret not found
+                    await showPopup('User Not Found', 'Invalid secret code. Please check and try again.', 'fa-user-slash', 'OK', true);
+                    window.location.href = 'https://workfrommobile.pages.dev/';
+                    return false;
+                }
+            } catch (err) {
+                loadingEl.classList.add('hidden');
+                await showPopup('Network Error', 'Could not verify secret. Please check your connection.', 'fa-wifi', 'OK', true);
                 window.location.href = 'https://workfrommobile.pages.dev/';
-                return;
+                return false;
             }
+        }
 
+        async function loadData() {
             try {
                 loadingEl.classList.remove('hidden');
                 statsContainer.classList.add('hidden');
@@ -602,13 +631,11 @@
                         urlsContainer.classList.remove('hidden');
                     }
                 } else {
-                    showError('Invalid secret. Redirecting...');
-                    setTimeout(() => { window.location.href = 'https://workfrommobile.pages.dev/'; }, 2000);
+                    showError('Failed to load data. Please refresh.');
                 }
             } catch (err) {
                 loadingEl.classList.add('hidden');
                 showError('Network error: ' + (err.message || ''));
-                setTimeout(() => { window.location.href = 'https://workfrommobile.pages.dev/'; }, 2500);
             }
         }
 
@@ -703,7 +730,6 @@
             }, 1000);
             visitIntervals.set(slNo, intervalId);
 
-            // fallback
             setTimeout(() => {
                 if (pendingVerification.has(slNo) && checkTimeSpent(slNo)) {
                     clearInterval(visitIntervals.get(slNo));
@@ -751,7 +777,6 @@
             }
         }
 
-        // ---- cancel if user leaves before time ----
         window.handleUrlClick = async function(slNo, id, url) {
             slNo = Number(slNo);
             if (viewedSlNos.has(slNo)) {
@@ -762,6 +787,14 @@
                 showToast('Already verifying!', 'error');
                 return;
             }
+
+            // Show reminder popup before opening
+            await showPopup(
+                '⏳ Minimum 1 Minute Required',
+                'You must watch the video for at least 1 minute to earn the reward.',
+                'fa-clock',
+                'OK, start now!'
+            );
 
             const card = document.querySelector(`.url-card[data-slno="${slNo}"]`);
             const btn = card?.querySelector('.visit-btn');
@@ -788,7 +821,6 @@
             renderUrls(allItems);
             showToast(`⏳ Spend at least ${MIN_TIME_SECONDS}s on page`, 'success', 'Timer started');
 
-            // cancel if user closes tab before time
             const cancelHandler = () => {
                 if (pendingVerification.has(slNo) && !checkTimeSpent(slNo)) {
                     clearInterval(visitIntervals.get(slNo));
@@ -811,7 +843,7 @@
         };
 
         window.refreshData = function() {
-            validateAndLoad();
+            loadData();
             showToast('Refreshing...', 'success');
         };
 
@@ -835,10 +867,9 @@
             }
         });
 
-        // entry point: check auth and show starting popup if secret exists
-        if (checkAuthAndShowPopup()) {
-            // popup will trigger validateAndLoad on OK
-        }
+        // ---- ENTRY: check secret with sheet, show popups accordingly ----
+        checkSecretAndValidate();
+
     })();
 </script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
