@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Work·track</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+        body { background: #f4f7fc; min-height: 100vh; padding: 1rem; display: flex; align-items: flex-start; justify-content: center; }
+        .container { max-width: 600px; width: 100%; background: white; border-radius: 1.8rem; padding: 1.5rem 1.2rem; box-shadow: 0 16px 40px -8px rgba(0,0,0,0.08); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid #eef3f9; flex-wrap: wrap; gap: 0.5rem; }
+        .header h1 { font-size: 1.3rem; color: #0b1e33; font-weight: 600; display: flex; align-items: center; gap: 0.4rem; }
+        .header h1 i { color: #2a7de1; font-size: 1.2rem; }
+        .header-actions { display: flex; gap: 0.5rem; align-items: center; }
+        .refresh-btn, .logout-btn { border: none; padding: 0.4rem 1rem; border-radius: 40px; font-weight: 600; font-size: 0.75rem; cursor: pointer; transition: 0.15s; background: #e9edf4; color: #1e3b5c; }
+        .logout-btn { background: #fee9e7; color: #b13e2e; }
+        .logout-btn:hover { background: #fdd5d0; transform: scale(0.96); }
+        .refresh-btn:hover { background: #d1dbe8; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; margin: 1rem 0 1.5rem; }
+        .stat-box { background: #f8faff; padding: 0.9rem 0.3rem; border-radius: 1.2rem; text-align: center; border: 1px solid #eef3f9; }
+        .stat-box .icon { font-size: 1.2rem; color: #2a7de1; margin-bottom: 0.1rem; }
+        .stat-box .num { font-size: 1.8rem; font-weight: 700; color: #0b2b4a; line-height: 1.2; }
+        .stat-box .label { font-size: 0.6rem; font-weight: 500; color: #4a617c; text-transform: uppercase; letter-spacing: 0.3px; }
+        .stat-box.pending .num { color: #b45b0e; }
+        .stat-box.today-views .num { color: #1f509e; }
+        .stat-box.earning .num { color: #0f7b3a; }
+        .loading { text-align: center; color: #36618b; padding: 1.5rem 0; font-size: 0.95rem; }
+        .hidden { display: none !important; }
+        .error { background: #fee9e7; color: #b13e2e; padding: 0.8rem; border-radius: 1rem; margin: 0.5rem 0; text-align: center; font-size: 0.9rem; }
+        .success-msg { background: #d4edda; color: #155724; padding: 0.8rem; border-radius: 1rem; margin: 0.5rem 0; text-align: center; font-size: 0.9rem; border-left: 4px solid #28a745; }
+        .urls-container { margin-top: 1.5rem; }
+        .url-card { background: #f8faff; border: 1px solid #eef3f9; border-radius: 1.2rem; padding: 1rem 1rem; margin-bottom: 0.8rem; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 0.7rem; transition: 0.2s; flex-wrap: wrap; }
+        .url-card.blocked { background: #f5f5f5; opacity: 0.8; border-color: #e0e0e0; }
+        .url-card.blocked .url-text { color: #888; }
+        .url-card .url-info { display: flex; align-items: center; gap: 0.7rem; flex: 1 1 auto; min-width: 120px; }
+        .url-card .sl-no { background: #2a7de1; color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
+        .url-card .url-details { flex: 1; min-width: 80px; }
+        .url-card .url-details .id-label { font-size: 0.65rem; color: #6c757d; text-transform: uppercase; letter-spacing: 0.3px; display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; }
+        .url-card .url-actions { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
+        .url-card .visit-btn { background: #2a7de1; color: white; border: none; padding: 0.5rem 1.2rem; border-radius: 40px; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: 0.15s; display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap; }
+        .url-card .visit-btn:active { transform: scale(0.94); }
+        .url-card .visit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .url-card .visit-btn.visited { background: #28a745; }
+        .url-card.blocked .visit-btn { background: #d1d1d1; color: #666; cursor: not-allowed; }
+        .time-spent { font-size: 0.65rem; color: #2c5a7a; background: #e9edf4; padding: 0.2rem 0.6rem; border-radius: 30px; display: inline-block; margin-top: 0.2rem; }
+        .viewed-badge, .pending-badge { display: inline-block; padding: 0.1rem 0.6rem; border-radius: 40px; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.2px; }
+        .viewed-badge { background: #d4edda; color: #155724; }
+        .pending-badge { background: #fff3cd; color: #856404; }
+        .empty-state { text-align: center; padding: 2rem 0.5rem; color: #6c757d; }
+        .filter-section { display: flex; gap: 0.4rem; margin: 0.8rem 0 1rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.3rem 1rem; border: 2px solid #e9edf4; border-radius: 40px; background: white; color: #4a617c; font-weight: 500; font-size: 0.7rem; cursor: pointer; transition: 0.15s; }
+        .filter-btn.active { border-color: #2a7de1; background: #2a7de1; color: white; }
+        .toast { position: fixed; bottom: 1.2rem; left: 1.2rem; right: 1.2rem; max-width: 380px; margin: 0 auto; background: #0b1e33; color: white; padding: 0.9rem 1.2rem; border-radius: 1.2rem; box-shadow: 0 8px 24px rgba(0,0,0,0.15); transform: translateY(80px); opacity: 0; transition: 0.25s ease; z-index: 999; font-size: 0.9rem; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: #1e7e34; }
+        .toast.error { background: #b13e2e; }
+        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; animation: fadeIn 0.25s ease; }
+        .popup-box { background: white; max-width: 400px; width: 90%; padding: 2rem 1.5rem; border-radius: 2rem; box-shadow: 0 24px 48px rgba(0,0,0,0.2); text-align: center; animation: slideUp 0.3s ease; }
+        .popup-box h2 { color: #0b1e33; font-size: 1.4rem; margin-bottom: 0.5rem; }
+        .popup-box p { color: #2c4a6a; font-size: 1rem; margin: 0.8rem 0 1.8rem; line-height: 1.5; }
+        .popup-box .popup-icon { font-size: 3rem; color: #2a7de1; margin-bottom: 0.3rem; }
+        .popup-box .btn-ok { background: #2a7de1; color: white; border: none; padding: 0.8rem 2.8rem; border-radius: 40px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.15s; box-shadow: 0 6px 14px rgba(42,125,225,0.25); }
+        .popup-box .btn-ok:active { transform: scale(0.94); }
+        .popup-box .btn-ok.danger { background: #d32f2f; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @media (max-width: 480px) {
+            .container { padding: 1rem 0.8rem; }
+            .stats-grid { grid-template-columns: 1fr; gap: 0.5rem; }
+            .stat-box { display: flex; align-items: center; justify-content: space-between; padding: 0.7rem 1rem; border-radius: 1.2rem; }
+            .stat-box .icon { font-size: 1.2rem; margin: 0; }
+            .stat-box .num { font-size: 1.6rem; }
+            .stat-box .label { font-size: 0.6rem; }
+            .stat-box > div { display: flex; align-items: center; gap: 0.5rem; }
+            .url-card { padding: 0.9rem; flex-direction: row; flex-wrap: wrap; }
+            .header h1 { font-size: 1.1rem; }
+            .url-card .url-actions { width: 100%; justify-content: flex-end; }
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <div class="header">
+        <h1><i class="fas fa-shield-alt"></i> Work·track</h1>
+        <div class="header-actions">
+            <button class="refresh-btn" onclick="refreshData()"><i class="fas fa-sync"></i></button>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+
+    <div id="loading" class="loading"><i class="fas fa-spinner fa-pulse"></i> Loading...</div>
+    <div id="statsContainer" class="hidden">
+        <div class="stats-grid">
+            <div class="stat-box pending"><div><span class="num" id="pendingCount">0</span></div><span class="label">Unwatched Videos</span></div>
+            <div class="stat-box today-views"><div><span class="num" id="todayViews">0</span></div><span class="label">Today Views</span></div>
+            <div class="stat-box earning"><div><span class="num" id="todayEarning">0</span></div><span class="label">Today Earning</span></div>
+        </div>
+    </div>
+
+    <div id="error" class="error hidden"></div>
+    <div id="successMsg" class="success-msg hidden"></div>
+
+    <div id="urlsContainer" class="hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem; flex-wrap: wrap;">
+            <h2 style="font-size: 1rem; color: #0b1e33;"><i class="fas fa-video"></i> Videos</h2>
+            <span style="font-size: 0.75rem; color: #6c757d;" id="urlCount">0</span>
+        </div>
+        <div class="filter-section">
+            <button class="filter-btn" data-filter="all" onclick="filterUrls('all')">All</button>
+            <button class="filter-btn active" data-filter="available" onclick="filterUrls('available')">Available</button>
+            <button class="filter-btn" data-filter="viewed" onclick="filterUrls('viewed')">Watched</button>
+        </div>
+        <div id="urlsList"></div>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+<div id="popupOverlay" class="popup-overlay hidden">
+    <div class="popup-box">
+        <div class="popup-icon" id="popupIcon"><i class="fas fa-info-circle"></i></div>
+        <h2 id="popupTitle">Notice</h2>
+        <p id="popupMessage">Message</p>
+        <button class="btn-ok" id="popupOkBtn">OK</button>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // IMPORTANT: Use the SAME script URL for both pages
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzoHGVIEEmpOf2S8arfC7EaY-DLHo4IwebJHA-2OstNfD6ulQf0aj4DeHecN-B4xRmq/exec';
+
+        const loadingEl = document.getElementById('loading');
+        const statsContainer = document.getElementById('statsContainer');
+        const urlsContainer = document.getElementById('urlsContainer');
+        const urlsList = document.getElementById('urlsList');
+        const errorEl = document.getElementById('error');
+        const successMsg = document.getElementById('successMsg');
+        const pendingEl = document.getElementById('pendingCount');
+        const todayViewsEl = document.getElementById('todayViews');
+        const todayEarningEl = document.getElementById('todayEarning');
+        const urlCount = document.getElementById('urlCount');
+        const toast = document.getElementById('toast');
+        const popupOverlay = document.getElementById('popupOverlay');
+        const popupTitle = document.getElementById('popupTitle');
+        const popupMessage = document.getElementById('popupMessage');
+        const popupIcon = document.getElementById('popupIcon');
+        const popupOkBtn = document.getElementById('popupOkBtn');
+
+        let allItems = [];
+        let toastTimeout = null;
+        let currentFilter = 'available';
+        let secret = '';
+        let viewedSlNos = new Set();
+        let pendingVerification = new Set();
+        const visitStartTimes = new Map();
+        const visitIntervals = new Map();
+        const MIN_TIME_SECONDS = 60;
+        let isPopupActive = false;
+
+        function showToast(message, type = 'success', detail = '') {
+            if (toastTimeout) clearTimeout(toastTimeout);
+            let html = `<div class="toast-title">${message}</div>`;
+            if (detail) html += `<div class="toast-detail">${detail}</div>`;
+            toast.innerHTML = html;
+            toast.className = `toast ${type}`;
+            setTimeout(() => toast.classList.add('show'), 80);
+            toastTimeout = setTimeout(() => toast.classList.remove('show'), 4200);
+        }
+
+        function showPopup(title, message, icon = 'fa-info-circle', btnText = 'OK', isDanger = false) {
+            return new Promise((resolve) => {
+                popupTitle.textContent = title;
+                popupMessage.textContent = message;
+                popupIcon.innerHTML = `<i class="fas ${icon}"></i>`;
+                popupOkBtn.textContent = btnText;
+                if (isDanger) {
+                    popupOkBtn.classList.add('danger');
+                } else {
+                    popupOkBtn.classList.remove('danger');
+                }
+                popupOverlay.classList.remove('hidden');
+                isPopupActive = true;
+                const handler = function() {
+                    popupOverlay.classList.add('hidden');
+                    isPopupActive = false;
+                    popupOkBtn.removeEventListener('click', handler);
+                    resolve();
+                };
+                popupOkBtn.addEventListener('click', handler);
+            });
+        }
+
+        async function checkSecretAndValidate() {
+            const params = new URLSearchParams(window.location.search);
+            secret = params.get('secretcode');
+            if (!secret) {
+                await showPopup('Access Denied', 'No secret code found. Please provide a valid secret.', 'fa-times-circle', 'OK', true);
+                window.location.href = 'https://workfrommobile.pages.dev/';
+                return false;
+            }
+
+            try {
+                loadingEl.classList.remove('hidden');
+                const response = await fetch(`${WEB_APP_URL}?secretcode=${encodeURIComponent(secret)}&checkonly=true`);
+                const data = await response.json();
+                loadingEl.classList.add('hidden');
+
+                if (data.success) {
+                    await showPopup('⏳ Watch & Earn', 'Please watch the video for a minimum of 1 minute to earn the reward.', 'fa-play-circle', 'OK, got it!');
+                    await loadData();
+                    return true;
+                } else {
+                    await showPopup('User Not Found', 'Invalid secret code. Please check and try again.', 'fa-user-slash', 'OK', true);
+                    window.location.href = 'https://workfrommobile.pages.dev/';
+                    return false;
+                }
+            } catch (err) {
+                loadingEl.classList.add('hidden');
+                await showPopup('Network Error', 'Could not verify secret. Please check your connection.', 'fa-wifi', 'OK', true);
+                window.location.href = 'https://workfrommobile.pages.dev/';
+                return false;
+            }
+        }
+
+        function updateStats() {
+            const total = allItems.length;
+            const viewed = viewedSlNos.size;
+            const pending = total - viewed;
+            pendingEl.textContent = pending;
+            todayViewsEl.textContent = viewed;
+            const earning = (viewed * 0.70).toFixed(2);
+            todayEarningEl.textContent = `₹${earning}`;
+        }
+
+        async function loadData() {
+            try {
+                loadingEl.classList.remove('hidden');
+                statsContainer.classList.add('hidden');
+                urlsContainer.classList.add('hidden');
+                errorEl.classList.add('hidden');
+
+                const response = await fetch(`${WEB_APP_URL
